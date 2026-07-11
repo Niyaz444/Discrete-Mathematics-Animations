@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build the Table · Worked Exam Problem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+    --given:#EAE7DA;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);font-family:'IBM Plex Sans',sans-serif;color:var(--ink);padding:32px 16px 70px;}
+  .wrap{max-width:1000px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(22px,4.3vw,32px);margin:0 0 6px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14.5px;margin:0 auto 22px;max-width:640px;line-height:1.6;}
+
+  .formula-banner{
+    text-align:center; background:var(--ink); color:#F4F2EA; border-radius:14px;
+    padding:18px 20px; margin-bottom:22px; font-family:'IBM Plex Mono',monospace;
+    font-size:clamp(16px,3.2vw,22px); letter-spacing:.02em;
+    box-shadow:0 12px 28px -16px rgba(28,43,51,.6);
+  }
+  .formula-banner .tag{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:8px;font-family:'IBM Plex Mono',monospace;}
+
+  .howto{
+    background:#fff;border:1px dashed var(--line);border-radius:12px;
+    padding:14px 18px;margin-bottom:22px;font-size:13.5px;line-height:1.65;color:var(--ink-soft);
+    box-shadow:0 6px 16px -12px rgba(28,43,51,.35);
+  }
+  .howto strong{color:var(--ink);}
+
+  .steps{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px; margin-bottom:24px;
+  }
+  .step-chip{
+    background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px 10px;
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); text-align:center;
+    box-shadow:0 4px 10px -8px rgba(28,43,51,.4);
+  }
+  .step-chip b{display:block; color:var(--ink); font-size:13px; margin-bottom:2px;}
+
+  .toolbar{
+    position:sticky; top:10px; z-index:20;
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+    background:var(--ink); color:#F4F2EA; border-radius:14px; padding:12px 18px; margin-bottom:22px;
+    box-shadow:0 12px 28px -16px rgba(28,43,51,.6);
+    font-family:'IBM Plex Mono',monospace; font-size:13px;
+  }
+  .toolbar .score span{color:var(--gold);font-weight:700;font-size:16px;}
+  .toolbar .btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .tbtn{
+    background:transparent;border:1.5px solid #F4F2EA;color:#F4F2EA;border-radius:20px;
+    padding:6px 13px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.03em;
+    text-transform:uppercase;cursor:pointer;transition:.15s ease;
+  }
+  .tbtn:hover{background:#F4F2EA;color:var(--ink);}
+  .tbtn.primary{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .tbtn.primary:hover{background:#256150;}
+
+  /* ---------- Table with real gaps between columns ---------- */
+  .table-scroll{
+    overflow-x:auto; border-radius:14px; box-shadow:0 14px 34px -18px rgba(28,43,51,.45);
+    background:#E3E0D2; border:1px solid rgba(28,43,51,.08); padding:14px 10px; margin-bottom:22px;
+  }
+  table{
+    border-collapse:separate;
+    border-spacing:10px 8px;   /* <-- real horizontal + vertical gap between every column/row */
+    width:100%; min-width:920px;
+  }
+  thead th{
+    background:var(--card); padding:10px 8px 12px; text-align:center; vertical-align:bottom;
+    border-radius:8px 8px 0 0; border-bottom:2px solid var(--ink);
+  }
+  thead th.given{background:#DEDACB;}
+  thead th .step-num{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--gold);text-transform:uppercase;letter-spacing:.05em;display:block;}
+  thead th .sym{font-family:'IBM Plex Mono',monospace;font-size:13.5px;font-weight:700;color:var(--ink);display:block;white-space:nowrap;}
+  thead th.given .sym{color:var(--ink); font-size:17px;}
+  thead th.final{background:#E4F1EC;}
+  thead th.final .sym{color:var(--teal);}
+
+  tbody td{
+    text-align:center; padding:10px 8px; background:var(--card); border-radius:8px;
+  }
+  tbody tr:nth-child(even) td{background:#FAF9F4;}
+  tbody tr:nth-child(even) td.given{background:#E3DFCF;}
+  td.given{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:15px; background:var(--given); color:var(--ink);}
+  td.final-col{background:#EFF8F4;}
+  tbody tr:nth-child(even) td.final-col{background:#E4F1EC;}
+
+  .cell-wrap{position:relative; display:inline-block;}
+  .toggle{
+    position:relative; width:52px; height:26px; border-radius:20px; cursor:pointer;
+    background:#E4E0D2; border:1.5px solid var(--line); display:inline-flex; align-items:center;
+    font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; user-select:none;
+    transition:background .2s ease, border-color .2s ease;
+  }
+  .toggle .lab{position:absolute; width:50%; text-align:center; transition:opacity .2s ease, color .2s ease;}
+  .toggle .lab.f{left:0; color:var(--brick);}
+  .toggle .lab.t{right:0; color:var(--teal); opacity:.35;}
+  .toggle.on .lab.t{opacity:1;}
+  .toggle.on .lab.f{opacity:.35;}
+  .toggle .knob{
+    position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%;
+    background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.35); transition:left .2s ease;
+  }
+  .toggle.on{background:#DCEFE9; border-color:var(--teal);}
+  .toggle.on .knob{left:28px;}
+  .toggle:not(.on){background:#F6E4E0; border-color:var(--brick);}
+  .cell-wrap.ok .toggle{box-shadow:0 0 0 3px rgba(47,122,102,.35);}
+  .cell-wrap.bad .toggle{box-shadow:0 0 0 3px rgba(181,73,61,.35);}
+  .mark{
+    position:absolute; top:-9px; right:-9px; width:17px; height:17px; border-radius:50%;
+    font-size:10px; line-height:17px; text-align:center; font-weight:700; color:#fff;
+    opacity:0; transform:scale(.5); transition:all .25s cubic-bezier(.2,1.6,.4,1);
+  }
+  .cell-wrap.ok .mark{opacity:1; transform:scale(1); background:var(--teal);}
+  .cell-wrap.bad .mark{opacity:1; transform:scale(1); background:var(--brick);}
+
+  .verdict-box{
+    background:var(--card); border-radius:14px; padding:18px 20px; margin-bottom:20px;
+    border:1.5px solid rgba(28,43,51,.08); box-shadow:0 8px 20px -14px rgba(28,43,51,.4);
+    transition:border-color .25s ease, background .25s ease;
+  }
+  .verdict-box.correct{border-color:var(--teal); background:#F3FAF7;}
+  .verdict-box.incorrect{border-color:var(--brick); background:#FCF3F2;}
+  .classify-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .control-label{font-family:'IBM Plex Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);}
+  .seg{display:inline-flex;border:1.5px solid var(--line);border-radius:20px;overflow:hidden;background:#F6F4EC;}
+  .seg button{
+    border:none;background:transparent;padding:8px 15px;font-family:'IBM Plex Sans',sans-serif;
+    font-size:13px;font-weight:600;cursor:pointer;color:var(--ink-soft);transition:.15s ease;
+  }
+  .seg button.sel.taut-sel{background:var(--teal);color:#fff;}
+  .seg button.sel.contra-sel{background:var(--brick);color:#fff;}
+  .seg button.sel.conting-sel{background:var(--gold);color:#fff;}
+  .result-icon{width:22px;height:22px;border-radius:50%;font-size:13px;line-height:22px;text-align:center;font-weight:700;color:#fff;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .result-icon.show{opacity:1;transform:scale(1);}
+  .result-icon.ok{background:var(--teal);}
+  .result-icon.bad{background:var(--brick);}
+
+  .explain{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .explain.show{max-height:260px;opacity:1;margin-top:14px;}
+  .explain-inner{border-top:1px dashed var(--line);padding-top:12px;font-size:13.5px;line-height:1.65;color:var(--ink-soft);}
+  .explain-inner strong{color:var(--ink);}
+  .mono{font-family:'IBM Plex Mono',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:36px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Build the Table Yourself</h1>
+  <p class="sub">Topic 3 — Tautologies, Logic · a worked exam problem, one column at a time (Pause → Review → Proceed)</p>
+
+  <div class="formula-banner">
+    <span class="tag">Check whether this compound proposition is a Tautology, Contradiction, or Contingency</span>
+    (p ∨ q) → (q ∧ r) &nbsp;↔&nbsp; (p ∧ ¬r)
+  </div>
+
+  <div class="howto">
+    <strong>How this works:</strong> this is exactly the exam question above — but instead of reading a finished table, you're going to build it. Six columns, left to right, each one a small step. Fill in a column, move to the next — that's <strong>Pause, Review, Proceed</strong>. The last column is the actual answer to the biconditional; the classification switch below the table is the final verdict.
+  </div>
+
+  <div class="steps">
+    <div class="step-chip"><b>Step 1</b>p ∨ q</div>
+    <div class="step-chip"><b>Step 2</b>q ∧ r</div>
+    <div class="step-chip"><b>Step 3</b>(p∨q) → (q∧r)</div>
+    <div class="step-chip"><b>Step 4</b>¬r</div>
+    <div class="step-chip"><b>Step 5</b>p ∧ ¬r</div>
+    <div class="step-chip"><b>Step 6</b>Combine 3 &amp; 5 with ↔</div>
+  </div>
+
+  <div class="toolbar">
+    <div class="score">Score: <span id="scoreDisplay">0 / 0</span> correct</div>
+    <div class="btns">
+      <button class="tbtn primary" onclick="checkAll()">Check My Answers</button>
+      <button class="tbtn" onclick="revealAll()">Reveal Answers</button>
+      <button class="tbtn" onclick="resetAll()">Reset All</button>
+    </div>
+  </div>
+
+  <div class="table-scroll">
+    <table id="ttable">
+      <thead><tr id="headRow"></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="verdict-box" id="verdictBox">
+    <div class="classify-row">
+      <span class="control-label">Final verdict — is the whole formula a:</span>
+      <div class="seg" data-role="classify">
+        <button data-val="Tautology" type="button">Tautology</button>
+        <button data-val="Contradiction" type="button">Contradiction</button>
+        <button data-val="Contingency" type="button">Contingency</button>
+      </div>
+      <span class="result-icon" data-icon="classify"></span>
+    </div>
+    <div class="explain" id="finalExplain">
+      <div class="explain-inner">
+        <strong>Why:</strong> Look at the final (Step 6) column once it's fully correct. If every row reads True, it's a <strong>Tautology</strong>. If every row reads False, it's a <strong>Contradiction</strong>. If it's a mix of True and False, it's a <strong>Contingency</strong> — which is exactly what happens here: the Step 6 column reads F, F, T, F, F, T, F, F. Since it contains both T and F, the compound proposition is a <strong>Contingency</strong>.
+      </div>
+    </div>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Topic 3 — Build the Table Yourself</footer>
+</div>
+
+<script>
+const rows = [];
+[true,false].forEach(p=>{ [true,false].forEach(q=>{ [true,false].forEach(r=>{ rows.push({p,q,r}); }); }); });
+
+const columns = [
+  {key:'c1', sym:'p ∨ q', step:'Step 1', fn:(p,q,r)=> p||q},
+  {key:'c2', sym:'q ∧ r', step:'Step 2', fn:(p,q,r)=> q&&r},
+  {key:'c3', sym:'(p∨q)→(q∧r)', step:'Step 3', fn:(p,q,r)=> (!(p||q)) || (q&&r)},
+  {key:'c4', sym:'¬r', step:'Step 4', fn:(p,q,r)=> !r},
+  {key:'c5', sym:'p ∧ ¬r', step:'Step 5', fn:(p,q,r)=> p && !r},
+  {key:'c6', sym:'Step 3 ↔ Step 5', step:'Step 6 · Final', fn:(p,q,r)=> ((!(p||q))||(q&&r)) === (p && !r), final:true}
+];
+
+const CORRECT_CLASS = 'Contingency';
+let TOTAL = 0;
+
+// ---------- Header ----------
+const headRow = document.getElementById('headRow');
+['p','q','r'].forEach(v=>{
+  const th = document.createElement('th');
+  th.className = 'given';
+  th.innerHTML = `<span class="sym">${v}</span>`;
+  headRow.appendChild(th);
+});
+columns.forEach(c=>{
+  const th = document.createElement('th');
+  th.className = c.final ? 'final' : '';
+  th.innerHTML = `<span class="step-num">${c.step}</span><span class="sym">${c.sym}</span>`;
+  headRow.appendChild(th);
+});
+
+// ---------- Body ----------
+const tbody = document.getElementById('tbody');
+rows.forEach((rw, ri)=>{
+  const tr = document.createElement('tr');
+  [rw.p, rw.q, rw.r].forEach(val=>{
+    const td = document.createElement('td');
+    td.className = 'given';
+    td.textContent = val ? 'T':'F';
+    tr.appendChild(td);
+  });
+  columns.forEach(c=>{
+    const td = document.createElement('td');
+    if(c.final) td.className = 'final-col';
+    const correct = c.fn(rw.p, rw.q, rw.r);
+    const wrap = document.createElement('div');
+    wrap.className = 'cell-wrap';
+    wrap.dataset.correct = correct ? '1':'0';
+    wrap.dataset.value = '0';
+    wrap.innerHTML = `
+      <div class="toggle" role="button" aria-label="${c.sym} row ${ri+1}">
+        <span class="lab f">F</span><span class="lab t">T</span><span class="knob"></span>
+      </div>
+      <span class="mark"></span>`;
+    wrap.querySelector('.toggle').addEventListener('click', ()=>{
+      const on = wrap.dataset.value === '1';
+      wrap.dataset.value = on ? '0' : '1';
+      wrap.querySelector('.toggle').classList.toggle('on', !on);
+      wrap.classList.remove('ok','bad');
+      wrap.querySelector('.mark').textContent = '';
+      updateScoreLive();
+    });
+    td.appendChild(wrap);
+    tr.appendChild(td);
+  });
+  tbody.appendChild(tr);
+});
+
+TOTAL = rows.length * columns.length + 1; // +1 for final classification
+
+// ---------- Classification control ----------
+const verdictBox = document.getElementById('verdictBox');
+const seg = verdictBox.querySelector('[data-role="classify"]');
+seg.querySelectorAll('button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','taut-sel','contra-sel','conting-sel'));
+    btn.classList.add('sel');
+    if(btn.dataset.val==='Tautology') btn.classList.add('taut-sel');
+    if(btn.dataset.val==='Contradiction') btn.classList.add('contra-sel');
+    if(btn.dataset.val==='Contingency') btn.classList.add('conting-sel');
+    seg.dataset.value = btn.dataset.val;
+    verdictBox.classList.remove('correct','incorrect');
+    verdictBox.querySelector('[data-icon="classify"]').classList.remove('show','ok','bad');
+    verdictBox.querySelector('[data-icon="classify"]').textContent = '';
+    document.getElementById('finalExplain').classList.remove('show');
+    updateScoreLive();
+  });
+});
+
+document.getElementById('scoreDisplay').textContent = '0 / ' + TOTAL;
+
+// ---------- Scoring ----------
+function allWraps(){ return document.querySelectorAll('.cell-wrap'); }
+
+function updateScoreLive(){
+  let correct = 0;
+  allWraps().forEach(w=>{ if(w.dataset.value === w.dataset.correct) correct++; });
+  if(seg.dataset.value === CORRECT_CLASS) correct++;
+  document.getElementById('scoreDisplay').textContent = correct + ' / ' + TOTAL;
+}
+
+function checkAll(){
+  let correct = 0;
+  allWraps().forEach(w=>{
+    const ok = w.dataset.value === w.dataset.correct;
+    w.classList.remove('ok','bad');
+    w.classList.add(ok?'ok':'bad');
+    w.querySelector('.mark').textContent = ok ? '✓':'✗';
+    if(ok) correct++;
+  });
+  const icon = verdictBox.querySelector('[data-icon="classify"]');
+  const isCorrect = seg.dataset.value === CORRECT_CLASS;
+  if(seg.dataset.value !== undefined){
+    icon.classList.add('show', isCorrect?'ok':'bad');
+    icon.textContent = isCorrect ? '✓':'✗';
+    if(isCorrect) correct++;
+  }
+  verdictBox.classList.remove('correct','incorrect');
+  verdictBox.classList.add(isCorrect ? 'correct':'incorrect');
+  document.getElementById('finalExplain').classList.add('show');
+  document.getElementById('scoreDisplay').textContent = correct + ' / ' + TOTAL;
+}
+
+function revealAll(){
+  allWraps().forEach(w=>{
+    w.dataset.value = w.dataset.correct;
+    w.querySelector('.toggle').classList.toggle('on', w.dataset.correct==='1');
+    w.classList.remove('ok','bad');
+    w.classList.add('ok');
+    w.querySelector('.mark').textContent = '✓';
+  });
+  seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','taut-sel','contra-sel','conting-sel'));
+  const btn = seg.querySelector(`button[data-val="${CORRECT_CLASS}"]`);
+  btn.classList.add('sel','conting-sel');
+  seg.dataset.value = CORRECT_CLASS;
+  const icon = verdictBox.querySelector('[data-icon="classify"]');
+  icon.classList.add('show','ok');
+  icon.textContent = '✓';
+  verdictBox.classList.remove('incorrect');
+  verdictBox.classList.add('correct');
+  document.getElementById('finalExplain').classList.add('show');
+  document.getElementById('scoreDisplay').textContent = TOTAL + ' / ' + TOTAL;
+}
+
+function resetAll(){
+  allWraps().forEach(w=>{
+    w.dataset.value = '0';
+    w.querySelector('.toggle').classList.remove('on');
+    w.classList.remove('ok','bad');
+    w.querySelector('.mark').textContent = '';
+  });
+  delete seg.dataset.value;
+  seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','taut-sel','contra-sel','conting-sel'));
+  const icon = verdictBox.querySelector('[data-icon="classify"]');
+  icon.classList.remove('show','ok','bad');
+  icon.textContent = '';
+  verdictBox.classList.remove('correct','incorrect');
+  document.getElementById('finalExplain').classList.remove('show');
+  document.getElementById('scoreDisplay').textContent = '0 / ' + TOTAL;
+}
+</script>
+</body>
+</html>
