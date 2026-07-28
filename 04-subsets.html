@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subsets · Topic 4 of 6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pcb:#0F1B15; --pcb-light:#17251D; --pcb-line:#25392C;
+    --copper:#C08552; --phosphor:#6FE3A6; --warn:#E0794F; --bonus:#D9A441;
+    --paper:#F3EEDF; --ink:#211C12; --ink-soft:#6B6250; --purple:#8B6FC9;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--pcb);color:var(--paper);font-family:'IBM Plex Sans',sans-serif;padding:0 0 100px;line-height:1.65;
+    background-image:radial-gradient(circle at 1px 1px, rgba(111,227,166,0.05) 1px, transparent 0); background-size:26px 26px;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  ::selection{background:var(--phosphor);color:var(--pcb);}
+  a:focus-visible, button:focus-visible, .toggle:focus-visible{outline:2px solid var(--phosphor); outline-offset:3px;}
+
+  .hero{position:relative;padding:50px 16px 36px;text-align:center;overflow:hidden;border-bottom:1px solid var(--pcb-line);background:linear-gradient(180deg,#0B1410 0%, var(--pcb) 100%);}
+  .hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;background-image:linear-gradient(var(--pcb-line) 1px, transparent 1px),linear-gradient(90deg, var(--pcb-line) 1px, transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse at center, black 0%, transparent 72%);}
+  .hero-inner{position:relative;z-index:1;}
+  .hero-fig{width:150px;height:150px;margin:0 auto 14px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(28px,6vw,46px);margin:0 0 10px;color:var(--paper);text-shadow:0 0 30px rgba(111,227,166,.2);}
+  .sub{text-align:center;color:#B9C4B9;font-size:14.5px;margin:0 auto;max-width:600px;line-height:1.6;}
+  .series-chip{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;background:rgba(217,164,65,.12);border:1px solid var(--bonus);color:var(--bonus);padding:4px 14px;border-radius:20px;margin-top:14px;letter-spacing:.04em;}
+
+  .panel-nav{position:sticky;top:0;z-index:40;background:rgba(15,27,21,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--pcb-line);padding:10px 16px;}
+  .panel-nav-inner{max-width:900px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+  .nav-led{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8FA093;text-decoration:none;padding:5px 10px;border-radius:20px;border:1px solid transparent;transition:.2s ease;}
+  .nav-led:hover{color:var(--paper);border-color:var(--pcb-line);}
+
+  .wrap{max-width:900px;margin:0 auto;padding:0 16px;}
+  .section-block{max-width:900px;margin:0 auto;padding:56px 16px 0;scroll-margin-top:64px;}
+  .sec-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.12em;text-align:center;margin-bottom:8px;}
+  .sec-title{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(22px,4.4vw,32px);text-align:center;margin:0 0 16px;color:var(--paper);}
+  .sec-sub{text-align:center;color:#B9C4B9;font-size:14px;max-width:640px;margin:0 auto 26px;}
+
+  .concept-box{background:var(--pcb-light);border:1.5px solid var(--pcb-line);border-radius:14px;padding:18px 22px;margin-bottom:18px;}
+  .concept-box strong{color:var(--paper);}
+  .concept-box p{font-size:14px;color:#DDE6DF;margin:0 0 10px;line-height:1.65;}
+  .concept-box p:last-child{margin-bottom:0;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:rgba(0,0,0,.25);color:var(--copper);padding:1px 6px;border-radius:4px;}
+  .formula-pill{font-family:'IBM Plex Mono',monospace;font-size:15px;background:rgba(111,227,166,.1);border:1.5px solid var(--phosphor);color:var(--phosphor);padding:9px 20px;border-radius:10px;display:inline-block;}
+  .pill-wrap{text-align:center;margin:14px 0;}
+
+  .def-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:18px;}
+  .def-card{background:var(--pcb-light);border:1.5px solid var(--pcb-line);border-radius:12px;padding:14px 16px;}
+  .def-card .dname{font-family:'Fraunces',serif;font-weight:700;font-size:15px;color:var(--phosphor);margin-bottom:6px;}
+  .def-card .dform{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--bonus);margin-bottom:6px;}
+  .def-card p{font-size:12.5px;color:#B9C4B9;margin:0;line-height:1.55;}
+
+  /* ============ real-life example cards ============ */
+  .ex-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:20px;}
+  .ex-card{background:var(--paper);color:var(--ink);border-radius:10px;padding:20px 22px;box-shadow:0 14px 28px -18px rgba(0,0,0,.5);}
+  .ex-icon{width:42px;height:42px;color:var(--copper);margin-bottom:12px;}
+  .ex-icon svg{width:100%;height:100%;}
+  .ex-card h4{font-family:'Fraunces',serif;font-weight:700;font-size:16px;margin:0 0 6px;}
+  .ex-card p{font-size:13.5px;margin:0;color:var(--ink-soft);}
+  .ex-sample{margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;background:rgba(47,122,95,.1);color:#1f5c47;border:1px solid rgba(47,122,95,.3);padding:4px 10px;border-radius:20px;}
+
+  /* ============ subset-verify card (membership tester + verdict) ============ */
+  .mem-card{background:var(--pcb-light);border:1.5px solid var(--pcb-line);border-radius:14px;padding:18px 20px;margin-bottom:18px;}
+  .mem-formula{text-align:center;font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--phosphor);background:rgba(111,227,166,.08);border-radius:10px;padding:10px;margin-bottom:14px;}
+  .mem-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+  .mem-score{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8FA093;}
+  .mem-score strong{color:var(--phosphor);}
+  .mem-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .tbtn{background:transparent;border:1.5px solid var(--pcb-line);color:#B9C4B9;border-radius:20px;padding:5px 12px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;transition:.15s ease;}
+  .tbtn:hover{background:var(--pcb-light);color:var(--paper);border-color:var(--copper);}
+  .tbtn.primary{background:rgba(111,227,166,.12);border-color:var(--phosphor);color:var(--phosphor);}
+  .mem-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
+  .mem-cell{background:#132018;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:70px;}
+  .mem-cell .cand{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--paper);}
+
+  .toggle{position:relative;width:48px;height:24px;border-radius:20px;cursor:pointer;background:rgba(0,0,0,.3);border:1.5px solid var(--warn);display:inline-flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;user-select:none;transition:border-color .2s ease, box-shadow .2s ease;}
+  .toggle .lab{position:absolute;width:50%;text-align:center;transition:opacity .2s ease;}
+  .toggle .lab.t{left:0;color:var(--phosphor);opacity:.35;} .toggle .lab.f{right:0;color:var(--warn);opacity:1;}
+  .toggle.on .lab.t{opacity:1;} .toggle.on .lab.f{opacity:.35;}
+  .toggle .knob{position:absolute;top:2px;left:26px;width:18px;height:18px;border-radius:50%;background:linear-gradient(180deg,#E0794F,#B5493D);box-shadow:0 1px 3px rgba(0,0,0,.5);transition:left .2s ease, background .2s ease;}
+  .toggle.on{border-color:var(--phosphor);box-shadow:0 0 8px rgba(111,227,166,.35);}
+  .toggle.on .knob{left:2px;background:linear-gradient(180deg,#BFFFE0,#6FE3A6);}
+  .mem-cell.ok .toggle{box-shadow:0 0 0 2.5px rgba(111,227,166,.35);}
+  .mem-cell.bad .toggle{box-shadow:0 0 0 2.5px rgba(224,121,79,.35);}
+  .mem-mark{font-size:10px;font-weight:700;height:12px;}
+  .mem-mark.ok{color:var(--phosphor);} .mem-mark.bad{color:var(--warn);}
+
+  .verdict-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#0E1912;border-radius:10px;padding:12px 14px;}
+  .verdict-label{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#8FA093;}
+  .seg{display:inline-flex;border:1.5px solid var(--pcb-line);border-radius:20px;overflow:hidden;background:rgba(0,0,0,.25);}
+  .seg button{border:none;background:transparent;padding:7px 15px;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:#8FA093;transition:.15s ease;}
+  .seg button.sel{background:rgba(111,227,166,.16);color:var(--phosphor);}
+  .seg button.sel.bad-sel{background:rgba(224,121,79,.16);color:var(--warn);}
+  .verdict-icon{width:18px;height:18px;border-radius:50%;font-size:11px;line-height:18px;text-align:center;font-weight:700;color:#0B140F;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .verdict-icon.show{opacity:1;transform:scale(1);}
+  .verdict-icon.ok{background:var(--phosphor);} .verdict-icon.bad{background:var(--warn);color:#fff;}
+  .verdict-explain{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .verdict-explain.show{max-height:150px;opacity:1;margin-top:10px;}
+  .verdict-explain-inner{font-size:12.5px;line-height:1.6;color:#B9C4B9;}
+  .verdict-explain-inner strong{color:var(--paper);}
+
+  /* ============ nested-circle drag venn ============ */
+  .dnd-card{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:16px;padding:18px 20px;margin-bottom:20px;}
+  .dnd-title{text-align:center;font-family:'Fraunces',serif;font-weight:700;font-size:16px;color:var(--paper);margin-bottom:4px;}
+  .dnd-instructions{text-align:center;font-size:12.5px;color:#8FA093;margin-bottom:14px;}
+  .dnd-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+  .dnd-score{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8FA093;}
+  .dnd-score strong{color:var(--phosphor);}
+  .dnd-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .dnd-stage{position:relative;width:100%;height:320px;background:#0E1912;border:1.5px solid #37493F;border-radius:10px;overflow:hidden;touch-action:none;}
+  .dnd-u-label{position:absolute;top:8px;left:12px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8FA093;font-weight:700;letter-spacing:.05em;}
+  .dnd-circle{position:absolute;border-radius:50%;pointer-events:none;}
+  .dnd-circle-outer{background:rgba(217,164,65,0.05);border:2.5px solid var(--bonus);}
+  .dnd-circle-inner{background:rgba(111,227,166,0.09);border:2.5px solid var(--phosphor);}
+  .dnd-circle-label{position:absolute;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:14px;}
+  .dnd-chip{position:absolute;width:42px;height:42px;border-radius:50%;background:#1C2B21;border:2px solid #8FA093;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;color:var(--paper);cursor:grab;user-select:none;touch-action:none;transition:border-color .2s ease, box-shadow .2s ease;z-index:5;}
+  .dnd-chip:active{cursor:grabbing;}
+  .dnd-chip.correct{border-color:var(--phosphor);box-shadow:0 0 10px rgba(111,227,166,.5);}
+  .dnd-chip.incorrect{border-color:var(--warn);box-shadow:0 0 10px rgba(224,121,79,.5);}
+  .dnd-caption{text-align:center;font-size:12.5px;color:#B9C4B9;margin-top:12px;}
+
+  /* ============ counter-examples ============ */
+  .counter-card{background:var(--paper);color:var(--ink);border-radius:8px;padding:18px 22px;margin-bottom:16px;box-shadow:0 14px 28px -18px rgba(0,0,0,.55);}
+  .counter-tag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:10px;padding:3px 11px;border-radius:20px;margin-bottom:10px;color:#fff;background:#B5493D;text-transform:uppercase;letter-spacing:.04em;}
+  .counter-card p{font-size:14px;margin:0 0 10px;}
+  .c-reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:5px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .c-reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .c-reveal-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .c-reveal-panel.show{max-height:280px;opacity:1;margin-top:10px;}
+  .c-reveal-inner{border-top:1.5px dashed rgba(33,28,18,.2);padding-top:8px;font-size:13.5px;}
+
+  /* ============ solved examples ============ */
+  .solved-card{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:14px;padding:18px 22px;margin-bottom:16px;}
+  .solved-num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+  .solved-q{font-size:14.5px;color:var(--paper);margin-bottom:12px;}
+  .solved-reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.03em;text-transform:uppercase;background:rgba(111,227,166,.1);border:1.5px solid var(--phosphor);color:var(--phosphor);padding:8px 16px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .solved-reveal-btn:hover{background:rgba(111,227,166,.2);}
+  .solved-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .solved-panel.show{max-height:460px;opacity:1;margin-top:12px;}
+  .solved-panel-inner{background:#0E1912;border-left:3px solid var(--phosphor);border-radius:0 8px 8px 0;padding:12px 16px;font-size:13.5px;line-height:1.65;color:#DDE6DF;}
+  .solved-panel-inner strong{color:var(--paper);}
+
+  /* ============ exercises ============ */
+  .ux-card{background:var(--paper);color:var(--ink);border-radius:8px;padding:16px 20px;margin-bottom:12px;box-shadow:0 12px 24px -16px rgba(0,0,0,.5);}
+  .ux-num{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12px;color:var(--copper);}
+  .ux-q{font-size:14px;margin:6px 0 10px;}
+  .ux-scratch{width:100%;border:1.5px dashed rgba(33,28,18,.25);border-radius:8px;background:rgba(255,255,255,.5);padding:8px 11px;font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;color:var(--ink);resize:vertical;min-height:36px;margin:6px 0;}
+  .ux-reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:5px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .ux-reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .ux-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .ux-panel.show{max-height:200px;opacity:1;margin-top:8px;}
+  .ux-panel-inner{border-top:1.5px dashed rgba(33,28,18,.2);padding-top:8px;font-size:13.5px;}
+
+  .next-banner{max-width:900px;margin:70px auto 0;padding:0 16px;text-align:center;}
+  .next-banner-inner{background:var(--pcb-light);border:1.5px dashed var(--bonus);border-radius:14px;padding:20px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--bonus);}
+
+  footer{text-align:center;font-size:11.5px;color:#5C6B60;margin-top:50px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;}
+  footer .ok{color:var(--phosphor);}
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <svg class="hero-fig" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="6" width="138" height="138" rx="12" fill="none" stroke="#25392C" stroke-width="2"/>
+        <circle cx="75" cy="75" r="52" fill="rgba(217,164,65,0.08)" stroke="#D9A441" stroke-width="2.5"/>
+        <circle cx="75" cy="75" r="24" fill="rgba(111,227,166,0.14)" stroke="#6FE3A6" stroke-width="2.5"/>
+      </svg>
+      <div class="eyebrow">Discrete Mathematics · Set Theory Module</div>
+      <h1 class="page-title">Subsets</h1>
+      <p class="sub">One set living entirely inside another. It sounds simple — until you have to prove it, or tell it apart from "belongs to."</p>
+      <div class="series-chip">Topic 4 of 6 · Set Theory Series</div>
+    </div>
+  </div>
+
+  <div class="panel-nav">
+    <div class="panel-nav-inner" id="navRow"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="definition">
+    <div class="sec-eyebrow">4.1</div>
+    <h2 class="sec-title">What Is a Subset?</h2>
+    <div class="concept-box">
+      <p><strong>Definition.</strong> A is a <strong>subset</strong> of B, written <span class="mono">A ⊆ B</span>, if every single element of A is also an element of B. Formally: <span class="mono">A ⊆ B ⟺ ∀x (x∈A → x∈B)</span>.</p>
+      <p>Notice the definition is built entirely out of an <em>implication</em> — which is exactly why a false antecedent makes it vacuously true (more on that below).</p>
+    </div>
+    <div class="pill-wrap"><span class="formula-pill">A ⊆ B &nbsp;⟺&nbsp; ∀x (x∈A → x∈B)</span></div>
+    <div class="def-grid">
+      <div class="def-card"><div class="dname">Subset</div><div class="dform">A ⊆ B</div><p>Every element of A is in B. B might have extra elements A doesn't.</p></div>
+      <div class="def-card"><div class="dname">Proper Subset</div><div class="dform">A ⊂ B</div><p>A ⊆ B, and additionally A ≠ B — B has at least one element A is missing.</p></div>
+      <div class="def-card"><div class="dname">Superset</div><div class="dform">B ⊇ A</div><p>Just A ⊆ B, written from B's point of view.</p></div>
+      <div class="def-card"><div class="dname">Reflexivity</div><div class="dform">A ⊆ A</div><p>Every set is a subset of itself — trivially true.</p></div>
+    </div>
+    <div class="concept-box">
+      <p><strong>The most useful fact in this whole topic:</strong> to prove two sets are equal, show <span class="mono">A ⊆ B</span> <em>and</em> <span class="mono">B ⊆ A</span>. If every element of each is contained in the other, they must be exactly the same set. This "double containment" technique is the standard way mathematicians prove set equality.</p>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="real-life">
+    <div class="sec-eyebrow">4.2</div>
+    <h2 class="sec-title">Three Real-Life Examples</h2>
+    <p class="sec-sub">Anywhere a smaller category sits entirely inside a bigger one, you have a subset.</p>
+    <div class="ex-grid">
+      <div class="ex-card">
+        <div class="ex-icon"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M24 6 L4 16 L24 26 L44 16 Z"/><path d="M12 20 V32 Q24 38 36 32 V20"/></svg></div>
+        <h4>Dean's List Students</h4>
+        <p>Every student on the Dean's List is enrolled at the university — but not every enrolled student makes the Dean's List. Dean's List ⊆ Enrolled Students.</p>
+        <div class="ex-sample">Dean's List ⊆ Enrolled</div>
+      </div>
+      <div class="ex-card">
+        <div class="ex-icon"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="24" cy="26" rx="16" ry="12"/><circle cx="24" cy="14" r="6"/><path d="M14 22 Q12 16 16 12 M34 22 Q36 16 32 12"/></svg></div>
+        <h4>Mammals Among Animals</h4>
+        <p>Every mammal is an animal, but plenty of animals — reptiles, fish, insects — aren't mammals. Mammals ⊆ Animals.</p>
+        <div class="ex-sample">Mammals ⊆ Animals</div>
+      </div>
+      <div class="ex-card">
+        <div class="ex-icon"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="4" width="20" height="40" rx="4"/><line x1="14" y1="36" x2="34" y2="36"/><circle cx="24" cy="40" r="1.5" fill="currentColor" stroke="none"/></svg></div>
+        <h4>Apps on Your Phone</h4>
+        <p>Every app installed on your phone is available on the app store, but the store carries millions of apps you'll never install. Installed Apps ⊆ Store Catalog.</p>
+        <div class="ex-sample">Installed ⊆ Store Catalog</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="math-examples">
+    <div class="sec-eyebrow">4.3</div>
+    <h2 class="sec-title">Three Mathematical Examples</h2>
+    <p class="sec-sub">For each pair, test whether the candidates land in B — then decide the overall verdict.</p>
+
+    <div class="mem-card" id="mem-1">
+      <div class="mem-formula">A = {x∈ℤ | x is a multiple of 4} &nbsp;&nbsp;vs&nbsp;&nbsp; B = {x∈ℤ | x is a multiple of 2}</div>
+      <div id="mem-body-1"></div>
+      <div class="verdict-row" id="verdict-1"><span class="verdict-label">Does A ⊆ B?</span><div class="seg" data-role="v"><button data-val="Yes">Yes</button><button data-val="No">No</button></div><span class="verdict-icon"></span></div>
+      <div class="verdict-explain" id="explain-1"><div class="verdict-explain-inner"><strong>Yes.</strong> Every multiple of 4 is automatically a multiple of 2 (4k = 2(2k)) — no exceptions exist.</div></div>
+    </div>
+
+    <div class="mem-card" id="mem-2">
+      <div class="mem-formula">A = {x∈ℝ | −1≤x≤1} &nbsp;&nbsp;vs&nbsp;&nbsp; B = {x∈ℝ | −2≤x≤2}</div>
+      <div id="mem-body-2"></div>
+      <div class="verdict-row" id="verdict-2"><span class="verdict-label">Does A ⊆ B?</span><div class="seg" data-role="v"><button data-val="Yes">Yes</button><button data-val="No">No</button></div><span class="verdict-icon"></span></div>
+      <div class="verdict-explain" id="explain-2"><div class="verdict-explain-inner"><strong>Yes.</strong> [−1,1] sits entirely within [−2,2] — a smaller interval nested inside a bigger one.</div></div>
+    </div>
+
+    <div class="mem-card" id="mem-3">
+      <div class="mem-formula">A = {perfect squares ≤ 100} &nbsp;&nbsp;vs&nbsp;&nbsp; B = {x∈ℕ | x≤100}</div>
+      <div id="mem-body-3"></div>
+      <div class="verdict-row" id="verdict-3"><span class="verdict-label">Does A ⊆ B?</span><div class="seg" data-role="v"><button data-val="Yes">Yes</button><button data-val="No">No</button></div><span class="verdict-icon"></span></div>
+      <div class="verdict-explain" id="explain-3"><div class="verdict-explain-inner"><strong>Yes.</strong> Every perfect square up to 100 (1,4,9,…,100) is itself a natural number no greater than 100.</div></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="venn">
+    <div class="sec-eyebrow">4.4</div>
+    <h2 class="sec-title">Two Venn Diagrams — Drag It Yourself</h2>
+    <p class="sec-sub">A subset isn't drawn as overlapping circles — it's one circle sitting entirely <em>inside</em> another.</p>
+
+    <div class="dnd-card">
+      <div class="dnd-title">Diagram 1 — A = {2,4,6} ⊆ B = {1,…,8}</div>
+      <div class="dnd-instructions">Drag each chip: into the <strong>inner circle</strong> if it's in A, into the <strong>ring</strong> if it's in B but not A, or leave it <strong>outside</strong> everything.</div>
+      <div class="dnd-toolbar">
+        <span class="dnd-score">Placed correctly: <strong data-dnd-score>0</strong> / 8</span>
+        <span class="dnd-btns"><button class="tbtn primary" data-dnd-act="check">Check</button><button class="tbtn" data-dnd-act="reveal">Reveal</button><button class="tbtn" data-dnd-act="reset">Reset</button></span>
+      </div>
+      <div class="dnd-stage" id="dndStage1"><span class="dnd-u-label">Universe</span></div>
+      <div class="dnd-caption">1, 2, 3, 4, 6, 7, 9, 10 — notice there's no valid spot for "in A but not B," because A ⊆ B forbids it.</div>
+    </div>
+
+    <div class="dnd-card">
+      <div class="dnd-title">Diagram 2 — A = {3,6,9} ⊆ B = {1,…,10}</div>
+      <div class="dnd-instructions">Same task, new sets. Sort every chip into the correct zone.</div>
+      <div class="dnd-toolbar">
+        <span class="dnd-score">Placed correctly: <strong data-dnd-score2>0</strong> / 9</span>
+        <span class="dnd-btns"><button class="tbtn primary" data-dnd-act2="check">Check</button><button class="tbtn" data-dnd-act2="reveal">Reveal</button><button class="tbtn" data-dnd-act2="reset">Reset</button></span>
+      </div>
+      <div class="dnd-stage" id="dndStage2"><span class="dnd-u-label">Universe</span></div>
+      <div class="dnd-caption">1, 3, 4, 6, 7, 9, 10, 11, 12 — once again, the inner circle is entirely swallowed by the outer one.</div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="counter">
+    <div class="sec-eyebrow">4.5</div>
+    <h2 class="sec-title">Two Counter-Examples</h2>
+    <p class="sec-sub">The two mistakes almost everyone makes the first time.</p>
+
+    <div class="counter-card">
+      <span class="counter-tag">False Claim</span>
+      <p><em>"Since 1 ∈ {1,2,3}, it must also be true that {1} ∈ {1,2,3}."</em></p>
+      <button class="c-reveal-btn" data-reveal="ctr4-1">Reveal Why This Fails</button>
+      <div class="c-reveal-panel" id="ctr4-1"><div class="c-reveal-inner">
+        <strong>False — this confuses ∈ with ⊆.</strong> The elements of {1,2,3} are exactly 1, 2, and 3 — not the set {1}. So <span class="mono">{1} ∉ {1,2,3}</span>. What <em>is</em> true is <span class="mono">{1} ⊆ {1,2,3}</span>, since the lone element of {1} (namely 1) is a member of {1,2,3}. "Element of" and "subset of" are different relationships, and mixing them up is the single most common subset mistake.
+      </div></div>
+    </div>
+
+    <div class="counter-card">
+      <span class="counter-tag">False Claim</span>
+      <p><em>"The empty set can't be a subset of anything — it has no elements to compare."</em></p>
+      <button class="c-reveal-btn" data-reveal="ctr4-2">Reveal Why This Fails</button>
+      <div class="c-reveal-panel" id="ctr4-2"><div class="c-reveal-inner">
+        <strong>False — ∅ ⊆ A for every set A, and vacuously so.</strong> Recall <span class="mono">A⊆B ⟺ ∀x(x∈A → x∈B)</span>. For A=∅, the statement "x∈∅" is <em>never</em> true for any x — so the implication "x∈∅ → x∈B" is true automatically in every case, exactly like "if 1+1=3, then unicorns exist" was true earlier in this course. A false antecedent can't be caught out, so ∅ ⊆ B holds for literally any B, with zero exceptions.
+      </div></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="solved">
+    <div class="sec-eyebrow">4.6</div>
+    <h2 class="sec-title">Solved Examples</h2>
+    <div id="solvedContainer"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="exercises">
+    <div class="sec-eyebrow">4.7</div>
+    <h2 class="sec-title">Exercises</h2>
+    <p class="sec-sub">Try each one before revealing.</p>
+    <div id="exerciseContainer"></div>
+  </div>
+
+  <div class="next-banner">
+    <div class="next-banner-inner">✓ Topic 4 of 6 complete — <strong>Subsets</strong>.<br>Say the word and we'll move on to Topic 5: Power Set.</div>
+  </div>
+
+  <footer>Discrete Mathematics · Set Theory Module · Topic 4 &nbsp;—&nbsp; <span class="ok">CIRCUIT COMPLETE ✓</span></footer>
+
+<script>
+/* ===================== nav ===================== */
+const navItems = [
+  {id:'definition', label:'Definitions'},
+  {id:'real-life', label:'Real-Life'},
+  {id:'math-examples', label:'Math Examples'},
+  {id:'venn', label:'Venn Diagrams'},
+  {id:'counter', label:'Counter-Examples'},
+  {id:'solved', label:'Solved'},
+  {id:'exercises', label:'Exercises'}
+];
+const navRow = document.getElementById('navRow');
+navItems.forEach(n=>{ const a=document.createElement('a'); a.href='#'+n.id; a.className='nav-led'; a.textContent=n.label; navRow.appendChild(a); });
+
+/* ===================== membership tester (reused) ===================== */
+function buildMembershipTester(bodyId, candidates, checkFn){
+  const body = document.getElementById(bodyId);
+  const total = candidates.length;
+  const toolbar = document.createElement('div');
+  toolbar.className = 'mem-toolbar';
+  toolbar.innerHTML = `<span class="mem-score">Score: <strong data-local>0</strong> / ${total}</span>
+    <span class="mem-btns"><button class="tbtn primary" data-act="check">Check</button><button class="tbtn" data-act="reveal">Reveal</button><button class="tbtn" data-act="reset">Reset</button></span>`;
+  body.appendChild(toolbar);
+  const row = document.createElement('div');
+  row.className = 'mem-row';
+  const cells = [];
+  candidates.forEach(cand=>{
+    const correct = checkFn(cand);
+    const cell = document.createElement('div');
+    cell.className = 'mem-cell'; cell.dataset.correct = correct?'1':'0'; cell.dataset.value='0';
+    cell.innerHTML = `<span class="cand">${cand}</span>
+      <div class="toggle" role="button" tabindex="0"><span class="lab t">∈B</span><span class="lab f">∉B</span><span class="knob"></span></div>
+      <span class="mem-mark"></span>`;
+    const tgl = cell.querySelector('.toggle');
+    const flip = ()=>{
+      const on = cell.dataset.value==='1';
+      cell.dataset.value = on?'0':'1';
+      tgl.classList.toggle('on', !on);
+      cell.classList.remove('ok','bad');
+      cell.querySelector('.mem-mark').textContent = '';
+      updateLocal();
+    };
+    tgl.addEventListener('click', flip);
+    tgl.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){flip(); e.preventDefault();} });
+    row.appendChild(cell); cells.push(cell);
+  });
+  body.appendChild(row);
+  function updateLocal(){
+    let correct=0; cells.forEach(c=>{ if(c.dataset.value===c.dataset.correct) correct++; });
+    body.querySelector('[data-local]').textContent = correct;
+  }
+  toolbar.querySelectorAll('[data-act]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const act = btn.dataset.act;
+      if(act==='check'){ cells.forEach(c=>{ const ok=c.dataset.value===c.dataset.correct; c.classList.remove('ok','bad'); c.classList.add(ok?'ok':'bad'); c.querySelector('.mem-mark').className='mem-mark '+(ok?'ok':'bad'); c.querySelector('.mem-mark').textContent = ok?'✓':'✗'; }); }
+      if(act==='reveal'){ cells.forEach(c=>{ c.dataset.value=c.dataset.correct; c.querySelector('.toggle').classList.toggle('on', c.dataset.correct==='1'); c.classList.remove('ok','bad'); c.classList.add('ok'); c.querySelector('.mem-mark').className='mem-mark ok'; c.querySelector('.mem-mark').textContent='✓'; }); }
+      if(act==='reset'){ cells.forEach(c=>{ c.dataset.value='0'; c.querySelector('.toggle').classList.remove('on'); c.classList.remove('ok','bad'); c.querySelector('.mem-mark').textContent=''; }); }
+      updateLocal();
+    });
+  });
+}
+buildMembershipTester('mem-body-1', [4,7,8,9,12,15], x=> x%2===0);
+buildMembershipTester('mem-body-2', [-1,0,1,-1.5,1.5,3], x=> x>=-2 && x<=2);
+buildMembershipTester('mem-body-3', [16,25,50,64,99,150], x=> x<=100);
+
+/* ===================== overall subset verdicts ===================== */
+function buildVerdict(vId, eId, correct){
+  const vrow = document.getElementById(vId);
+  const explain = document.getElementById(eId);
+  const seg = vrow.querySelector('[data-role="v"]');
+  const icon = vrow.querySelector('.verdict-icon');
+  seg.querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      seg.querySelectorAll('button').forEach(x=>x.classList.remove('sel','bad-sel'));
+      const ok = b.dataset.val===correct;
+      b.classList.add('sel');
+      if(!ok) b.classList.add('bad-sel');
+      icon.classList.add('show', ok?'ok':'bad'); icon.textContent=ok?'✓':'✗';
+      explain.classList.add('show');
+    });
+  });
+}
+buildVerdict('verdict-1','explain-1','Yes');
+buildVerdict('verdict-2','explain-2','Yes');
+buildVerdict('verdict-3','explain-3','Yes');
+
+/* ===================== nested-circle drag engine ===================== */
+function makeDraggable(chip, stage, onDrop){
+  chip.addEventListener('pointerdown', (e)=>{
+    e.preventDefault();
+    chip.setPointerCapture(e.pointerId);
+    const startX=e.clientX, startY=e.clientY;
+    const startLeft=chip.offsetLeft, startTop=chip.offsetTop;
+    chip.style.zIndex=30;
+    function move(ev){
+      const dx=ev.clientX-startX, dy=ev.clientY-startY;
+      let newLeft=startLeft+dx, newTop=startTop+dy;
+      newLeft=Math.max(0, Math.min(stage.clientWidth-chip.offsetWidth, newLeft));
+      newTop=Math.max(0, Math.min(stage.clientHeight-chip.offsetHeight, newTop));
+      chip.style.left=newLeft+'px'; chip.style.top=newTop+'px';
+    }
+    function up(){ chip.removeEventListener('pointermove',move); chip.removeEventListener('pointerup',up); chip.style.zIndex=5; onDrop(); }
+    chip.addEventListener('pointermove', move);
+    chip.addEventListener('pointerup', up);
+  });
+}
+function insideCircle(chip, circle){
+  const cx = circle.offsetLeft + circle.offsetWidth/2, cy = circle.offsetTop + circle.offsetHeight/2;
+  const r = circle.offsetWidth/2;
+  const chx = chip.offsetLeft + chip.offsetWidth/2, chy = chip.offsetTop + chip.offsetHeight/2;
+  return Math.hypot(chx-cx, chy-cy) < (r-6);
+}
+function layoutTray(chips, stage){
+  const n=chips.length; const trayY = stage.clientHeight-58;
+  const spacing = stage.clientWidth/(n+1);
+  chips.forEach((chip,i)=>{ chip.style.left = Math.round(spacing*(i+1)-21)+'px'; chip.style.top = trayY+'px'; });
+}
+function setupNestedCircles(stage, outerSize, innerSize){
+  const w = stage.clientWidth || 700;
+  const cx = w/2, cy = 145;
+  const outer = document.createElement('div'); outer.className='dnd-circle dnd-circle-outer';
+  outer.style.width=outerSize+'px'; outer.style.height=outerSize+'px';
+  outer.style.left=Math.round(cx-outerSize/2)+'px'; outer.style.top=Math.round(cy-outerSize/2)+'px';
+  const inner = document.createElement('div'); inner.className='dnd-circle dnd-circle-inner';
+  inner.style.width=innerSize+'px'; inner.style.height=innerSize+'px';
+  inner.style.left=Math.round(cx-innerSize/2)+'px'; inner.style.top=Math.round(cy-innerSize/2)+'px';
+  const labOuter = document.createElement('span'); labOuter.className='dnd-circle-label'; labOuter.textContent='B'; labOuter.style.color='#D9A441';
+  labOuter.style.left=Math.round(cx-outerSize/2+10)+'px'; labOuter.style.top=Math.round(cy-outerSize/2+6)+'px';
+  const labInner = document.createElement('span'); labInner.className='dnd-circle-label'; labInner.textContent='A'; labInner.style.color='#6FE3A6';
+  labInner.style.left=Math.round(cx-8)+'px'; labInner.style.top=Math.round(cy-innerSize/2-2)+'px';
+  stage.appendChild(outer); stage.appendChild(inner); stage.appendChild(labOuter); stage.appendChild(labInner);
+  return {outer, inner};
+}
+function buildNestedDiagram(stageId, values, Aset, Bset, scoreSelector, actPrefix, outerSize, innerSize){
+  const stage = document.getElementById(stageId);
+  let outer, inner;
+  const chips = values.map(v=>{ const c=document.createElement('div'); c.className='dnd-chip'; c.textContent=v; c.dataset.val=v; stage.appendChild(c); return c; });
+  requestAnimationFrame(()=>{ const circ = setupNestedCircles(stage, outerSize, innerSize); outer=circ.outer; inner=circ.inner; layoutTray(chips, stage); });
+  function zoneCorrect(v){ if(Aset.includes(v)) return 'inner'; if(Bset.includes(v)) return 'outer'; return 'none'; }
+  function updateScore(){ document.querySelector(scoreSelector).textContent = chips.filter(c=>c.classList.contains('correct')).length; }
+  chips.forEach(chip=> makeDraggable(chip, stage, ()=>{ chip.classList.remove('correct','incorrect'); updateScore(); }));
+
+  document.querySelector(`[data-dnd-act${actPrefix}="check"]`).addEventListener('click', ()=>{
+    chips.forEach(chip=>{
+      const v = Number(chip.dataset.val);
+      const placedZone = insideCircle(chip,inner) ? 'inner' : (insideCircle(chip,outer) ? 'outer' : 'none');
+      const ok = placedZone === zoneCorrect(v);
+      chip.classList.remove('correct','incorrect'); chip.classList.add(ok?'correct':'incorrect');
+    });
+    updateScore();
+  });
+  document.querySelector(`[data-dnd-act${actPrefix}="reveal"]`).addEventListener('click', ()=>{
+    const icx = inner.offsetLeft+inner.offsetWidth/2, icy = inner.offsetTop+inner.offsetHeight/2;
+    const innerChips = chips.filter(c=>zoneCorrect(Number(c.dataset.val))==='inner');
+    const ringChips = chips.filter(c=>zoneCorrect(Number(c.dataset.val))==='outer');
+    const outsideChips = chips.filter(c=>zoneCorrect(Number(c.dataset.val))==='none');
+    innerChips.forEach((c,i)=>{
+      const ang = (i/Math.max(innerChips.length,1))*Math.PI*2;
+      const r = Math.min(22, innerSize/2 - 20);
+      c.style.left = Math.round(icx + r*Math.cos(ang) - 21)+'px';
+      c.style.top = Math.round(icy + r*Math.sin(ang) - 21)+'px';
+    });
+    ringChips.forEach((c,i)=>{
+      const ang = (i/Math.max(ringChips.length,1))*Math.PI*2 + 0.3;
+      const r = (innerSize/2 + outerSize/2)/2;
+      c.style.left = Math.round(icx + r*Math.cos(ang) - 21)+'px';
+      c.style.top = Math.round(icy + r*Math.sin(ang) - 21)+'px';
+    });
+    outsideChips.forEach((c,i)=>{ c.style.left=(14+i*52)+'px'; c.style.top='16px'; });
+    chips.forEach(c=>{ c.classList.remove('incorrect'); c.classList.add('correct'); });
+    updateScore();
+  });
+  document.querySelector(`[data-dnd-act${actPrefix}="reset"]`).addEventListener('click', ()=>{
+    chips.forEach(c=>c.classList.remove('correct','incorrect')); layoutTray(chips, stage); updateScore();
+  });
+}
+
+buildNestedDiagram('dndStage1', [1,2,3,4,6,7,9,10], [2,4,6], [1,2,3,4,5,6,7,8], '[data-dnd-score]', '', 240, 120);
+buildNestedDiagram('dndStage2', [1,3,4,6,7,9,10,11,12], [3,6,9], [1,2,3,4,5,6,7,8,9,10], '[data-dnd-score2]', '2', 250, 120);
+
+/* ===================== counter-examples ===================== */
+document.querySelectorAll('.c-reveal-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{ document.getElementById(btn.dataset.reveal).classList.toggle('show'); });
+});
+
+/* ===================== solved examples ===================== */
+const SOLVED = [
+  {q:'Is {2,4,6} ⊆ {1,2,3,4,5,6}? Justify.',
+   a:'<strong>Yes.</strong> Check every element of {2,4,6}: 2∈{1,…,6} ✓, 4∈{1,…,6} ✓, 6∈{1,…,6} ✓. All three pass, so the subset relationship holds.'},
+  {q:'List all subsets of {a,b}.',
+   a:'∅, {a}, {b}, {a,b} — <strong>4 subsets</strong> in total (including the empty set and the whole set itself). This matches 2² = 4, previewing next topic\'s Power Set formula.'},
+  {q:'Prove {x∈ℤ | x is a multiple of 6} ⊆ {x∈ℤ | x is a multiple of 3}.',
+   a:'Let x be any multiple of 6. Then x = 6k for some integer k, which means x = 3(2k) — so x is also a multiple of 3. Since x was arbitrary, every multiple of 6 is a multiple of 3, proving the subset relationship in general (not just for a few examples).'},
+  {q:'Use the double-containment technique to prove A = B, where A = {x∈ℤ | x²=4} and B = {−2, 2}.',
+   a:'<strong>A⊆B:</strong> if x²=4 then x=2 or x=−2, both of which are in B.<br><strong>B⊆A:</strong> 2²=4 ✓ so 2∈A; (−2)²=4 ✓ so −2∈A.<br>Since A⊆B and B⊆A, <strong>A = B.</strong>'},
+  {q:'How many subsets does {a,b,c} have? List them.',
+   a:'∅, {a}, {b}, {c}, {a,b}, {a,c}, {b,c}, {a,b,c} — <strong>8 subsets</strong>, matching 2³ = 8.'}
+];
+const solvedContainer = document.getElementById('solvedContainer');
+SOLVED.forEach((s,i)=>{
+  const card=document.createElement('div'); card.className='solved-card';
+  const pid='solved4-panel-'+i;
+  card.innerHTML = `<div class="solved-num">Example ${i+1}</div><div class="solved-q">${s.q}</div>
+    <button class="solved-reveal-btn">Reveal Solution</button>
+    <div class="solved-panel" id="${pid}"><div class="solved-panel-inner">${s.a}</div></div>`;
+  card.querySelector('.solved-reveal-btn').addEventListener('click', ()=>{ document.getElementById(pid).classList.toggle('show'); });
+  solvedContainer.appendChild(card);
+});
+
+/* ===================== exercises ===================== */
+const EXERCISES = [
+  {q:'Is {1,3,5} ⊆ {1,2,3,4,5}?', a:'<strong>Yes</strong> — 1, 3, and 5 are all present in {1,2,3,4,5}.'},
+  {q:'List all subsets of {x,y,z}.', a:'∅, {x}, {y}, {z}, {x,y}, {x,z}, {y,z}, {x,y,z} — <strong>8 subsets</strong> (2³).'},
+  {q:'Is ∅ ⊆ {7,8,9}? Justify.', a:'<strong>Yes, vacuously.</strong> ∅ has no elements to fail the membership test, so "every element of ∅ is in {7,8,9}" is automatically true.'},
+  {q:'True or False: if A⊆B and B⊆C, then A⊆C.', a:'<strong>True — this is transitivity.</strong> If every element of A is in B, and every element of B is in C, then every element of A is in C too, by chaining the two implications.'},
+  {q:'Which is correct: {5} ∈ {5,10,15}, or {5} ⊆ {5,10,15}?', a:'<strong>{5} ⊆ {5,10,15}</strong> is correct — the lone element of {5} (namely 5) is a member of {5,10,15}. {5} itself is not one of the listed elements 5, 10, 15, so {5} ∈ {5,10,15} is false.'}
+];
+const exContainer = document.getElementById('exerciseContainer');
+EXERCISES.forEach((ex,i)=>{
+  const card=document.createElement('div'); card.className='ux-card';
+  const pid='ux4-panel-'+i;
+  card.innerHTML = `<div class="ux-num">Exercise ${i+1}</div><div class="ux-q">${ex.q}</div>
+    <textarea class="ux-scratch" placeholder="Write your answer here first..."></textarea>
+    <button class="ux-reveal-btn">Reveal Answer</button>
+    <div class="ux-panel" id="${pid}"><div class="ux-panel-inner">${ex.a}</div></div>`;
+  card.querySelector('.ux-reveal-btn').addEventListener('click', ()=>{ document.getElementById(pid).classList.toggle('show'); });
+  exContainer.appendChild(card);
+});
+</script>
+</body>
+</html>

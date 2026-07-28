@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empty · Finite · Infinite · Countable · Uncountable · Topic 2 of 6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pcb:#0F1B15; --pcb-light:#17251D; --pcb-line:#25392C;
+    --copper:#C08552; --phosphor:#6FE3A6; --warn:#E0794F; --bonus:#D9A441;
+    --paper:#F3EEDF; --ink:#211C12; --ink-soft:#6B6250; --purple:#8B6FC9;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--pcb);color:var(--paper);font-family:'IBM Plex Sans',sans-serif;padding:0 0 100px;line-height:1.65;
+    background-image:radial-gradient(circle at 1px 1px, rgba(111,227,166,0.05) 1px, transparent 0); background-size:26px 26px;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  ::selection{background:var(--phosphor);color:var(--pcb);}
+  a:focus-visible, button:focus-visible, .toggle:focus-visible{outline:2px solid var(--phosphor); outline-offset:3px;}
+
+  /* ============ hero ============ */
+  .hero{position:relative;padding:50px 16px 36px;text-align:center;overflow:hidden;border-bottom:1px solid var(--pcb-line);background:linear-gradient(180deg,#0B1410 0%, var(--pcb) 100%);}
+  .hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;background-image:linear-gradient(var(--pcb-line) 1px, transparent 1px),linear-gradient(90deg, var(--pcb-line) 1px, transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse at center, black 0%, transparent 72%);}
+  .hero-inner{position:relative;z-index:1;}
+  .hero-fig{width:150px;height:150px;margin:0 auto 14px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(24px,5.4vw,42px);margin:0 0 10px;color:var(--paper);text-shadow:0 0 30px rgba(111,227,166,.2);}
+  .sub{text-align:center;color:#B9C4B9;font-size:14.5px;margin:0 auto;max-width:600px;line-height:1.6;}
+  .series-chip{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;background:rgba(217,164,65,.12);border:1px solid var(--bonus);color:var(--bonus);padding:4px 14px;border-radius:20px;margin-top:14px;letter-spacing:.04em;}
+
+  .panel-nav{position:sticky;top:0;z-index:40;background:rgba(15,27,21,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--pcb-line);padding:10px 16px;}
+  .panel-nav-inner{max-width:900px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+  .nav-led{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8FA093;text-decoration:none;padding:5px 10px;border-radius:20px;border:1px solid transparent;transition:.2s ease;}
+  .nav-led:hover{color:var(--paper);border-color:var(--pcb-line);}
+
+  .wrap{max-width:900px;margin:0 auto;padding:0 16px;}
+  .section-block{max-width:900px;margin:0 auto;padding:56px 16px 0;scroll-margin-top:64px;}
+  .sec-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.12em;text-align:center;margin-bottom:8px;}
+  .sec-title{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(22px,4.4vw,32px);text-align:center;margin:0 0 16px;color:var(--paper);}
+  .sec-sub{text-align:center;color:#B9C4B9;font-size:14px;max-width:640px;margin:0 auto 26px;}
+
+  .concept-box{background:var(--pcb-light);border:1.5px solid var(--pcb-line);border-radius:14px;padding:18px 22px;margin-bottom:18px;}
+  .concept-box strong{color:var(--paper);}
+  .concept-box p{font-size:14px;color:#DDE6DF;margin:0 0 10px;line-height:1.65;}
+  .concept-box p:last-child{margin-bottom:0;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:rgba(0,0,0,.25);color:var(--copper);padding:1px 6px;border-radius:4px;}
+
+  .formula-pill{font-family:'IBM Plex Mono',monospace;font-size:15px;background:rgba(111,227,166,.1);border:1.5px solid var(--phosphor);color:var(--phosphor);padding:9px 20px;border-radius:10px;display:inline-block;}
+  .pill-wrap{text-align:center;margin:14px 0;}
+
+  /* ============ definition cards for the 5 terms ============ */
+  .def-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:18px;}
+  .def-card{background:var(--pcb-light);border:1.5px solid var(--pcb-line);border-radius:12px;padding:14px 16px;}
+  .def-card .dname{font-family:'Fraunces',serif;font-weight:700;font-size:15px;color:var(--phosphor);margin-bottom:6px;}
+  .def-card p{font-size:12.5px;color:#B9C4B9;margin:0;line-height:1.55;}
+
+  .hierarchy-plate{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:14px;padding:18px 20px;margin-bottom:18px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:#DDE6DF;line-height:2;}
+  .hierarchy-plate .hl{color:var(--bonus);}
+
+  /* ============ real-life example cards ============ */
+  .ex-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:20px;}
+  .ex-card{background:var(--paper);color:var(--ink);border-radius:10px;padding:20px 22px;box-shadow:0 14px 28px -18px rgba(0,0,0,.5);}
+  .ex-icon{width:42px;height:42px;color:var(--copper);margin-bottom:12px;}
+  .ex-icon svg{width:100%;height:100%;}
+  .ex-card h4{font-family:'Fraunces',serif;font-weight:700;font-size:16px;margin:0 0 6px;}
+  .ex-card p{font-size:13.5px;margin:0;color:var(--ink-soft);}
+  .ex-sample{margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;background:rgba(47,122,95,.1);color:#1f5c47;border:1px solid rgba(47,122,95,.3);padding:4px 10px;border-radius:20px;}
+
+  /* ============ classify card (3-way segment) ============ */
+  .cls-card{background:var(--pcb-light);border:1.5px solid var(--pcb-line);border-radius:14px;padding:18px 20px;margin-bottom:18px;}
+  .cls-formula{text-align:center;font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--phosphor);background:rgba(111,227,166,.08);border-radius:10px;padding:10px;margin-bottom:14px;}
+  .cls-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;}
+  .seg{display:inline-flex;border:1.5px solid var(--pcb-line);border-radius:20px;overflow:hidden;background:rgba(0,0,0,.25);}
+  .seg button{border:none;background:transparent;padding:8px 15px;font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;color:#8FA093;transition:.15s ease;}
+  .seg button.sel{background:rgba(111,227,166,.16);color:var(--phosphor);}
+  .seg button.sel.bad-sel{background:rgba(224,121,79,.16);color:var(--warn);}
+  .cls-icon{width:20px;height:20px;border-radius:50%;font-size:12px;line-height:20px;text-align:center;font-weight:700;color:#0B140F;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .cls-icon.show{opacity:1;transform:scale(1);}
+  .cls-icon.ok{background:var(--phosphor);} .cls-icon.bad{background:var(--warn);color:#fff;}
+  .cls-btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:12px;}
+  .tbtn{background:transparent;border:1.5px solid var(--pcb-line);color:#B9C4B9;border-radius:20px;padding:5px 12px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;transition:.15s ease;}
+  .tbtn:hover{background:var(--pcb-light);color:var(--paper);border-color:var(--copper);}
+  .tbtn.primary{background:rgba(111,227,166,.12);border-color:var(--phosphor);color:var(--phosphor);}
+  .cls-explain{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .cls-explain.show{max-height:200px;opacity:1;margin-top:12px;}
+  .cls-explain-inner{background:#0E1912;border:1px solid var(--pcb-line);border-radius:10px;padding:12px 16px;font-size:12.5px;line-height:1.6;color:#B9C4B9;}
+  .cls-explain-inner strong{color:var(--paper);}
+
+  /* ============ drag-sort venn ============ */
+  .dnd-card{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:16px;padding:18px 20px;margin-bottom:20px;}
+  .dnd-title{text-align:center;font-family:'Fraunces',serif;font-weight:700;font-size:16px;color:var(--paper);margin-bottom:4px;}
+  .dnd-instructions{text-align:center;font-size:12.5px;color:#8FA093;margin-bottom:14px;}
+  .dnd-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+  .dnd-score{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8FA093;}
+  .dnd-score strong{color:var(--phosphor);}
+  .dnd-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .dnd-stage{position:relative;width:100%;height:300px;background:#0E1912;border:1.5px solid #37493F;border-radius:10px;overflow:hidden;touch-action:none;}
+  .sort-divider{position:absolute;left:50%;top:0;bottom:0;width:0;border-left:2px dashed #37493F;}
+  .sort-zone-label{position:absolute;top:10px;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;letter-spacing:.04em;}
+  .sort-zone-label.left{left:16px;color:var(--phosphor);}
+  .sort-zone-label.right{right:16px;color:var(--warn);}
+  .dnd-chip{position:absolute;min-width:44px;height:40px;padding:0 10px;border-radius:20px;background:#1C2B21;border:2px solid #8FA093;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;color:var(--paper);cursor:grab;user-select:none;touch-action:none;transition:border-color .2s ease, box-shadow .2s ease;z-index:5;white-space:nowrap;}
+  .dnd-chip:active{cursor:grabbing;}
+  .dnd-chip.correct{border-color:var(--phosphor);box-shadow:0 0 10px rgba(111,227,166,.5);}
+  .dnd-chip.incorrect{border-color:var(--warn);box-shadow:0 0 10px rgba(224,121,79,.5);}
+  .dnd-caption{text-align:center;font-size:12.5px;color:#B9C4B9;margin-top:12px;}
+
+  /* ============ counter-examples ============ */
+  .counter-card{background:var(--paper);color:var(--ink);border-radius:8px;padding:18px 22px;margin-bottom:16px;box-shadow:0 14px 28px -18px rgba(0,0,0,.55);}
+  .counter-tag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:10px;padding:3px 11px;border-radius:20px;margin-bottom:10px;color:#fff;background:#B5493D;text-transform:uppercase;letter-spacing:.04em;}
+  .counter-card p{font-size:14px;margin:0 0 10px;}
+  .c-reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:5px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .c-reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .c-reveal-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .c-reveal-panel.show{max-height:260px;opacity:1;margin-top:10px;}
+  .c-reveal-inner{border-top:1.5px dashed rgba(33,28,18,.2);padding-top:8px;font-size:13.5px;}
+
+  /* ============ solved examples ============ */
+  .solved-card{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:14px;padding:18px 22px;margin-bottom:16px;}
+  .solved-num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+  .solved-q{font-size:14.5px;color:var(--paper);margin-bottom:12px;}
+  .solved-reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.03em;text-transform:uppercase;background:rgba(111,227,166,.1);border:1.5px solid var(--phosphor);color:var(--phosphor);padding:8px 16px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .solved-reveal-btn:hover{background:rgba(111,227,166,.2);}
+  .solved-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .solved-panel.show{max-height:420px;opacity:1;margin-top:12px;}
+  .solved-panel-inner{background:#0E1912;border-left:3px solid var(--phosphor);border-radius:0 8px 8px 0;padding:12px 16px;font-size:13.5px;line-height:1.65;color:#DDE6DF;}
+  .solved-panel-inner strong{color:var(--paper);}
+
+  /* ============ exercises ============ */
+  .ux-card{background:var(--paper);color:var(--ink);border-radius:8px;padding:16px 20px;margin-bottom:12px;box-shadow:0 12px 24px -16px rgba(0,0,0,.5);}
+  .ux-num{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12px;color:var(--copper);}
+  .ux-q{font-size:14px;margin:6px 0 10px;}
+  .ux-scratch{width:100%;border:1.5px dashed rgba(33,28,18,.25);border-radius:8px;background:rgba(255,255,255,.5);padding:8px 11px;font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;color:var(--ink);resize:vertical;min-height:36px;margin:6px 0;}
+  .ux-reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:5px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .ux-reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .ux-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .ux-panel.show{max-height:200px;opacity:1;margin-top:8px;}
+  .ux-panel-inner{border-top:1.5px dashed rgba(33,28,18,.2);padding-top:8px;font-size:13.5px;}
+
+  .next-banner{max-width:900px;margin:70px auto 0;padding:0 16px;text-align:center;}
+  .next-banner-inner{background:var(--pcb-light);border:1.5px dashed var(--bonus);border-radius:14px;padding:20px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--bonus);}
+
+  footer{text-align:center;font-size:11.5px;color:#5C6B60;margin-top:50px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;}
+  footer .ok{color:var(--phosphor);}
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <svg class="hero-fig" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="6" width="138" height="138" rx="12" fill="none" stroke="#25392C" stroke-width="2"/>
+        <path d="M45 75 C45 60 58 60 66 75 C74 90 87 90 87 75 C87 60 74 60 66 75 C58 90 45 90 45 75 Z" fill="none" stroke="#6FE3A6" stroke-width="4"/>
+        <circle cx="115" cy="35" r="3" fill="#C08552"/>
+        <circle cx="125" cy="115" r="3" fill="#C08552"/>
+        <circle cx="30" cy="30" r="3" fill="#C08552"/>
+      </svg>
+      <div class="eyebrow">Discrete Mathematics · Set Theory Module</div>
+      <h1 class="page-title">Empty, Finite, Infinite,<br>Countable &amp; Uncountable</h1>
+      <p class="sub">Not all infinities are the same size. This is where set theory stops being obvious and starts being beautiful.</p>
+      <div class="series-chip">Topic 2 of 6 · Set Theory Series</div>
+    </div>
+  </div>
+
+  <div class="panel-nav">
+    <div class="panel-nav-inner" id="navRow"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="definition">
+    <div class="sec-eyebrow">2.1</div>
+    <h2 class="sec-title">Five Words, Five Definitions</h2>
+    <div class="def-grid">
+      <div class="def-card"><div class="dname">Empty</div><p>The set with zero elements, written <span class="mono">∅</span> or <span class="mono">{ }</span>. There is exactly one empty set.</p></div>
+      <div class="def-card"><div class="dname">Finite</div><p>A set whose elements can be counted completely, ending at some whole number n. Its cardinality is that n.</p></div>
+      <div class="def-card"><div class="dname">Infinite</div><p>A set that is not finite — no matter how long you count, you never finish.</p></div>
+      <div class="def-card"><div class="dname">Countable</div><p>Finite, <em>or</em> infinite but "listable" — there's a way to put its elements in one-to-one correspondence with ℕ = {1, 2, 3, …}.</p></div>
+      <div class="def-card"><div class="dname">Uncountable</div><p>Infinite, and impossible to list even in principle — no bijection with ℕ exists. Strictly "more" elements than ℕ has.</p></div>
+    </div>
+    <div class="concept-box">
+      <p><strong>The key surprise of this topic:</strong> "infinite" is not one size. Some infinite sets (like ℕ, ℤ, ℚ) can be listed one at a time and are called <strong>countably infinite</strong>. Others (like ℝ) are so much bigger that no list — however cleverly you order it — can ever capture all of them. Those are <strong>uncountable</strong>.</p>
+    </div>
+    <div class="hierarchy-plate">
+      All Sets = <span class="hl">Finite</span> ∪ <span class="hl">Infinite</span><br>
+      <span class="hl">Infinite</span> = Countably Infinite ∪ <span class="hl">Uncountable</span><br>
+      <span class="hl">Countable</span> = Finite ∪ Countably Infinite
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="real-life">
+    <div class="sec-eyebrow">2.2</div>
+    <h2 class="sec-title">Three Real-Life Examples</h2>
+    <p class="sec-sub">One finite, one countably infinite, one uncountable — same everyday world, three completely different kinds of "how many."</p>
+    <div class="ex-grid">
+      <div class="ex-card">
+        <div class="ex-icon"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="7"/><ellipse cx="24" cy="24" rx="20" ry="8"/><circle cx="4" cy="24" r="1.8" fill="currentColor" stroke="none"/><circle cx="44" cy="24" r="1.8" fill="currentColor" stroke="none"/></svg></div>
+        <h4>Planets in the Solar System</h4>
+        <p>The set of planets currently orbiting the Sun. You can count all of them and the counting stops — a textbook finite set.</p>
+        <div class="ex-sample">|Set| = 8 — finite</div>
+      </div>
+      <div class="ex-card">
+        <div class="ex-icon"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="18"/><path d="M24 14 V24 L32 29"/></svg></div>
+        <h4>Every Tick of a Clock, Forever</h4>
+        <p>The set of every second a clock ticks, if it ran forever: tick 1, tick 2, tick 3, … Each tick has a definite position in the count — nothing is skipped, and the list never ends.</p>
+        <div class="ex-sample">Countably infinite</div>
+      </div>
+      <div class="ex-card">
+        <div class="ex-icon"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="19" y="6" width="10" height="26" rx="5"/><circle cx="24" cy="36" r="7"/><line x1="24" y1="14" x2="24" y2="30"/></svg></div>
+        <h4>A Thermometer's True Reading</h4>
+        <p>The set of every exact real-valued temperature a fever thermometer could theoretically show between 36.0°C and 37.0°C. Between any two readings sit infinitely many more — no list can ever enumerate them all.</p>
+        <div class="ex-sample">Uncountable</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="math-examples">
+    <div class="sec-eyebrow">2.3</div>
+    <h2 class="sec-title">Three Mathematical Examples</h2>
+    <p class="sec-sub">Classify each set-builder expression yourself before checking.</p>
+
+    <div class="cls-card" id="cls-1">
+      <div class="cls-formula">A = { x ∈ ℤ &nbsp;|&nbsp; x² ≤ 25 }</div>
+      <div class="cls-row"><div class="seg" data-role="cls"><button data-val="Finite">Finite</button><button data-val="Countably Infinite">Countably Infinite</button><button data-val="Uncountable">Uncountable</button></div><span class="cls-icon"></span></div>
+      <div class="cls-btns"><button class="tbtn primary" data-act="check">Check</button><button class="tbtn" data-act="reveal">Reveal</button><button class="tbtn" data-act="reset">Reset</button></div>
+      <div class="cls-explain"><div class="cls-explain-inner"><strong>Finite.</strong> x² ≤ 25 forces −5 ≤ x ≤ 5, so A = {−5,−4,−3,−2,−1,0,1,2,3,4,5} — exactly 11 elements, and the counting stops.</div></div>
+    </div>
+
+    <div class="cls-card" id="cls-2">
+      <div class="cls-formula">B = { x ∈ ℕ &nbsp;|&nbsp; x is even }</div>
+      <div class="cls-row"><div class="seg" data-role="cls"><button data-val="Finite">Finite</button><button data-val="Countably Infinite">Countably Infinite</button><button data-val="Uncountable">Uncountable</button></div><span class="cls-icon"></span></div>
+      <div class="cls-btns"><button class="tbtn primary" data-act="check">Check</button><button class="tbtn" data-act="reveal">Reveal</button><button class="tbtn" data-act="reset">Reset</button></div>
+      <div class="cls-explain"><div class="cls-explain-inner"><strong>Countably infinite.</strong> B = {2,4,6,8,…} never ends, but the bijection n ↦ 2n matches every natural number to exactly one even number — a complete, orderly list.</div></div>
+    </div>
+
+    <div class="cls-card" id="cls-3">
+      <div class="cls-formula">C = { x ∈ ℝ &nbsp;|&nbsp; 0 &lt; x &lt; 1 }</div>
+      <div class="cls-row"><div class="seg" data-role="cls"><button data-val="Finite">Finite</button><button data-val="Countably Infinite">Countably Infinite</button><button data-val="Uncountable">Uncountable</button></div><span class="cls-icon"></span></div>
+      <div class="cls-btns"><button class="tbtn primary" data-act="check">Check</button><button class="tbtn" data-act="reveal">Reveal</button><button class="tbtn" data-act="reset">Reset</button></div>
+      <div class="cls-explain"><div class="cls-explain-inner"><strong>Uncountable.</strong> This open interval has exactly the same cardinality as all of ℝ. Cantor's diagonal argument proves no list — however you order it — can contain every real number between 0 and 1.</div></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="venn">
+    <div class="sec-eyebrow">2.4</div>
+    <h2 class="sec-title">Two Sorting Diagrams — Drag It Yourself</h2>
+    <p class="sec-sub">Drag each set into the region where it belongs.</p>
+
+    <div class="dnd-card">
+      <div class="dnd-title">Diagram 1 — Finite or Infinite?</div>
+      <div class="dnd-instructions">Drag every chip into the correct half.</div>
+      <div class="dnd-toolbar">
+        <span class="dnd-score">Placed correctly: <strong data-dnd-score>0</strong> / 6</span>
+        <span class="dnd-btns"><button class="tbtn primary" data-dnd-act="check">Check</button><button class="tbtn" data-dnd-act="reveal">Reveal</button><button class="tbtn" data-dnd-act="reset">Reset</button></span>
+      </div>
+      <div class="dnd-stage" id="dndStage1">
+        <div class="sort-divider"></div>
+        <span class="sort-zone-label left">FINITE</span>
+        <span class="sort-zone-label right">INFINITE</span>
+      </div>
+      <div class="dnd-caption">∅, {1,2,…,50}, ℕ, ℝ, {x | x²=4}, ℚ</div>
+    </div>
+
+    <div class="dnd-card">
+      <div class="dnd-title">Diagram 2 — Countable or Uncountable?</div>
+      <div class="dnd-instructions">All six of these sets are infinite. Drag each into the correct half — this is the harder distinction.</div>
+      <div class="dnd-toolbar">
+        <span class="dnd-score">Placed correctly: <strong data-dnd-score2>0</strong> / 6</span>
+        <span class="dnd-btns"><button class="tbtn primary" data-dnd-act2="check">Check</button><button class="tbtn" data-dnd-act2="reveal">Reveal</button><button class="tbtn" data-dnd-act2="reset">Reset</button></span>
+      </div>
+      <div class="dnd-stage" id="dndStage2">
+        <div class="sort-divider"></div>
+        <span class="sort-zone-label left">COUNTABLE</span>
+        <span class="sort-zone-label right">UNCOUNTABLE</span>
+      </div>
+      <div class="dnd-caption">ℕ, ℤ, ℚ, ℝ, 𝒫(ℕ), {2,4,6,8,…}</div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="counter">
+    <div class="sec-eyebrow">2.5</div>
+    <h2 class="sec-title">Two Counter-Examples</h2>
+    <p class="sec-sub">Two claims that sound reasonable — and are both false.</p>
+
+    <div class="counter-card">
+      <span class="counter-tag">False Claim</span>
+      <p><em>"ℕ and ℝ are both infinite, so they must have the same number of elements."</em></p>
+      <button class="c-reveal-btn" data-reveal="ctr2-1">Reveal Why This Fails</button>
+      <div class="c-reveal-panel" id="ctr2-1"><div class="c-reveal-inner"><strong>False — via Cantor's diagonal argument.</strong> Suppose you could list every real number in (0,1) as a sequence r₁, r₂, r₃, … Build a new number d by taking the n-th decimal digit of rₙ and changing it (e.g. add 1, wrapping 9→0). This d differs from every rₙ in at least one digit — so d isn't on the list, contradicting the assumption that the list was complete. No list can capture all of ℝ. Since ℕ demonstrably <em>can</em> be listed and ℝ demonstrably <em>cannot</em>, |ℝ| &gt; |ℕ| — two infinities, two different sizes.</div></div>
+    </div>
+
+    <div class="counter-card">
+      <span class="counter-tag">False Claim</span>
+      <p><em>"A set can never be the same size as one of its own proper subsets."</em></p>
+      <button class="c-reveal-btn" data-reveal="ctr2-2">Reveal Why This Fails</button>
+      <div class="c-reveal-panel" id="ctr2-2"><div class="c-reveal-inner"><strong>False for infinite sets — true only for finite ones.</strong> Let E = {2,4,6,8,…} ⊂ ℕ. E is a <em>proper</em> subset of ℕ — it's missing every odd number. Yet the map n ↦ 2n is a perfect bijection between ℕ and E, so |E| = |ℕ|. A finite set can never match a proper subset of itself (remove one element, the count drops) — but infinite sets routinely do. Mathematicians (following Dedekind) actually use exactly this property to <em>define</em> what "infinite" means.</div></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="solved">
+    <div class="sec-eyebrow">2.6</div>
+    <h2 class="sec-title">Solved Examples</h2>
+    <div id="solvedContainer"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="exercises">
+    <div class="sec-eyebrow">2.7</div>
+    <h2 class="sec-title">Exercises</h2>
+    <p class="sec-sub">Try each one before revealing.</p>
+    <div id="exerciseContainer"></div>
+  </div>
+
+  <div class="next-banner">
+    <div class="next-banner-inner">✓ Topic 2 of 6 complete — <strong>Empty / Finite / Infinite / Countable / Uncountable Sets</strong>.<br>Say the word and we'll move on to Topic 3: Types of Sets &amp; Set Algebra.</div>
+  </div>
+
+  <footer>Discrete Mathematics · Set Theory Module · Topic 2 &nbsp;—&nbsp; <span class="ok">CIRCUIT COMPLETE ✓</span></footer>
+
+<script>
+/* ===================== nav ===================== */
+const navItems = [
+  {id:'definition', label:'Definitions'},
+  {id:'real-life', label:'Real-Life'},
+  {id:'math-examples', label:'Math Examples'},
+  {id:'venn', label:'Sort Diagrams'},
+  {id:'counter', label:'Counter-Examples'},
+  {id:'solved', label:'Solved'},
+  {id:'exercises', label:'Exercises'}
+];
+const navRow = document.getElementById('navRow');
+navItems.forEach(n=>{ const a=document.createElement('a'); a.href='#'+n.id; a.className='nav-led'; a.textContent=n.label; navRow.appendChild(a); });
+
+/* ===================== 3-way classifier ===================== */
+function buildClassifier(cardId, correct){
+  const card = document.getElementById(cardId);
+  const seg = card.querySelector('[data-role="cls"]');
+  const icon = card.querySelector('.cls-icon');
+  const explain = card.querySelector('.cls-explain');
+  seg.querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      seg.querySelectorAll('button').forEach(x=>x.classList.remove('sel','bad-sel'));
+      const ok = b.dataset.val === correct;
+      b.classList.add('sel', ok ? '' : 'bad-sel');
+      icon.classList.add('show', ok?'ok':'bad'); icon.textContent = ok?'✓':'✗';
+      explain.classList.add('show');
+    });
+  });
+  card.querySelector('[data-act="check"]').addEventListener('click', ()=>{
+    const sel = seg.querySelector('button.sel');
+    if(sel){ const ok = sel.dataset.val===correct; icon.classList.add('show', ok?'ok':'bad'); icon.textContent = ok?'✓':'✗'; explain.classList.add('show'); }
+  });
+  card.querySelector('[data-act="reveal"]').addEventListener('click', ()=>{
+    seg.querySelectorAll('button').forEach(x=>x.classList.remove('sel','bad-sel'));
+    seg.querySelector(`button[data-val="${correct}"]`).classList.add('sel');
+    icon.classList.add('show','ok'); icon.textContent='✓';
+    explain.classList.add('show');
+  });
+  card.querySelector('[data-act="reset"]').addEventListener('click', ()=>{
+    seg.querySelectorAll('button').forEach(x=>x.classList.remove('sel','bad-sel'));
+    icon.classList.remove('show','ok','bad');
+    explain.classList.remove('show');
+  });
+}
+buildClassifier('cls-1', 'Finite');
+buildClassifier('cls-2', 'Countably Infinite');
+buildClassifier('cls-3', 'Uncountable');
+
+/* ===================== drag-sort engine (reused pattern) ===================== */
+function makeDraggable(chip, stage, onDrop){
+  chip.addEventListener('pointerdown', (e)=>{
+    e.preventDefault();
+    chip.setPointerCapture(e.pointerId);
+    const startX = e.clientX, startY = e.clientY;
+    const startLeft = chip.offsetLeft, startTop = chip.offsetTop;
+    chip.style.zIndex = 30;
+    function move(ev){
+      const dx = ev.clientX - startX, dy = ev.clientY - startY;
+      let newLeft = startLeft + dx, newTop = startTop + dy;
+      newLeft = Math.max(0, Math.min(stage.clientWidth - chip.offsetWidth, newLeft));
+      newTop = Math.max(0, Math.min(stage.clientHeight - chip.offsetHeight, newTop));
+      chip.style.left = newLeft + 'px';
+      chip.style.top = newTop + 'px';
+    }
+    function up(){
+      chip.removeEventListener('pointermove', move);
+      chip.removeEventListener('pointerup', up);
+      chip.style.zIndex = 5;
+      onDrop();
+    }
+    chip.addEventListener('pointermove', move);
+    chip.addEventListener('pointerup', up);
+  });
+}
+function zoneOf(chip, stage){
+  const chx = chip.offsetLeft + chip.offsetWidth/2;
+  return chx < stage.clientWidth/2 ? 'left' : 'right';
+}
+function layoutTray(chips, stage){
+  const n = chips.length;
+  const trayY = stage.clientHeight - 60;
+  const spacing = stage.clientWidth / (n+1);
+  chips.forEach((chip,i)=>{
+    const w = chip.offsetWidth || 60;
+    chip.style.left = Math.round(spacing*(i+1) - w/2) + 'px';
+    chip.style.top = trayY + 'px';
+  });
+}
+function buildSortDiagram(stageId, items, scoreSelector, actPrefix){
+  const stage = document.getElementById(stageId);
+  const chips = items.map(it=>{
+    const chip = document.createElement('div');
+    chip.className = 'dnd-chip'; chip.textContent = it.label; chip.dataset.zone = it.zone;
+    stage.appendChild(chip);
+    return chip;
+  });
+  requestAnimationFrame(()=> layoutTray(chips, stage));
+  function updateScore(){
+    document.querySelector(scoreSelector).textContent = chips.filter(c=>c.classList.contains('correct')).length;
+  }
+  chips.forEach(chip=> makeDraggable(chip, stage, ()=>{ chip.classList.remove('correct','incorrect'); updateScore(); }));
+
+  document.querySelector(`[data-dnd-act${actPrefix}="check"]`).addEventListener('click', ()=>{
+    chips.forEach(chip=>{
+      const ok = zoneOf(chip, stage) === chip.dataset.zone;
+      chip.classList.remove('correct','incorrect');
+      chip.classList.add(ok?'correct':'incorrect');
+    });
+    updateScore();
+  });
+  document.querySelector(`[data-dnd-act${actPrefix}="reveal"]`).addEventListener('click', ()=>{
+    const leftChips = chips.filter(c=>c.dataset.zone==='left');
+    const rightChips = chips.filter(c=>c.dataset.zone==='right');
+    leftChips.forEach((chip,i)=>{
+      chip.style.left = (20 + (i%3)*90) + 'px';
+      chip.style.top = (60 + Math.floor(i/3)*56) + 'px';
+      chip.classList.remove('incorrect'); chip.classList.add('correct');
+    });
+    rightChips.forEach((chip,i)=>{
+      chip.style.left = Math.round(stage.clientWidth*0.58 + (i%2)*90) + 'px';
+      chip.style.top = (60 + Math.floor(i/2)*56) + 'px';
+      chip.classList.remove('incorrect'); chip.classList.add('correct');
+    });
+    updateScore();
+  });
+  document.querySelector(`[data-dnd-act${actPrefix}="reset"]`).addEventListener('click', ()=>{
+    chips.forEach(c=>c.classList.remove('correct','incorrect'));
+    layoutTray(chips, stage);
+    updateScore();
+  });
+}
+
+buildSortDiagram('dndStage1', [
+  {label:'∅', zone:'left'},
+  {label:'{1,2,…,50}', zone:'left'},
+  {label:'ℕ', zone:'right'},
+  {label:'ℝ', zone:'right'},
+  {label:'{x|x²=4}', zone:'left'},
+  {label:'ℚ', zone:'right'}
+], '[data-dnd-score]', '');
+
+buildSortDiagram('dndStage2', [
+  {label:'ℕ', zone:'left'},
+  {label:'ℤ', zone:'left'},
+  {label:'ℚ', zone:'left'},
+  {label:'ℝ', zone:'right'},
+  {label:'𝒫(ℕ)', zone:'right'},
+  {label:'{2,4,6,8,…}', zone:'left'}
+], '[data-dnd-score2]', '2');
+
+/* ===================== counter-examples ===================== */
+document.querySelectorAll('.c-reveal-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{ document.getElementById(btn.dataset.reveal).classList.toggle('show'); });
+});
+
+/* ===================== solved examples ===================== */
+const SOLVED = [
+  {q:'Determine whether A = {x ∈ ℤ | −3 ≤ x ≤ 3} is finite or infinite. State its cardinality.',
+   a:'<strong>Finite.</strong> A = {−3,−2,−1,0,1,2,3} — exactly 7 elements, so |A| = 7.'},
+  {q:'Show that the set of positive even integers is countably infinite by exhibiting a bijection with ℕ.',
+   a:'Define f: ℕ → {positive even integers} by <span class="mono">f(n) = 2n</span>. This is injective (different n give different 2n) and surjective (every even number 2k is f(k)) — a genuine bijection. Since a bijection with ℕ exists, the set is <strong>countably infinite.</strong>'},
+  {q:'Is the empty set finite or infinite? Justify your answer.',
+   a:'<strong>Finite.</strong> "Finite" means the counting process terminates at some whole number — and 0 is a perfectly valid whole number. |∅| = 0, so ∅ is finite (and therefore automatically countable too).'},
+  {q:'Sketch Cantor\'s diagonal argument to show (0,1) ⊂ ℝ is uncountable.',
+   a:'Assume, for contradiction, that every real number in (0,1) can be listed as r₁, r₂, r₃, … written in decimal form. Construct a new number d by taking the n-th digit of rₙ and changing it to a different digit. Then d differs from every rₙ in at least the n-th place, so d isn\'t anywhere on the list — yet d ∈ (0,1). This contradicts the assumption that the list was complete. <strong>No such list can exist, so (0,1) is uncountable.</strong>'},
+  {q:'Is ℚ (the rationals) countable? Justify briefly.',
+   a:'<strong>Yes, countable.</strong> Arrange all fractions p/q (q≠0) in an infinite grid indexed by numerator and denominator, then trace a zig-zag diagonal path through the grid, skipping any fraction that reduces to one already counted. This path visits every rational number exactly once, in a definite order — a bijection with ℕ. Surprisingly, ℚ has the <em>same</em> cardinality as ℕ, even though ℚ looks "denser."'}
+];
+const solvedContainer = document.getElementById('solvedContainer');
+SOLVED.forEach((s,i)=>{
+  const card = document.createElement('div');
+  card.className = 'solved-card';
+  const pid = 'solved2-panel-'+i;
+  card.innerHTML = `<div class="solved-num">Example ${i+1}</div><div class="solved-q">${s.q}</div>
+    <button class="solved-reveal-btn">Reveal Solution</button>
+    <div class="solved-panel" id="${pid}"><div class="solved-panel-inner">${s.a}</div></div>`;
+  card.querySelector('.solved-reveal-btn').addEventListener('click', ()=>{ document.getElementById(pid).classList.toggle('show'); });
+  solvedContainer.appendChild(card);
+});
+
+/* ===================== exercises ===================== */
+const EXERCISES = [
+  {q:'Classify {x ∈ ℝ | x² + 1 = 0} as finite or infinite. (Careful — check whether it has any elements at all.)', a:'It\'s the empty set (no real number squares to −1), and the empty set is <strong>finite</strong> — cardinality 0.'},
+  {q:'Is the set of all finite-length strings over the alphabet {0, 1} countable or uncountable?', a:'<strong>Countable.</strong> You can list all strings of length 1, then all of length 2, then length 3, and so on — each length contributes only finitely many strings, and this ordering enumerates every finite string exactly once.'},
+  {q:'Give a bijection showing ℤ (all integers) is countably infinite.', a:'Zig-zag outward from 0: f(0)=0, and for n≥1, map even n ↦ n/2, odd n ↦ −(n+1)/2. This produces the order 0, 1, −1, 2, −2, 3, −3, … covering every integer exactly once.'},
+  {q:'Is the power set of a finite set always finite? Justify.', a:'<strong>Yes.</strong> If |S| = n, then |𝒫(S)| = 2ⁿ, which is always a finite number for finite n.'},
+  {q:'True or False: every subset of a countable set is countable.', a:'<strong>True.</strong> Any subset of a countable set can be listed by simply skipping the elements of the original list that aren\'t in the subset — the resulting list is still a valid enumeration (possibly finite, possibly infinite), so the subset is countable.'}
+];
+const exContainer = document.getElementById('exerciseContainer');
+EXERCISES.forEach((ex,i)=>{
+  const card = document.createElement('div');
+  card.className = 'ux-card';
+  const pid = 'ux2-panel-'+i;
+  card.innerHTML = `<div class="ux-num">Exercise ${i+1}</div><div class="ux-q">${ex.q}</div>
+    <textarea class="ux-scratch" placeholder="Write your answer here first..."></textarea>
+    <button class="ux-reveal-btn">Reveal Answer</button>
+    <div class="ux-panel" id="${pid}"><div class="ux-panel-inner">${ex.a}</div></div>`;
+  card.querySelector('.ux-reveal-btn').addEventListener('click', ()=>{ document.getElementById(pid).classList.toggle('show'); });
+  exContainer.appendChild(card);
+});
+</script>
+</body>
+</html>

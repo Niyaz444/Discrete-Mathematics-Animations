@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sets · Topic 1 of 6 · Set Theory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pcb:#0F1B15; --pcb-light:#17251D; --pcb-line:#25392C;
+    --copper:#C08552; --phosphor:#6FE3A6; --warn:#E0794F; --bonus:#D9A441;
+    --paper:#F3EEDF; --ink:#211C12; --ink-soft:#6B6250; --purple:#8B6FC9;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--pcb);color:var(--paper);font-family:'IBM Plex Sans',sans-serif;padding:0 0 100px;line-height:1.65;
+    background-image:radial-gradient(circle at 1px 1px, rgba(111,227,166,0.05) 1px, transparent 0); background-size:26px 26px;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  ::selection{background:var(--phosphor);color:var(--pcb);}
+  a:focus-visible, button:focus-visible, .toggle:focus-visible{outline:2px solid var(--phosphor); outline-offset:3px;}
+
+  /* ============ hero ============ */
+  .hero{position:relative;padding:50px 16px 36px;text-align:center;overflow:hidden;border-bottom:1px solid var(--pcb-line);background:linear-gradient(180deg,#0B1410 0%, var(--pcb) 100%);}
+  .hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;background-image:linear-gradient(var(--pcb-line) 1px, transparent 1px),linear-gradient(90deg, var(--pcb-line) 1px, transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse at center, black 0%, transparent 72%);}
+  .hero-inner{position:relative;z-index:1;}
+  .hero-fig{width:150px;height:150px;margin:0 auto 14px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(28px,6vw,46px);margin:0 0 10px;color:var(--paper);text-shadow:0 0 30px rgba(111,227,166,.2);}
+  .sub{text-align:center;color:#B9C4B9;font-size:14.5px;margin:0 auto;max-width:600px;line-height:1.6;}
+  .series-chip{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;background:rgba(217,164,65,.12);border:1px solid var(--bonus);color:var(--bonus);padding:4px 14px;border-radius:20px;margin-top:14px;letter-spacing:.04em;}
+
+  .panel-nav{position:sticky;top:0;z-index:40;background:rgba(15,27,21,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--pcb-line);padding:10px 16px;}
+  .panel-nav-inner{max-width:900px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+  .nav-led{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8FA093;text-decoration:none;padding:5px 10px;border-radius:20px;border:1px solid transparent;transition:.2s ease;}
+  .nav-led:hover{color:var(--paper);border-color:var(--pcb-line);}
+
+  .wrap{max-width:900px;margin:0 auto;padding:0 16px;}
+  .section-block{max-width:900px;margin:0 auto;padding:56px 16px 0;scroll-margin-top:64px;}
+  .sec-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.12em;text-align:center;margin-bottom:8px;}
+  .sec-title{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(22px,4.4vw,32px);text-align:center;margin:0 0 16px;color:var(--paper);}
+  .sec-sub{text-align:center;color:#B9C4B9;font-size:14px;max-width:620px;margin:0 auto 26px;}
+
+  .concept-box{background:var(--pcb-light);border:1.5px solid var(--pcb-line);border-radius:14px;padding:18px 22px;margin-bottom:18px;}
+  .concept-box strong{color:var(--paper);}
+  .concept-box p{font-size:14px;color:#DDE6DF;margin:0 0 10px;line-height:1.65;}
+  .concept-box p:last-child{margin-bottom:0;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:rgba(0,0,0,.25);color:var(--copper);padding:1px 6px;border-radius:4px;}
+
+  .formula-pill{font-family:'IBM Plex Mono',monospace;font-size:15px;background:rgba(111,227,166,.1);border:1.5px solid var(--phosphor);color:var(--phosphor);padding:9px 20px;border-radius:10px;display:inline-block;}
+  .pill-wrap{text-align:center;margin:14px 0;}
+
+  /* ============ real-life example cards (icon based) ============ */
+  .ex-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:20px;}
+  .ex-card{background:var(--paper);color:var(--ink);border-radius:10px;padding:20px 22px;box-shadow:0 14px 28px -18px rgba(0,0,0,.5);}
+  .ex-icon{width:42px;height:42px;color:var(--copper);margin-bottom:12px;}
+  .ex-icon svg{width:100%;height:100%;}
+  .ex-card h4{font-family:'Fraunces',serif;font-weight:700;font-size:16px;margin:0 0 6px;}
+  .ex-card p{font-size:13.5px;margin:0;color:var(--ink-soft);}
+  .ex-sample{margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;background:rgba(47,122,95,.1);color:#1f5c47;border:1px solid rgba(47,122,95,.3);padding:4px 10px;border-radius:20px;}
+
+  /* ============ drag-and-drop venn ============ */
+  .dnd-card{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:16px;padding:18px 20px;margin-bottom:20px;}
+  .dnd-title{text-align:center;font-family:'Fraunces',serif;font-weight:700;font-size:16px;color:var(--paper);margin-bottom:4px;}
+  .dnd-instructions{text-align:center;font-size:12.5px;color:#8FA093;margin-bottom:14px;}
+  .dnd-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+  .dnd-score{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8FA093;}
+  .dnd-score strong{color:var(--phosphor);}
+  .dnd-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .dnd-stage{position:relative;width:100%;height:320px;background:#0E1912;border:1.5px solid #37493F;border-radius:10px;overflow:hidden;touch-action:none;}
+  .dnd-u-label{position:absolute;top:8px;left:12px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8FA093;font-weight:700;letter-spacing:.05em;}
+  .dnd-outside-label{position:absolute;bottom:8px;right:12px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5C6B60;letter-spacing:.03em;}
+  .dnd-circle{position:absolute;border-radius:50%;background:rgba(111,227,166,0.07);border:2.5px solid var(--phosphor);pointer-events:none;}
+  .dnd-circle-label{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;color:var(--phosphor);font-weight:700;font-size:15px;}
+  .dnd-chip{position:absolute;width:46px;height:46px;border-radius:50%;background:#1C2B21;border:2px solid var(--warn);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:14px;color:var(--paper);cursor:grab;user-select:none;touch-action:none;transition:border-color .2s ease, box-shadow .2s ease;z-index:5;}
+  .dnd-chip:active{cursor:grabbing;}
+  .dnd-chip.correct{border-color:var(--phosphor);box-shadow:0 0 10px rgba(111,227,166,.5);}
+  .dnd-chip.incorrect{border-color:var(--warn);box-shadow:0 0 10px rgba(224,121,79,.5);}
+  .dnd-counter{text-align:center;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--bonus);margin-top:12px;}
+  .dnd-counter strong{font-size:15px;}
+  .dnd-caption{text-align:center;font-size:12.5px;color:#B9C4B9;margin-top:12px;}
+
+
+  /* ============ membership tester (interactive) ============ */
+  .mem-card{background:var(--pcb-light);border:1.5px solid var(--pcb-line);border-radius:14px;padding:18px 20px;margin-bottom:18px;}
+  .mem-formula{text-align:center;font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--phosphor);background:rgba(111,227,166,.08);border-radius:10px;padding:10px;margin-bottom:14px;}
+  .mem-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+  .mem-score{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8FA093;}
+  .mem-score strong{color:var(--phosphor);}
+  .mem-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .tbtn{background:transparent;border:1.5px solid var(--pcb-line);color:#B9C4B9;border-radius:20px;padding:5px 12px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;transition:.15s ease;}
+  .tbtn:hover{background:var(--pcb-light);color:var(--paper);border-color:var(--copper);}
+  .tbtn.primary{background:rgba(111,227,166,.12);border-color:var(--phosphor);color:var(--phosphor);}
+  .mem-row{display:flex;flex-wrap:wrap;gap:10px;}
+  .mem-cell{background:#132018;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:84px;}
+  .mem-cell .cand{font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--paper);}
+
+  .toggle{position:relative;width:52px;height:26px;border-radius:20px;cursor:pointer;background:rgba(0,0,0,.3);border:1.5px solid var(--warn);display:inline-flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;user-select:none;transition:border-color .2s ease, box-shadow .2s ease;}
+  .toggle .lab{position:absolute;width:50%;text-align:center;transition:opacity .2s ease;}
+  .toggle .lab.t{left:0;color:var(--phosphor);opacity:.35;} .toggle .lab.f{right:0;color:var(--warn);opacity:1;}
+  .toggle.on .lab.t{opacity:1;} .toggle.on .lab.f{opacity:.35;}
+  .toggle .knob{position:absolute;top:2px;left:28px;width:20px;height:20px;border-radius:50%;background:linear-gradient(180deg,#E0794F,#B5493D);box-shadow:0 1px 3px rgba(0,0,0,.5);transition:left .2s ease, background .2s ease;}
+  .toggle.on{border-color:var(--phosphor);box-shadow:0 0 8px rgba(111,227,166,.35);}
+  .toggle.on .knob{left:2px;background:linear-gradient(180deg,#BFFFE0,#6FE3A6);}
+  .mem-cell.ok .toggle{box-shadow:0 0 0 2.5px rgba(111,227,166,.35);}
+  .mem-cell.bad .toggle{box-shadow:0 0 0 2.5px rgba(224,121,79,.35);}
+  .mem-mark{font-size:10px;font-weight:700;height:12px;}
+  .mem-mark.ok{color:var(--phosphor);} .mem-mark.bad{color:var(--warn);}
+
+  .mem-explain{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .mem-explain.show{max-height:260px;opacity:1;margin-top:12px;}
+  .mem-explain-inner{background:#0E1912;border:1px solid var(--pcb-line);border-radius:10px;padding:12px 16px;font-size:12.5px;line-height:1.6;color:#B9C4B9;}
+  .mem-explain-inner strong{color:var(--paper);}
+
+  /* ============ venn diagrams ============ */
+  .venn-card{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:16px;padding:20px;margin-bottom:18px;}
+  .venn-card svg{width:100%;height:auto;display:block;}
+  .venn-caption{text-align:center;font-size:13px;color:#B9C4B9;margin-top:10px;}
+
+  /* ============ counter-examples (valid/invalid) ============ */
+  .counter-card{background:var(--paper);color:var(--ink);border-radius:8px;padding:18px 22px;margin-bottom:16px;box-shadow:0 14px 28px -18px rgba(0,0,0,.55);}
+  .counter-tag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:10px;padding:3px 11px;border-radius:20px;margin-bottom:10px;color:#fff;background:#B5493D;text-transform:uppercase;letter-spacing:.04em;}
+  .counter-card p{font-size:14px;margin:0 0 10px;}
+  .seg{display:inline-flex;border:1.5px solid rgba(33,28,18,.2);border-radius:20px;overflow:hidden;background:#fff;}
+  .seg button{border:none;background:transparent;padding:8px 16px;font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--ink-soft);transition:.15s ease;}
+  .seg button.sel.true-sel{background:rgba(47,122,95,.14);color:#2F7A5F;}
+  .seg button.sel.false-sel{background:rgba(181,73,61,.14);color:#B5493D;}
+  .seg button.sel.bad-sel{background:rgba(181,73,61,.14);color:#B5493D;}
+  .cnt-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0 4px;}
+  .cnt-icon{width:20px;height:20px;border-radius:50%;font-size:12px;line-height:20px;text-align:center;font-weight:700;color:#fff;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .cnt-icon.show{opacity:1;transform:scale(1);}
+  .cnt-icon.ok{background:#2F7A5F;} .cnt-icon.bad{background:#B5493D;}
+  .c-reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:5px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .c-reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .c-reveal-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .c-reveal-panel.show{max-height:220px;opacity:1;margin-top:10px;}
+  .c-reveal-inner{border-top:1.5px dashed rgba(33,28,18,.2);padding-top:8px;font-size:13.5px;}
+
+  /* ============ solved examples (stepper-ish reveal) ============ */
+  .solved-card{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:14px;padding:18px 22px;margin-bottom:16px;}
+  .solved-num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+  .solved-q{font-size:14.5px;color:var(--paper);margin-bottom:12px;}
+  .solved-reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.03em;text-transform:uppercase;background:rgba(111,227,166,.1);border:1.5px solid var(--phosphor);color:var(--phosphor);padding:8px 16px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .solved-reveal-btn:hover{background:rgba(111,227,166,.2);}
+  .solved-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .solved-panel.show{max-height:400px;opacity:1;margin-top:12px;}
+  .solved-panel-inner{background:#0E1912;border-left:3px solid var(--phosphor);border-radius:0 8px 8px 0;padding:12px 16px;font-size:13.5px;line-height:1.65;color:#DDE6DF;}
+  .solved-panel-inner strong{color:var(--paper);}
+
+  /* ============ exercises ============ */
+  .ux-card{background:var(--paper);color:var(--ink);border-radius:8px;padding:16px 20px;margin-bottom:12px;box-shadow:0 12px 24px -16px rgba(0,0,0,.5);}
+  .ux-num{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12px;color:var(--copper);}
+  .ux-q{font-size:14px;margin:6px 0 10px;}
+  .ux-scratch{width:100%;border:1.5px dashed rgba(33,28,18,.25);border-radius:8px;background:rgba(255,255,255,.5);padding:8px 11px;font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;color:var(--ink);resize:vertical;min-height:36px;margin:6px 0;}
+  .ux-reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:5px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .ux-reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .ux-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .ux-panel.show{max-height:200px;opacity:1;margin-top:8px;}
+  .ux-panel-inner{border-top:1.5px dashed rgba(33,28,18,.2);padding-top:8px;font-size:13.5px;}
+
+  .next-banner{max-width:900px;margin:70px auto 0;padding:0 16px;text-align:center;}
+  .next-banner-inner{background:var(--pcb-light);border:1.5px dashed var(--bonus);border-radius:14px;padding:20px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--bonus);}
+
+  footer{text-align:center;font-size:11.5px;color:#5C6B60;margin-top:50px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;}
+  footer .ok{color:var(--phosphor);}
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <svg class="hero-fig" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="6" width="138" height="138" rx="12" fill="none" stroke="#25392C" stroke-width="2"/>
+        <circle cx="60" cy="75" r="42" fill="rgba(111,227,166,0.10)" stroke="#6FE3A6" stroke-width="2.5"/>
+        <circle cx="30" cy="65" r="3" fill="#6FE3A6"/>
+        <circle cx="70" cy="55" r="3" fill="#6FE3A6"/>
+        <circle cx="50" cy="95" r="3" fill="#6FE3A6"/>
+        <circle cx="75" cy="90" r="3" fill="#6FE3A6"/>
+        <circle cx="115" cy="40" r="3" fill="#C08552"/>
+        <circle cx="125" cy="105" r="3" fill="#C08552"/>
+        <circle cx="105" cy="115" r="3" fill="#C08552"/>
+      </svg>
+      <div class="eyebrow">Discrete Mathematics · Set Theory Module</div>
+      <h1 class="page-title">Sets</h1>
+      <p class="sub">The most basic object in all of mathematics — and the one every other structure in this course is quietly built out of.</p>
+      <div class="series-chip">Topic 1 of 6 · Set Theory Series</div>
+    </div>
+  </div>
+
+  <div class="panel-nav">
+    <div class="panel-nav-inner" id="navRow"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="definition">
+    <div class="sec-eyebrow">1.1</div>
+    <h2 class="sec-title">What Is a Set?</h2>
+    <div class="concept-box">
+      <p><strong>Definition.</strong> A <strong>set</strong> is a well-defined collection of distinct objects, called its <strong>elements</strong> or <strong>members</strong>. "Well-defined" means that for any candidate object, it must be possible to say unambiguously whether it belongs to the collection or not — no vagueness, no opinion required.</p>
+      <p>We usually name sets with capital letters (A, B, C, …) and elements with lowercase letters. If <span class="mono">a</span> is an element of set <span class="mono">A</span>, we write <span class="mono">a ∈ A</span> ("a belongs to A" or "a is a member of A"). If it isn't, we write <span class="mono">a ∉ A</span>.</p>
+    </div>
+    <div class="pill-wrap"><span class="formula-pill">a ∈ A &nbsp;&nbsp;·&nbsp;&nbsp; b ∉ A</span></div>
+
+    <div class="concept-box">
+      <p><strong>Two ways to describe a set:</strong></p>
+      <p><strong>Roster (tabular) form</strong> — list every element inside braces: <span class="mono">A = {2, 4, 6, 8, 10}</span></p>
+      <p><strong>Set-builder form</strong> — describe a defining property: <span class="mono">A = {x ∈ ℕ | x is even and x ≤ 10}</span>, read "the set of all x in the natural numbers such that x is even and x is at most 10."</p>
+      <p>A set is completely determined by <em>which</em> elements it has — not by the order you list them in, and not by how many times you (redundantly) list an element. <span class="mono">{1,2,3} = {3,2,1} = {1,1,2,2,3}</span> — all three notations describe the exact same set.</p>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="real-life">
+    <div class="sec-eyebrow">1.2</div>
+    <h2 class="sec-title">Three Real-Life Examples</h2>
+    <p class="sec-sub">Sets aren't just abstract symbols — anywhere you have a well-defined collection with clear membership, you already have a set.</p>
+    <div class="ex-grid">
+      <div class="ex-card">
+        <div class="ex-icon"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18 L24 8 L44 18 L24 28 Z"/><path d="M14 23 V33 Q24 39 34 33 V23"/><path d="M44 18 V30"/></svg></div>
+        <h4>Enrolled Students</h4>
+        <p>The set of all students officially enrolled in a Discrete Mathematics course this semester. Membership is unambiguous — the registrar's system says yes or no for any given student ID.</p>
+        <div class="ex-sample">e.g. Roll No. 24 ∈ this set</div>
+      </div>
+      <div class="ex-card">
+        <div class="ex-icon"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="16" r="9"/><path d="M22.5 22.5 L41 41 M32 31 L38 25 M27 36 L33 30"/></svg></div>
+        <h4>Cryptographic Key Primes</h4>
+        <p>The set of prime numbers less than 100 used to generate RSA encryption keys. Every candidate number is either prime or not — no ambiguity, which is exactly why cryptography can rely on it.</p>
+        <div class="ex-sample">e.g. 17 ∈ this set</div>
+      </div>
+      <div class="ex-card">
+        <div class="ex-icon"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="7" width="36" height="10" rx="2"/><rect x="6" y="21" width="36" height="10" rx="2"/><rect x="6" y="35" width="36" height="6" rx="2"/><circle cx="13" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="13" cy="26" r="1.6" fill="currentColor" stroke="none"/></svg></div>
+        <h4>Server Log IP Addresses</h4>
+        <p>The set of distinct IP addresses that accessed a web server in the last hour. A log file guarantees each address is counted once, regardless of how many times it actually connected.</p>
+        <div class="ex-sample">e.g. 203.0.113.42 ∈ this set</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="math-examples">
+    <div class="sec-eyebrow">1.3</div>
+    <h2 class="sec-title">Three Mathematical Examples</h2>
+    <p class="sec-sub">Set-builder notation in action. For each set below, test whether a candidate value belongs — toggle <span class="mono">∈</span> or <span class="mono">∉</span> for every candidate, then check your work.</p>
+
+    <div class="mem-card" id="mem-1">
+      <div class="mem-formula">A = { x ∈ ℤ &nbsp;|&nbsp; x² &lt; 20 }</div>
+      <div id="mem-body-1"></div>
+    </div>
+
+    <div class="mem-card" id="mem-2">
+      <div class="mem-formula">B = { x ∈ ℝ &nbsp;|&nbsp; x² − 5x + 6 = 0 }</div>
+      <div id="mem-body-2"></div>
+    </div>
+
+    <div class="mem-card" id="mem-3">
+      <div class="mem-formula">C = { x &nbsp;|&nbsp; x is a positive divisor of 36 }</div>
+      <div id="mem-body-3"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="venn">
+    <div class="sec-eyebrow">1.4</div>
+    <h2 class="sec-title">Two Venn Diagrams — Drag It Yourself</h2>
+    <p class="sec-sub">Don't just look at set membership — drag the objects yourself and find out if your instinct was right.</p>
+
+    <div class="dnd-card">
+      <div class="dnd-title">Diagram 1 — Where Does Each Number Belong?</div>
+      <div class="dnd-instructions">A = { 2, 4, 6, 8 }. Drag every chip below either <strong>inside</strong> the circle (∈ A) or leave it <strong>outside</strong> (∉ A).</div>
+      <div class="dnd-toolbar">
+        <span class="dnd-score">Placed correctly: <strong data-dnd-score>0</strong> / 7</span>
+        <span class="dnd-btns">
+          <button class="tbtn primary" data-dnd-act="check">Check</button>
+          <button class="tbtn" data-dnd-act="reveal">Reveal</button>
+          <button class="tbtn" data-dnd-act="reset">Reset</button>
+        </span>
+      </div>
+      <div class="dnd-stage" id="dndStage1">
+        <span class="dnd-u-label">U (Universal Set)</span>
+        <div class="dnd-circle" id="dndCircle1"><span class="dnd-circle-label">A</span></div>
+      </div>
+      <div class="dnd-caption">Drag each numbered chip from the bottom tray into or out of the circle.</div>
+    </div>
+
+    <div class="dnd-card">
+      <div class="dnd-title">Diagram 2 — How Many Distinct Elements, Really?</div>
+      <div class="dnd-instructions">B is written as { 3, 1, 1, 2, 3, 2 } — six numbers listed, with repeats. Drag <strong>all six chips</strong> into the circle and watch how many <em>distinct</em> positions actually get used.</div>
+      <div class="dnd-toolbar">
+        <span class="dnd-score">Chips placed inside: <strong data-dnd-score2>0</strong> / 6</span>
+        <span class="dnd-btns">
+          <button class="tbtn primary" data-dnd-act2="check">Check</button>
+          <button class="tbtn" data-dnd-act2="reveal">Reveal</button>
+          <button class="tbtn" data-dnd-act2="reset">Reset</button>
+        </span>
+      </div>
+      <div class="dnd-stage" id="dndStage2">
+        <span class="dnd-u-label">U (Universal Set)</span>
+        <div class="dnd-circle" id="dndCircle2"><span class="dnd-circle-label">B</span></div>
+      </div>
+      <div class="dnd-counter">Distinct values inside the circle: <strong id="distinctCount">0</strong> / 3</div>
+      <div class="dnd-caption">However many of the six chips you drag in, the set itself can only ever have 3 distinct elements: {1, 2, 3}.</div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="counter">
+    <div class="sec-eyebrow">1.5</div>
+    <h2 class="sec-title">Two Counter-Examples</h2>
+    <p class="sec-sub">"Well-defined" is doing real work in the definition. Here's what happens when it's missing.</p>
+
+    <div class="counter-card">
+      <span class="counter-tag">Not a Well-Defined Set</span>
+      <p><em>"The collection of all tall students in this class."</em></p>
+      <p>Decide: is this a valid set?</p>
+      <div class="cnt-row" id="cnt-1">
+        <div class="seg"><button data-val="Valid">Valid Set</button><button data-val="Invalid">Not a Set</button></div>
+        <span class="cnt-icon"></span>
+        <button class="c-reveal-btn" data-act="reveal-cnt-1">Reveal</button>
+      </div>
+      <div class="c-reveal-panel" id="cnt-1-panel"><div class="c-reveal-inner"><strong>Not a well-defined set.</strong> "Tall" has no fixed cutoff — one person might call 5'9" tall, another might not. Since membership depends on opinion rather than a fixed, checkable criterion, this collection fails the definition. (Fix it by replacing "tall" with an exact rule, e.g. "height ≥ 175 cm," and it becomes perfectly well-defined.)</div></div>
+    </div>
+
+    <div class="counter-card">
+      <span class="counter-tag">Russell's Paradox</span>
+      <p>Let <span class="mono">R = {x | x ∉ x}</span> — "the set of all sets that do not contain themselves." Is <span class="mono">R</span> itself a member of <span class="mono">R</span>?</p>
+      <button class="c-reveal-btn" data-act="reveal-cnt-2">Reveal the Paradox</button>
+      <div class="c-reveal-panel" id="cnt-2-panel"><div class="c-reveal-inner">
+        Try both answers and watch each one collapse: <strong>if R ∈ R</strong>, then by R's own defining rule, R must satisfy "x ∉ x" — so R ∉ R. Contradiction. <strong>If R ∉ R</strong>, then R satisfies its own membership rule "x ∉ x" — so R ∈ R after all. Contradiction again.<br><br>Discovered by Bertrand Russell in 1901, this broke the naive assumption that <em>any</em> property automatically defines a set, and pushed mathematicians toward the careful, axiomatic set theory used today.
+      </div></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="solved">
+    <div class="sec-eyebrow">1.6</div>
+    <h2 class="sec-title">Solved Examples</h2>
+    <div id="solvedContainer"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="exercises">
+    <div class="sec-eyebrow">1.7</div>
+    <h2 class="sec-title">Exercises</h2>
+    <p class="sec-sub">Try each one before revealing — write your working in the scratch box.</p>
+    <div id="exerciseContainer"></div>
+  </div>
+
+  <div class="next-banner">
+    <div class="next-banner-inner">✓ Topic 1 of 6 complete — <strong>Sets</strong>.<br>Say the word and we'll move on to Topic 2: Empty / Finite / Infinite / Countable / Uncountable Sets.</div>
+  </div>
+
+  <footer>Discrete Mathematics · Set Theory Module · Topic 1 — Sets &nbsp;—&nbsp; <span class="ok">CIRCUIT COMPLETE ✓</span></footer>
+
+<script>
+/* ===================== nav ===================== */
+const navItems = [
+  {id:'definition', label:'What is a Set?'},
+  {id:'real-life', label:'Real-Life'},
+  {id:'math-examples', label:'Math Examples'},
+  {id:'venn', label:'Venn Diagrams'},
+  {id:'counter', label:'Counter-Examples'},
+  {id:'solved', label:'Solved'},
+  {id:'exercises', label:'Exercises'}
+];
+const navRow = document.getElementById('navRow');
+navItems.forEach(n=>{ const a=document.createElement('a'); a.href='#'+n.id; a.className='nav-led'; a.textContent=n.label; navRow.appendChild(a); });
+
+/* ===================== membership tester builder ===================== */
+function buildMembershipTester(bodyId, candidates, checkFn){
+  const body = document.getElementById(bodyId);
+  const total = candidates.length;
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'mem-toolbar';
+  toolbar.innerHTML = `<span class="mem-score">Score: <strong data-local>0</strong> / ${total}</span>
+    <span class="mem-btns"><button class="tbtn primary" data-act="check">Check</button><button class="tbtn" data-act="reveal">Reveal</button><button class="tbtn" data-act="reset">Reset</button></span>`;
+  body.appendChild(toolbar);
+
+  const row = document.createElement('div');
+  row.className = 'mem-row';
+  const cells = [];
+  candidates.forEach(cand=>{
+    const correct = checkFn(cand);
+    const cell = document.createElement('div');
+    cell.className = 'mem-cell';
+    cell.dataset.correct = correct ? '1':'0';
+    cell.dataset.value = '0';
+    cell.innerHTML = `<span class="cand">${cand}</span>
+      <div class="toggle" role="button" tabindex="0"><span class="lab t">∈</span><span class="lab f">∉</span><span class="knob"></span></div>
+      <span class="mem-mark"></span>`;
+    const tgl = cell.querySelector('.toggle');
+    const flip = ()=>{
+      const on = cell.dataset.value === '1';
+      cell.dataset.value = on ? '0':'1';
+      tgl.classList.toggle('on', !on);
+      cell.classList.remove('ok','bad');
+      cell.querySelector('.mem-mark').textContent = '';
+      updateLocal();
+    };
+    tgl.addEventListener('click', flip);
+    tgl.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){flip(); e.preventDefault();} });
+    row.appendChild(cell);
+    cells.push(cell);
+  });
+  body.appendChild(row);
+
+  function updateLocal(){
+    let correct = 0;
+    cells.forEach(c=>{ if(c.dataset.value===c.dataset.correct) correct++; });
+    body.querySelector('[data-local]').textContent = correct;
+  }
+
+  toolbar.querySelectorAll('[data-act]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const act = btn.dataset.act;
+      if(act==='check'){
+        cells.forEach(c=>{
+          const ok = c.dataset.value === c.dataset.correct;
+          c.classList.remove('ok','bad'); c.classList.add(ok?'ok':'bad');
+          c.querySelector('.mem-mark').className = 'mem-mark ' + (ok?'ok':'bad');
+          c.querySelector('.mem-mark').textContent = ok?'✓':'✗';
+        });
+      }
+      if(act==='reveal'){
+        cells.forEach(c=>{
+          c.dataset.value = c.dataset.correct;
+          c.querySelector('.toggle').classList.toggle('on', c.dataset.correct==='1');
+          c.classList.remove('ok','bad'); c.classList.add('ok');
+          c.querySelector('.mem-mark').className = 'mem-mark ok';
+          c.querySelector('.mem-mark').textContent = '✓';
+        });
+      }
+      if(act==='reset'){
+        cells.forEach(c=>{
+          c.dataset.value = '0';
+          c.querySelector('.toggle').classList.remove('on');
+          c.classList.remove('ok','bad');
+          c.querySelector('.mem-mark').textContent = '';
+        });
+      }
+      updateLocal();
+    });
+  });
+}
+
+buildMembershipTester('mem-body-1', [-5,-4,0,4,5,4.5], (x)=> Number.isInteger(x) && (x*x < 20));
+buildMembershipTester('mem-body-2', [0,1,2,3,4], (x)=> (x*x - 5*x + 6) === 0);
+buildMembershipTester('mem-body-3', [5,6,9,24,36,40], (x)=> 36 % x === 0);
+
+/* ===================== drag-and-drop Venn engine ===================== */
+function makeDraggable(chip, stage, onDrop){
+  chip.addEventListener('pointerdown', (e)=>{
+    e.preventDefault();
+    chip.setPointerCapture(e.pointerId);
+    const startX = e.clientX, startY = e.clientY;
+    const startLeft = chip.offsetLeft, startTop = chip.offsetTop;
+    chip.style.zIndex = 30;
+    function move(ev){
+      const dx = ev.clientX - startX, dy = ev.clientY - startY;
+      let newLeft = startLeft + dx, newTop = startTop + dy;
+      newLeft = Math.max(0, Math.min(stage.clientWidth - chip.offsetWidth, newLeft));
+      newTop = Math.max(0, Math.min(stage.clientHeight - chip.offsetHeight, newTop));
+      chip.style.left = newLeft + 'px';
+      chip.style.top = newTop + 'px';
+    }
+    function up(){
+      chip.removeEventListener('pointermove', move);
+      chip.removeEventListener('pointerup', up);
+      chip.style.zIndex = 5;
+      onDrop();
+    }
+    chip.addEventListener('pointermove', move);
+    chip.addEventListener('pointerup', up);
+  });
+}
+function isInsideCircle(chip, circle){
+  const cx = circle.offsetLeft + circle.offsetWidth/2;
+  const cy = circle.offsetTop + circle.offsetHeight/2;
+  const r = circle.offsetWidth/2;
+  const chx = chip.offsetLeft + chip.offsetWidth/2;
+  const chy = chip.offsetTop + chip.offsetHeight/2;
+  return Math.hypot(chx-cx, chy-cy) < (r - 6);
+}
+function layoutTray(chips, stage){
+  const n = chips.length;
+  const spacing = stage.clientWidth / (n+1);
+  const trayY = stage.clientHeight - 62;
+  chips.forEach((chip,i)=>{
+    chip.style.left = Math.round(spacing*(i+1) - 23) + 'px';
+    chip.style.top = trayY + 'px';
+  });
+}
+
+/* ---------- Diagram 1: membership sorter ---------- */
+(function(){
+  const stage = document.getElementById('dndStage1');
+  const circle = document.getElementById('dndCircle1');
+  circle.style.width = '190px'; circle.style.height = '190px';
+  circle.style.left = 'calc(50% - 95px)'; circle.style.top = 'calc(36% - 95px)';
+  const candidates = [2,3,4,6,7,8,9];
+  const A = [2,4,6,8];
+  const correctIn = v => A.includes(v);
+  const chips = candidates.map(v=>{
+    const chip = document.createElement('div');
+    chip.className = 'dnd-chip'; chip.textContent = v; chip.dataset.val = v;
+    stage.appendChild(chip);
+    return chip;
+  });
+  requestAnimationFrame(()=> layoutTray(chips, stage));
+  function updateScore(){
+    document.querySelector('[data-dnd-score]').textContent =
+      chips.filter(c=>c.classList.contains('correct')).length;
+  }
+  chips.forEach(chip=> makeDraggable(chip, stage, ()=>{ chip.classList.remove('correct','incorrect'); updateScore(); }));
+
+  document.querySelector('[data-dnd-act="check"]').addEventListener('click', ()=>{
+    chips.forEach(chip=>{
+      const val = Number(chip.dataset.val);
+      const placedIn = isInsideCircle(chip, circle);
+      const ok = placedIn === correctIn(val);
+      chip.classList.remove('correct','incorrect');
+      chip.classList.add(ok ? 'correct':'incorrect');
+    });
+    updateScore();
+  });
+  document.querySelector('[data-dnd-act="reveal"]').addEventListener('click', ()=>{
+    const cx = circle.offsetLeft + circle.offsetWidth/2, cy = circle.offsetTop + circle.offsetHeight/2;
+    const inside = chips.filter(c=>correctIn(Number(c.dataset.val)));
+    const outside = chips.filter(c=>!correctIn(Number(c.dataset.val)));
+    inside.forEach((chip,i)=>{
+      const ang = (i/inside.length)*Math.PI*2;
+      const r = 55;
+      chip.style.left = Math.round(cx + r*Math.cos(ang) - 23) + 'px';
+      chip.style.top = Math.round(cy + r*Math.sin(ang) - 23) + 'px';
+      chip.classList.remove('incorrect'); chip.classList.add('correct');
+    });
+    outside.forEach((chip,i)=>{
+      chip.style.left = (16 + i*58) + 'px';
+      chip.style.top = '16px';
+      chip.classList.remove('incorrect'); chip.classList.add('correct');
+    });
+    updateScore();
+  });
+  document.querySelector('[data-dnd-act="reset"]').addEventListener('click', ()=>{
+    chips.forEach(c=>c.classList.remove('correct','incorrect'));
+    layoutTray(chips, stage);
+    updateScore();
+  });
+})();
+
+/* ---------- Diagram 2: duplicates collapse ---------- */
+(function(){
+  const stage = document.getElementById('dndStage2');
+  const circle = document.getElementById('dndCircle2');
+  circle.style.width = '200px'; circle.style.height = '200px';
+  circle.style.left = 'calc(50% - 100px)'; circle.style.top = 'calc(38% - 100px)';
+  circle.style.borderColor = '#D9A441'; circle.style.background = 'rgba(217,164,65,0.07)';
+  circle.querySelector('.dnd-circle-label').style.color = '#D9A441';
+  const values = [3,1,1,2,3,2];
+  const chips = values.map(v=>{
+    const chip = document.createElement('div');
+    chip.className = 'dnd-chip'; chip.textContent = v; chip.dataset.val = v;
+    chip.style.borderColor = '#D9A441';
+    stage.appendChild(chip);
+    return chip;
+  });
+  requestAnimationFrame(()=> layoutTray(chips, stage));
+
+  function refresh(){
+    const insideChips = chips.filter(c=>isInsideCircle(c, circle));
+    document.querySelector('[data-dnd-score2]').textContent = insideChips.length;
+    const distinct = new Set(insideChips.map(c=>c.dataset.val));
+    document.getElementById('distinctCount').textContent = distinct.size;
+  }
+  chips.forEach(chip=> makeDraggable(chip, stage, ()=>{ chip.classList.remove('correct','incorrect'); refresh(); }));
+
+  document.querySelector('[data-dnd-act2="check"]').addEventListener('click', ()=>{
+    chips.forEach(chip=>{
+      const ok = isInsideCircle(chip, circle);
+      chip.classList.remove('correct','incorrect');
+      chip.classList.add(ok ? 'correct':'incorrect');
+    });
+    refresh();
+  });
+  document.querySelector('[data-dnd-act2="reveal"]').addEventListener('click', ()=>{
+    const cx = circle.offsetLeft + circle.offsetWidth/2, cy = circle.offsetTop + circle.offsetHeight/2;
+    chips.forEach((chip,i)=>{
+      const ang = (i/chips.length)*Math.PI*2;
+      const r = 60;
+      chip.style.left = Math.round(cx + r*Math.cos(ang) - 23) + 'px';
+      chip.style.top = Math.round(cy + r*Math.sin(ang) - 23) + 'px';
+      chip.classList.remove('incorrect'); chip.classList.add('correct');
+    });
+    refresh();
+  });
+  document.querySelector('[data-dnd-act2="reset"]').addEventListener('click', ()=>{
+    chips.forEach(c=>c.classList.remove('correct','incorrect'));
+    layoutTray(chips, stage);
+    refresh();
+  });
+})();
+
+/* ===================== counter-example 1 toggle ===================== */
+(function(){
+  const wrap = document.getElementById('cnt-1');
+  const seg = wrap.querySelector('.seg');
+  const icon = wrap.querySelector('.cnt-icon');
+  const panel = document.getElementById('cnt-1-panel');
+  const correct = 'Invalid';
+  seg.querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      seg.querySelectorAll('button').forEach(x=>x.classList.remove('sel','true-sel','false-sel','bad-sel'));
+      const ok = b.dataset.val === correct;
+      b.classList.add('sel', ok ? 'false-sel' : 'bad-sel');
+      icon.classList.add('show', ok?'ok':'bad'); icon.textContent = ok?'✓':'✗';
+      panel.classList.add('show');
+    });
+  });
+  wrap.querySelector('[data-act="reveal-cnt-1"]').addEventListener('click', ()=>{
+    seg.querySelectorAll('button').forEach(x=>x.classList.remove('sel','true-sel','false-sel','bad-sel'));
+    seg.querySelector(`button[data-val="${correct}"]`).classList.add('sel','false-sel');
+    icon.classList.add('show','ok'); icon.textContent='✓';
+    panel.classList.toggle('show');
+  });
+})();
+document.querySelector('[data-act="reveal-cnt-2"]').addEventListener('click', ()=>{
+  document.getElementById('cnt-2-panel').classList.toggle('show');
+});
+
+/* ===================== solved examples ===================== */
+const SOLVED = [
+  {q:'Write the set of even natural numbers less than 15, in both roster and set-builder form.',
+   a:'<strong>Set-builder:</strong> <span class="mono">{x ∈ ℕ | x is even and x &lt; 15}</span><br><strong>Roster:</strong> <span class="mono">{2, 4, 6, 8, 10, 12, 14}</span> — seven elements.'},
+  {q:'Let A = {x ∈ ℤ | x is prime and x &lt; 10}. Is 7 ∈ A?',
+   a:'A = {2, 3, 5, 7}. Since 7 is prime and 7 &lt; 10, <strong>yes, 7 ∈ A.</strong>'},
+  {q:'Are the sets A = {1, 2, 3} and B = {3, 1, 2, 2} equal?',
+   a:'<strong>Yes.</strong> A set is defined only by which elements it contains — not their order, and not how many times each is listed. B lists 2 twice, but that doesn\'t create a "double" element; B still just contains {1, 2, 3}, identical to A.'},
+  {q:'Express the solution set of x² − 4 = 0 in both set-builder and roster form.',
+   a:'<strong>Set-builder:</strong> <span class="mono">{x ∈ ℝ | x² − 4 = 0}</span><br><strong>Roster:</strong> <span class="mono">{−2, 2}</span>, since (−2)² = 4 and 2² = 4 are the only two real solutions.'},
+  {q:'Is "the collection of natural numbers whose digits sum to 10" a well-defined set? Justify your answer.',
+   a:'<strong>Yes — it is well-defined,</strong> even though it\'s infinite. For any candidate natural number, you can always compute its digit sum exactly and compare it to 10 with a definite yes/no answer (e.g. 19 ✓, 28 ✓, 37 ✓, 46 ✓ … 109 ✓ …). "Well-defined" only requires that membership be decidable — it says nothing about whether the set has to be small or finite.'}
+];
+const solvedContainer = document.getElementById('solvedContainer');
+SOLVED.forEach((s,i)=>{
+  const card = document.createElement('div');
+  card.className = 'solved-card';
+  const pid = 'solved-panel-'+i;
+  card.innerHTML = `<div class="solved-num">Example ${i+1}</div><div class="solved-q">${s.q}</div>
+    <button class="solved-reveal-btn">Reveal Solution</button>
+    <div class="solved-panel" id="${pid}"><div class="solved-panel-inner">${s.a}</div></div>`;
+  card.querySelector('.solved-reveal-btn').addEventListener('click', ()=>{ document.getElementById(pid).classList.toggle('show'); });
+  solvedContainer.appendChild(card);
+});
+
+/* ===================== exercises ===================== */
+const EXERCISES = [
+  {q:'Write the set of odd natural numbers less than 12 in roster form.', a:'<span class="mono">{1, 3, 5, 7, 9, 11}</span>'},
+  {q:'Let P = {x ∈ ℤ | x² = 25}. List P in roster form.', a:'<span class="mono">{−5, 5}</span>'},
+  {q:'Are the sets {a, b, c} and {c, c, b, a} equal? Explain in one sentence.', a:'Yes — sets ignore order and repetition, so both describe exactly the same three elements: a, b, c.'},
+  {q:'Determine whether "the collection of the five best restaurants in the city" is a well-defined set. Justify.', a:'Not well-defined — "best" is a subjective ranking with no universally fixed criterion, so different people would disagree on membership.'},
+  {q:'Write the set {x ∈ ℤ | 3 &lt; x ≤ 8} in roster form.', a:'<span class="mono">{4, 5, 6, 7, 8}</span>'}
+];
+const exContainer = document.getElementById('exerciseContainer');
+EXERCISES.forEach((ex,i)=>{
+  const card = document.createElement('div');
+  card.className = 'ux-card';
+  const pid = 'ux-panel-'+i;
+  card.innerHTML = `<div class="ux-num">Exercise ${i+1}</div><div class="ux-q">${ex.q}</div>
+    <textarea class="ux-scratch" placeholder="Write your answer here first..."></textarea>
+    <button class="ux-reveal-btn">Reveal Answer</button>
+    <div class="ux-panel" id="${pid}"><div class="ux-panel-inner">${ex.a}</div></div>`;
+  card.querySelector('.ux-reveal-btn').addEventListener('click', ()=>{ document.getElementById(pid).classList.toggle('show'); });
+  exContainer.appendChild(card);
+});
+</script>
+</body>
+</html>

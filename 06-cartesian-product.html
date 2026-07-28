@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cartesian Product · Topic 6 of 6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pcb:#0F1B15; --pcb-light:#17251D; --pcb-line:#25392C;
+    --copper:#C08552; --phosphor:#6FE3A6; --warn:#E0794F; --bonus:#D9A441;
+    --paper:#F3EEDF; --ink:#211C12; --ink-soft:#6B6250; --purple:#8B6FC9;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--pcb);color:var(--paper);font-family:'IBM Plex Sans',sans-serif;padding:0 0 100px;line-height:1.65;
+    background-image:radial-gradient(circle at 1px 1px, rgba(111,227,166,0.05) 1px, transparent 0); background-size:26px 26px;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  ::selection{background:var(--phosphor);color:var(--pcb);}
+  a:focus-visible, button:focus-visible, .toggle:focus-visible{outline:2px solid var(--phosphor); outline-offset:3px;}
+
+  .hero{position:relative;padding:50px 16px 36px;text-align:center;overflow:hidden;border-bottom:1px solid var(--pcb-line);background:linear-gradient(180deg,#0B1410 0%, var(--pcb) 100%);}
+  .hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;background-image:linear-gradient(var(--pcb-line) 1px, transparent 1px),linear-gradient(90deg, var(--pcb-line) 1px, transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse at center, black 0%, transparent 72%);}
+  .hero-inner{position:relative;z-index:1;}
+  .hero-fig{width:150px;height:150px;margin:0 auto 14px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(26px,5.6vw,44px);margin:0 0 10px;color:var(--paper);text-shadow:0 0 30px rgba(111,227,166,.2);}
+  .sub{text-align:center;color:#B9C4B9;font-size:14.5px;margin:0 auto;max-width:600px;line-height:1.6;}
+  .series-chip{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;background:rgba(217,164,65,.12);border:1px solid var(--bonus);color:var(--bonus);padding:4px 14px;border-radius:20px;margin-top:14px;letter-spacing:.04em;}
+
+  .panel-nav{position:sticky;top:0;z-index:40;background:rgba(15,27,21,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--pcb-line);padding:10px 16px;}
+  .panel-nav-inner{max-width:900px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+  .nav-led{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8FA093;text-decoration:none;padding:5px 10px;border-radius:20px;border:1px solid transparent;transition:.2s ease;}
+  .nav-led:hover{color:var(--paper);border-color:var(--pcb-line);}
+
+  .wrap{max-width:900px;margin:0 auto;padding:0 16px;}
+  .section-block{max-width:900px;margin:0 auto;padding:56px 16px 0;scroll-margin-top:64px;}
+  .sec-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.12em;text-align:center;margin-bottom:8px;}
+  .sec-title{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(22px,4.4vw,32px);text-align:center;margin:0 0 16px;color:var(--paper);}
+  .sec-sub{text-align:center;color:#B9C4B9;font-size:14px;max-width:640px;margin:0 auto 26px;}
+
+  .concept-box{background:var(--pcb-light);border:1.5px solid var(--pcb-line);border-radius:14px;padding:18px 22px;margin-bottom:18px;}
+  .concept-box strong{color:var(--paper);}
+  .concept-box p{font-size:14px;color:#DDE6DF;margin:0 0 10px;line-height:1.65;}
+  .concept-box p:last-child{margin-bottom:0;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:rgba(0,0,0,.25);color:var(--copper);padding:1px 6px;border-radius:4px;}
+  .formula-pill{font-family:'IBM Plex Mono',monospace;font-size:15px;background:rgba(111,227,166,.1);border:1.5px solid var(--phosphor);color:var(--phosphor);padding:9px 20px;border-radius:10px;display:inline-block;}
+  .pill-wrap{text-align:center;margin:14px 0;}
+
+  .fact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:18px;}
+  .fact-card{background:var(--pcb-light);border:1.5px solid var(--pcb-line);border-radius:12px;padding:14px 16px;}
+  .fact-card .fform{font-family:'IBM Plex Mono',monospace;font-size:13.5px;color:var(--phosphor);margin-bottom:6px;}
+  .fact-card p{font-size:12.5px;color:#B9C4B9;margin:0;line-height:1.55;}
+
+  /* ============ real-life example cards ============ */
+  .ex-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:20px;}
+  .ex-card{background:var(--paper);color:var(--ink);border-radius:10px;padding:20px 22px;box-shadow:0 14px 28px -18px rgba(0,0,0,.5);}
+  .ex-icon{width:42px;height:42px;color:var(--copper);margin-bottom:12px;}
+  .ex-icon svg{width:100%;height:100%;}
+  .ex-card h4{font-family:'Fraunces',serif;font-weight:700;font-size:16px;margin:0 0 6px;}
+  .ex-card p{font-size:13.5px;margin:0;color:var(--ink-soft);}
+  .ex-sample{margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;background:rgba(47,122,95,.1);color:#1f5c47;border:1px solid rgba(47,122,95,.3);padding:4px 10px;border-radius:20px;}
+
+  /* ============ membership tester (reused, pair-valued) ============ */
+  .mem-card{background:var(--pcb-light);border:1.5px solid var(--pcb-line);border-radius:14px;padding:18px 20px;margin-bottom:18px;}
+  .mem-formula{text-align:center;font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--phosphor);background:rgba(111,227,166,.08);border-radius:10px;padding:10px;margin-bottom:14px;}
+  .mem-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+  .mem-score{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8FA093;}
+  .mem-score strong{color:var(--phosphor);}
+  .mem-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .tbtn{background:transparent;border:1.5px solid var(--pcb-line);color:#B9C4B9;border-radius:20px;padding:5px 12px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;transition:.15s ease;}
+  .tbtn:hover{background:var(--pcb-light);color:var(--paper);border-color:var(--copper);}
+  .tbtn.primary{background:rgba(111,227,166,.12);border-color:var(--phosphor);color:var(--phosphor);}
+  .mem-row{display:flex;flex-wrap:wrap;gap:10px;}
+  .mem-cell{background:#132018;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:70px;}
+  .mem-cell .cand{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--paper);}
+
+  .toggle{position:relative;width:48px;height:24px;border-radius:20px;cursor:pointer;background:rgba(0,0,0,.3);border:1.5px solid var(--warn);display:inline-flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;user-select:none;transition:border-color .2s ease, box-shadow .2s ease;}
+  .toggle .lab{position:absolute;width:50%;text-align:center;transition:opacity .2s ease;}
+  .toggle .lab.t{left:0;color:var(--phosphor);opacity:.35;} .toggle .lab.f{right:0;color:var(--warn);opacity:1;}
+  .toggle.on .lab.t{opacity:1;} .toggle.on .lab.f{opacity:.35;}
+  .toggle .knob{position:absolute;top:2px;left:26px;width:18px;height:18px;border-radius:50%;background:linear-gradient(180deg,#E0794F,#B5493D);box-shadow:0 1px 3px rgba(0,0,0,.5);transition:left .2s ease, background .2s ease;}
+  .toggle.on{border-color:var(--phosphor);box-shadow:0 0 8px rgba(111,227,166,.35);}
+  .toggle.on .knob{left:2px;background:linear-gradient(180deg,#BFFFE0,#6FE3A6);}
+  .mem-cell.ok .toggle{box-shadow:0 0 0 2.5px rgba(111,227,166,.35);}
+  .mem-cell.bad .toggle{box-shadow:0 0 0 2.5px rgba(224,121,79,.35);}
+  .mem-mark{font-size:10px;font-weight:700;height:12px;}
+  .mem-mark.ok{color:var(--phosphor);} .mem-mark.bad{color:var(--warn);}
+
+  /* ============ grid-drag diagram ============ */
+  .dnd-card{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:16px;padding:18px 20px;margin-bottom:20px;}
+  .dnd-title{text-align:center;font-family:'Fraunces',serif;font-weight:700;font-size:16px;color:var(--paper);margin-bottom:4px;}
+  .dnd-instructions{text-align:center;font-size:12.5px;color:#8FA093;margin-bottom:14px;}
+  .dnd-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+  .dnd-score{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8FA093;}
+  .dnd-score strong{color:var(--phosphor);}
+  .dnd-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .dnd-stage{position:relative;width:100%;height:320px;background:#0E1912;border:1.5px solid #37493F;border-radius:10px;overflow:hidden;touch-action:none;}
+  .grid-cell{position:absolute;border:1.5px dashed #37493F;border-radius:6px;background:rgba(255,255,255,.02);}
+  .grid-label{position:absolute;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--bonus);font-weight:700;}
+  .reject-zone{position:absolute;border:1.5px dashed var(--warn);border-radius:8px;background:rgba(224,121,79,.04);}
+  .reject-label{position:absolute;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--warn);text-transform:uppercase;letter-spacing:.03em;}
+  .dnd-chip{position:absolute;min-width:58px;height:36px;padding:0 8px;border-radius:18px;background:#1C2B21;border:2px solid #8FA093;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12px;color:var(--paper);cursor:grab;user-select:none;touch-action:none;transition:border-color .2s ease, box-shadow .2s ease;z-index:5;white-space:nowrap;}
+  .dnd-chip:active{cursor:grabbing;}
+  .dnd-chip.correct{border-color:var(--phosphor);box-shadow:0 0 10px rgba(111,227,166,.5);}
+  .dnd-chip.incorrect{border-color:var(--warn);box-shadow:0 0 10px rgba(224,121,79,.5);}
+  .dnd-caption{text-align:center;font-size:12.5px;color:#B9C4B9;margin-top:12px;}
+
+  /* ============ counter-examples ============ */
+  .counter-card{background:var(--paper);color:var(--ink);border-radius:8px;padding:18px 22px;margin-bottom:16px;box-shadow:0 14px 28px -18px rgba(0,0,0,.55);}
+  .counter-tag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:10px;padding:3px 11px;border-radius:20px;margin-bottom:10px;color:#fff;background:#B5493D;text-transform:uppercase;letter-spacing:.04em;}
+  .counter-card p{font-size:14px;margin:0 0 10px;}
+  .c-reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:5px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .c-reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .c-reveal-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .c-reveal-panel.show{max-height:280px;opacity:1;margin-top:10px;}
+  .c-reveal-inner{border-top:1.5px dashed rgba(33,28,18,.2);padding-top:8px;font-size:13.5px;}
+
+  /* ============ solved examples ============ */
+  .solved-card{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:14px;padding:18px 22px;margin-bottom:16px;}
+  .solved-num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+  .solved-q{font-size:14.5px;color:var(--paper);margin-bottom:12px;}
+  .solved-reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.03em;text-transform:uppercase;background:rgba(111,227,166,.1);border:1.5px solid var(--phosphor);color:var(--phosphor);padding:8px 16px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .solved-reveal-btn:hover{background:rgba(111,227,166,.2);}
+  .solved-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .solved-panel.show{max-height:460px;opacity:1;margin-top:12px;}
+  .solved-panel-inner{background:#0E1912;border-left:3px solid var(--phosphor);border-radius:0 8px 8px 0;padding:12px 16px;font-size:13.5px;line-height:1.65;color:#DDE6DF;}
+  .solved-panel-inner strong{color:var(--paper);}
+
+  /* ============ exercises ============ */
+  .ux-card{background:var(--paper);color:var(--ink);border-radius:8px;padding:16px 20px;margin-bottom:12px;box-shadow:0 12px 24px -16px rgba(0,0,0,.5);}
+  .ux-num{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12px;color:var(--copper);}
+  .ux-q{font-size:14px;margin:6px 0 10px;}
+  .ux-scratch{width:100%;border:1.5px dashed rgba(33,28,18,.25);border-radius:8px;background:rgba(255,255,255,.5);padding:8px 11px;font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;color:var(--ink);resize:vertical;min-height:36px;margin:6px 0;}
+  .ux-reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:5px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .ux-reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .ux-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .ux-panel.show{max-height:200px;opacity:1;margin-top:8px;}
+  .ux-panel-inner{border-top:1.5px dashed rgba(33,28,18,.2);padding-top:8px;font-size:13.5px;}
+
+  .finale-banner{max-width:900px;margin:70px auto 0;padding:0 16px;text-align:center;}
+  .finale-banner-inner{background:var(--pcb-light);border:1.5px solid var(--phosphor);border-radius:14px;padding:26px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--phosphor);}
+  .finale-banner-inner h3{font-family:'Fraunces',serif;font-weight:700;color:var(--paper);font-size:20px;margin:0 0 10px;}
+
+  footer{text-align:center;font-size:11.5px;color:#5C6B60;margin-top:50px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;}
+  footer .ok{color:var(--phosphor);}
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <svg class="hero-fig" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="6" width="138" height="138" rx="12" fill="none" stroke="#25392C" stroke-width="2"/>
+        <line x1="30" y1="120" x2="30" y2="30" stroke="#8FA093" stroke-width="1.5"/>
+        <line x1="30" y1="120" x2="120" y2="120" stroke="#8FA093" stroke-width="1.5"/>
+        <circle cx="55" cy="90" r="4" fill="#6FE3A6"/>
+        <circle cx="85" cy="60" r="4" fill="#6FE3A6"/>
+        <circle cx="105" cy="100" r="4" fill="#D9A441"/>
+        <circle cx="65" cy="45" r="4" fill="#D9A441"/>
+      </svg>
+      <div class="eyebrow">Discrete Mathematics · Set Theory Module</div>
+      <h1 class="page-title">Cartesian Product</h1>
+      <p class="sub">Where two sets stop being separate and start becoming coordinates. The final piece of the set theory foundation.</p>
+      <div class="series-chip">Topic 6 of 6 · Set Theory Series — Final Topic</div>
+    </div>
+  </div>
+
+  <div class="panel-nav">
+    <div class="panel-nav-inner" id="navRow"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="definition">
+    <div class="sec-eyebrow">6.1</div>
+    <h2 class="sec-title">What Is a Cartesian Product?</h2>
+    <div class="concept-box">
+      <p><strong>Definition.</strong> The <strong>Cartesian product</strong> of A and B, written <span class="mono">A × B</span>, is the set of every <em>ordered pair</em> whose first entry comes from A and second entry comes from B: <span class="mono">A × B = {(a,b) | a∈A and b∈B}</span>.</p>
+      <p><strong>Ordered</strong> is the key word. (1,2) and (2,1) are different elements of A×B unless the two happen to coincide — position matters here in a way it never did for plain sets.</p>
+    </div>
+    <div class="pill-wrap"><span class="formula-pill">|A × B| = |A| · |B|</span></div>
+    <div class="fact-grid">
+      <div class="fact-card"><div class="fform">A×B ≠ B×A</div><p>In general — swapping the sets swaps the coordinates of every pair.</p></div>
+      <div class="fact-card"><div class="fform">A×∅ = ∅</div><p>You can't form a single pair if one side has nothing to contribute.</p></div>
+      <div class="fact-card"><div class="fform">|A×B| = |A|·|B|</div><p>Multiplication, not addition — every element of A pairs with every element of B.</p></div>
+      <div class="fact-card"><div class="fform">A×B×C</div><p>Extends naturally to ordered triples, and beyond, for three or more sets.</p></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="real-life">
+    <div class="sec-eyebrow">6.2</div>
+    <h2 class="sec-title">Three Real-Life Examples</h2>
+    <p class="sec-sub">Anywhere two independent choices combine into one paired result, that's a Cartesian product.</p>
+    <div class="ex-grid">
+      <div class="ex-card">
+        <div class="ex-icon"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="36" height="36"/><line x1="6" y1="15" x2="42" y2="15"/><line x1="6" y1="24" x2="42" y2="24"/><line x1="6" y1="33" x2="42" y2="33"/><line x1="15" y1="6" x2="15" y2="42"/><line x1="24" y1="6" x2="24" y2="42"/><line x1="33" y1="6" x2="33" y2="42"/></svg></div>
+        <h4>Chessboard Squares</h4>
+        <p>Every square is named by a (column, row) pair — an element of {a,…,h} × {1,…,8}. "e4" is literally one ordered pair out of 64.</p>
+        <div class="ex-sample">{a,…,h} × {1,…,8}</div>
+      </div>
+      <div class="ex-card">
+        <div class="ex-icon"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="10" width="16" height="22" rx="2"/><circle cx="34" cy="16" r="6"/><rect x="10" y="36" width="16" height="4" rx="2"/></svg></div>
+        <h4>T-Shirt Orders</h4>
+        <p>Sizes {S,M,L} and colors {red,blue,green} — every possible order is one pair from Sizes × Colors, 9 combinations total.</p>
+        <div class="ex-sample">3 × 3 = 9 combinations</div>
+      </div>
+      <div class="ex-card">
+        <div class="ex-icon"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="10" width="16" height="28" rx="2"/><rect x="26" y="10" width="16" height="28" rx="2"/><path d="M22 24 H26"/></svg></div>
+        <h4>Enrollment Records</h4>
+        <p>A university's enrollment table pairs (StudentID, CourseID) for every registration — each row is an element of Students × Courses.</p>
+        <div class="ex-sample">Students × Courses</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="math-examples">
+    <div class="sec-eyebrow">6.3</div>
+    <h2 class="sec-title">Three Mathematical Examples</h2>
+    <p class="sec-sub">Test whether each candidate ordered pair genuinely belongs to A×B — watch out for swapped order.</p>
+
+    <div class="mem-card" id="mem-1">
+      <div class="mem-formula">A = {1, 2} &nbsp;&nbsp;·&nbsp;&nbsp; B = {x, y} &nbsp;&nbsp;→&nbsp;&nbsp; A × B = ?</div>
+      <div id="mem-body-1"></div>
+    </div>
+    <div class="mem-card" id="mem-2">
+      <div class="mem-formula">A = {1, 2, 3} &nbsp;&nbsp;·&nbsp;&nbsp; B = {1, 2, 3} &nbsp;&nbsp;→&nbsp;&nbsp; A × A = ?</div>
+      <div id="mem-body-2"></div>
+    </div>
+    <div class="mem-card" id="mem-3">
+      <div class="mem-formula">A = {x∈ℤ | 1≤x≤3} &nbsp;&nbsp;·&nbsp;&nbsp; B = {x∈ℤ | 1≤x≤2} &nbsp;&nbsp;→&nbsp;&nbsp; A × B = ?</div>
+      <div id="mem-body-3"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="venn">
+    <div class="sec-eyebrow">6.4</div>
+    <h2 class="sec-title">Two Grid Diagrams — Drag It Yourself</h2>
+    <p class="sec-sub">A Cartesian product isn't drawn with circles — it's a <strong>coordinate grid</strong>. Drag every pair into its true cell.</p>
+
+    <div class="dnd-card">
+      <div class="dnd-title">Diagram 1 — Place Every Pair in A × B</div>
+      <div class="dnd-instructions">A = {1,2} (columns), B = {x,y} (rows). Drag each chip into the cell where its column and row match — or into the reject zone if it isn't a valid pair at all.</div>
+      <div class="dnd-toolbar">
+        <span class="dnd-score">Placed correctly: <strong data-dnd-score>0</strong> / 6</span>
+        <span class="dnd-btns"><button class="tbtn primary" data-dnd-act="check">Check</button><button class="tbtn" data-dnd-act="reveal">Reveal</button><button class="tbtn" data-dnd-act="reset">Reset</button></span>
+      </div>
+      <div class="dnd-stage" id="dndStage1"></div>
+      <div class="dnd-caption">(1,x), (1,y), (2,x), (2,y) are the four real pairs — (x,1) has the order flipped, and (3,x) uses 3, which isn't even in A.</div>
+    </div>
+
+    <div class="dnd-card">
+      <div class="dnd-title">Diagram 2 — Place Every Pair in A × B</div>
+      <div class="dnd-instructions">A = {a,b} (columns), B = {1,2,3} (rows). Same task, bigger grid.</div>
+      <div class="dnd-toolbar">
+        <span class="dnd-score">Placed correctly: <strong data-dnd-score2>0</strong> / 6</span>
+        <span class="dnd-btns"><button class="tbtn primary" data-dnd-act2="check">Check</button><button class="tbtn" data-dnd-act2="reveal">Reveal</button><button class="tbtn" data-dnd-act2="reset">Reset</button></span>
+      </div>
+      <div class="dnd-stage" id="dndStage2"></div>
+      <div class="dnd-caption">(a,1), (a,2), (b,3) are real pairs — (1,a) is flipped, (c,1) uses c ∉ A, and (a,4) uses 4 ∉ B.</div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="counter">
+    <div class="sec-eyebrow">6.5</div>
+    <h2 class="sec-title">Two Counter-Examples</h2>
+    <p class="sec-sub">Two assumptions people carry over from plain sets that don't survive contact with ordered pairs.</p>
+
+    <div class="counter-card">
+      <span class="counter-tag">False Claim</span>
+      <p><em>"A × B = B × A, just like A ∪ B = B ∪ A."</em></p>
+      <button class="c-reveal-btn" data-reveal="ctr6-1">Reveal Why This Fails</button>
+      <div class="c-reveal-panel" id="ctr6-1"><div class="c-reveal-inner">
+        <strong>False — the Cartesian product is not commutative.</strong> With A={1,2}, B={x,y}: A×B = {(1,x),(1,y),(2,x),(2,y)}, but B×A = {(x,1),(x,2),(y,1),(y,2)}. Every single pair has its coordinates flipped — these are completely different sets of pairs (they only coincide when A=B). Union and intersection don't care about order; ordered pairs are built entirely around it.
+      </div></div>
+    </div>
+
+    <div class="counter-card">
+      <span class="counter-tag">False Claim</span>
+      <p><em>"|A×B| = |A| + |B|."</em></p>
+      <button class="c-reveal-btn" data-reveal="ctr6-2">Reveal Why This Fails</button>
+      <div class="c-reveal-panel" id="ctr6-2"><div class="c-reveal-inner">
+        <strong>False — it's multiplication, not addition.</strong> With |A|=2, |B|=3: the correct count is |A×B| = 2×3 = 6, not 2+3 = 5. Every single element of A must be paired with every single element of B — that's the multiplication principle from counting, not a simple combined total.
+      </div></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="solved">
+    <div class="sec-eyebrow">6.6</div>
+    <h2 class="sec-title">Solved Examples</h2>
+    <div id="solvedContainer"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="section-block" id="exercises">
+    <div class="sec-eyebrow">6.7</div>
+    <h2 class="sec-title">Exercises</h2>
+    <p class="sec-sub">Try each one before revealing.</p>
+    <div id="exerciseContainer"></div>
+  </div>
+
+  <div class="finale-banner">
+    <div class="finale-banner-inner">
+      <h3>✓ All 6 Topics Complete</h3>
+      Set · Empty/Finite/Infinite/Countable/Uncountable · Set Operations &amp; Algebra · Subsets · Power Set · Cartesian Product<br><br>
+      That's the full Set Theory foundation — everything after this in the course builds on these six files.
+    </div>
+  </div>
+
+  <footer>Discrete Mathematics · Set Theory Module · Topic 6 &nbsp;—&nbsp; <span class="ok">CIRCUIT COMPLETE ✓</span></footer>
+
+<script>
+/* ===================== nav ===================== */
+const navItems = [
+  {id:'definition', label:'Definition'},
+  {id:'real-life', label:'Real-Life'},
+  {id:'math-examples', label:'Math Examples'},
+  {id:'venn', label:'Grid Diagrams'},
+  {id:'counter', label:'Counter-Examples'},
+  {id:'solved', label:'Solved'},
+  {id:'exercises', label:'Exercises'}
+];
+const navRow = document.getElementById('navRow');
+navItems.forEach(n=>{ const a=document.createElement('a'); a.href='#'+n.id; a.className='nav-led'; a.textContent=n.label; navRow.appendChild(a); });
+
+/* ===================== membership tester (reused, ordered-pair labels) ===================== */
+function buildMembershipTester(bodyId, candidates, checkFn){
+  const body = document.getElementById(bodyId);
+  const total = candidates.length;
+  const toolbar = document.createElement('div');
+  toolbar.className = 'mem-toolbar';
+  toolbar.innerHTML = `<span class="mem-score">Score: <strong data-local>0</strong> / ${total}</span>
+    <span class="mem-btns"><button class="tbtn primary" data-act="check">Check</button><button class="tbtn" data-act="reveal">Reveal</button><button class="tbtn" data-act="reset">Reset</button></span>`;
+  body.appendChild(toolbar);
+  const row = document.createElement('div');
+  row.className = 'mem-row';
+  const cells = [];
+  candidates.forEach(cand=>{
+    const correct = checkFn(cand);
+    const cell = document.createElement('div');
+    cell.className = 'mem-cell'; cell.dataset.correct = correct?'1':'0'; cell.dataset.value='0';
+    cell.innerHTML = `<span class="cand">${cand}</span>
+      <div class="toggle" role="button" tabindex="0"><span class="lab t">∈</span><span class="lab f">∉</span><span class="knob"></span></div>
+      <span class="mem-mark"></span>`;
+    const tgl = cell.querySelector('.toggle');
+    const flip = ()=>{
+      const on = cell.dataset.value==='1';
+      cell.dataset.value = on?'0':'1';
+      tgl.classList.toggle('on', !on);
+      cell.classList.remove('ok','bad');
+      cell.querySelector('.mem-mark').textContent = '';
+      updateLocal();
+    };
+    tgl.addEventListener('click', flip);
+    tgl.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){flip(); e.preventDefault();} });
+    row.appendChild(cell); cells.push(cell);
+  });
+  body.appendChild(row);
+  function updateLocal(){
+    let correct=0; cells.forEach(c=>{ if(c.dataset.value===c.dataset.correct) correct++; });
+    body.querySelector('[data-local]').textContent = correct;
+  }
+  toolbar.querySelectorAll('[data-act]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const act = btn.dataset.act;
+      if(act==='check'){ cells.forEach(c=>{ const ok=c.dataset.value===c.dataset.correct; c.classList.remove('ok','bad'); c.classList.add(ok?'ok':'bad'); c.querySelector('.mem-mark').className='mem-mark '+(ok?'ok':'bad'); c.querySelector('.mem-mark').textContent = ok?'✓':'✗'; }); }
+      if(act==='reveal'){ cells.forEach(c=>{ c.dataset.value=c.dataset.correct; c.querySelector('.toggle').classList.toggle('on', c.dataset.correct==='1'); c.classList.remove('ok','bad'); c.classList.add('ok'); c.querySelector('.mem-mark').className='mem-mark ok'; c.querySelector('.mem-mark').textContent='✓'; }); }
+      if(act==='reset'){ cells.forEach(c=>{ c.dataset.value='0'; c.querySelector('.toggle').classList.remove('on'); c.classList.remove('ok','bad'); c.querySelector('.mem-mark').textContent=''; }); }
+      updateLocal();
+    });
+  });
+}
+buildMembershipTester('mem-body-1', ['(1,x)','(1,y)','(2,y)','(x,1)','(2,3)'], p=> ['(1,x)','(1,y)','(2,x)','(2,y)'].includes(p));
+buildMembershipTester('mem-body-2', ['(1,1)','(2,3)','(3,3)','(4,1)','(1,4)'], p=>{
+  const nums = p.replace(/[()]/g,'').split(',').map(Number);
+  return nums[0]>=1&&nums[0]<=3 && nums[1]>=1&&nums[1]<=3;
+});
+buildMembershipTester('mem-body-3', ['(1,1)','(3,2)','(2,3)','(4,1)','(3,1)'], p=>{
+  const nums = p.replace(/[()]/g,'').split(',').map(Number);
+  return nums[0]>=1&&nums[0]<=3 && nums[1]>=1&&nums[1]<=2;
+});
+
+/* ===================== grid-drag engine ===================== */
+function makeDraggable(chip, stage, onDrop){
+  chip.addEventListener('pointerdown', (e)=>{
+    e.preventDefault();
+    chip.setPointerCapture(e.pointerId);
+    const startX=e.clientX, startY=e.clientY;
+    const startLeft=chip.offsetLeft, startTop=chip.offsetTop;
+    chip.style.zIndex=30;
+    function move(ev){
+      const dx=ev.clientX-startX, dy=ev.clientY-startY;
+      let newLeft=startLeft+dx, newTop=startTop+dy;
+      newLeft=Math.max(0, Math.min(stage.clientWidth-chip.offsetWidth, newLeft));
+      newTop=Math.max(0, Math.min(stage.clientHeight-chip.offsetHeight, newTop));
+      chip.style.left=newLeft+'px'; chip.style.top=newTop+'px';
+    }
+    function up(){ chip.removeEventListener('pointermove',move); chip.removeEventListener('pointerup',up); chip.style.zIndex=5; onDrop(); }
+    chip.addEventListener('pointermove', move);
+    chip.addEventListener('pointerup', up);
+  });
+}
+function cellContainsChip(cell, chip){
+  const chx = chip.offsetLeft + chip.offsetWidth/2, chy = chip.offsetTop + chip.offsetHeight/2;
+  return chx >= cell.offsetLeft && chx <= cell.offsetLeft+cell.offsetWidth &&
+         chy >= cell.offsetTop && chy <= cell.offsetTop+cell.offsetHeight;
+}
+function layoutTray(chips, stage, trayTop){
+  const n=chips.length;
+  const spacing = stage.clientWidth/(n+1);
+  chips.forEach((chip,i)=>{ const w=chip.offsetWidth||64; chip.style.left = Math.round(spacing*(i+1)-w/2)+'px'; chip.style.top = trayTop+'px'; });
+}
+
+function buildGridDiagram(stageId, colLabels, rowLabels, chipDefs, scoreSelector, actPrefix){
+  const stage = document.getElementById(stageId);
+  const cellW = 62, cellH = 46;
+  const gridLeft = 46, gridTop = 34;
+  const nCols = colLabels.length, nRows = rowLabels.length;
+
+  // column headers
+  colLabels.forEach((cl,i)=>{
+    const lab = document.createElement('span'); lab.className='grid-label';
+    lab.textContent = cl;
+    lab.style.left = Math.round(gridLeft + i*cellW + cellW/2 - 6)+'px';
+    lab.style.top = (gridTop-22)+'px';
+    stage.appendChild(lab);
+  });
+  // row headers + cells
+  const cells = [];
+  rowLabels.forEach((rl,j)=>{
+    const lab = document.createElement('span'); lab.className='grid-label';
+    lab.textContent = rl;
+    lab.style.left = (gridLeft-28)+'px';
+    lab.style.top = Math.round(gridTop + j*cellH + cellH/2 - 8)+'px';
+    stage.appendChild(lab);
+    colLabels.forEach((cl,i)=>{
+      const cell = document.createElement('div'); cell.className='grid-cell';
+      cell.style.left = (gridLeft + i*cellW)+'px';
+      cell.style.top = (gridTop + j*cellH)+'px';
+      cell.style.width = (cellW-6)+'px';
+      cell.style.height = (cellH-6)+'px';
+      cell.dataset.col = cl; cell.dataset.row = rl;
+      stage.appendChild(cell);
+      cells.push(cell);
+    });
+  });
+  // reject zone (right side)
+  const rejLeft = gridLeft + nCols*cellW + 24;
+  const reject = document.createElement('div'); reject.className='reject-zone';
+  reject.style.left = rejLeft+'px'; reject.style.top = gridTop+'px';
+  reject.style.width = '100px'; reject.style.height = (nRows*cellH-6)+'px';
+  stage.appendChild(reject);
+  const rejLab = document.createElement('span'); rejLab.className='reject-label';
+  rejLab.textContent = 'NOT IN A×B'; rejLab.style.left = rejLeft+'px'; rejLab.style.top = (gridTop-16)+'px';
+  stage.appendChild(rejLab);
+
+  const trayTop = gridTop + nRows*cellH + 26;
+  const chips = chipDefs.map(def=>{
+    const chip = document.createElement('div'); chip.className='dnd-chip';
+    chip.textContent = def.label; chip.dataset.col = def.col; chip.dataset.row = def.row; chip.dataset.valid = def.valid?'1':'0';
+    stage.appendChild(chip);
+    return chip;
+  });
+  requestAnimationFrame(()=> layoutTray(chips, stage, trayTop));
+
+  function updateScore(){ document.querySelector(scoreSelector).textContent = chips.filter(c=>c.classList.contains('correct')).length; }
+  chips.forEach(chip=> makeDraggable(chip, stage, ()=>{ chip.classList.remove('correct','incorrect'); updateScore(); }));
+
+  document.querySelector(`[data-dnd-act${actPrefix}="check"]`).addEventListener('click', ()=>{
+    chips.forEach(chip=>{
+      const landedCell = cells.find(c=>cellContainsChip(c, chip));
+      let ok;
+      if(chip.dataset.valid==='1'){
+        ok = landedCell && landedCell.dataset.col===chip.dataset.col && landedCell.dataset.row===chip.dataset.row;
+      } else {
+        ok = !landedCell;
+      }
+      chip.classList.remove('correct','incorrect'); chip.classList.add(ok?'correct':'incorrect');
+    });
+    updateScore();
+  });
+  document.querySelector(`[data-dnd-act${actPrefix}="reveal"]`).addEventListener('click', ()=>{
+    chips.forEach(chip=>{
+      if(chip.dataset.valid==='1'){
+        const target = cells.find(c=>c.dataset.col===chip.dataset.col && c.dataset.row===chip.dataset.row);
+        chip.style.left = Math.round(target.offsetLeft + target.offsetWidth/2 - chip.offsetWidth/2)+'px';
+        chip.style.top = Math.round(target.offsetTop + target.offsetHeight/2 - chip.offsetHeight/2)+'px';
+      } else {
+        const idx = chips.filter(c=>c.dataset.valid==='0').indexOf(chip);
+        chip.style.left = (rejLeft+6)+'px';
+        chip.style.top = (gridTop + idx*38)+'px';
+      }
+      chip.classList.remove('incorrect'); chip.classList.add('correct');
+    });
+    updateScore();
+  });
+  document.querySelector(`[data-dnd-act${actPrefix}="reset"]`).addEventListener('click', ()=>{
+    chips.forEach(c=>c.classList.remove('correct','incorrect')); layoutTray(chips, stage, trayTop); updateScore();
+  });
+}
+
+buildGridDiagram('dndStage1', ['1','2'], ['x','y'], [
+  {label:'(1,x)', col:'1', row:'x', valid:true},
+  {label:'(1,y)', col:'1', row:'y', valid:true},
+  {label:'(2,x)', col:'2', row:'x', valid:true},
+  {label:'(2,y)', col:'2', row:'y', valid:true},
+  {label:'(x,1)', valid:false},
+  {label:'(3,x)', valid:false}
+], '[data-dnd-score]', '');
+
+buildGridDiagram('dndStage2', ['a','b'], ['1','2','3'], [
+  {label:'(a,1)', col:'a', row:'1', valid:true},
+  {label:'(a,2)', col:'a', row:'2', valid:true},
+  {label:'(b,3)', col:'b', row:'3', valid:true},
+  {label:'(1,a)', valid:false},
+  {label:'(c,1)', valid:false},
+  {label:'(a,4)', valid:false}
+], '[data-dnd-score2]', '2');
+
+/* ===================== counter-examples ===================== */
+document.querySelectorAll('.c-reveal-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{ document.getElementById(btn.dataset.reveal).classList.toggle('show'); });
+});
+
+/* ===================== solved examples ===================== */
+const SOLVED = [
+  {q:'Let A = {1,2}, B = {a,b}. List A×B.',
+   a:'A×B = <strong>{(1,a), (1,b), (2,a), (2,b)}</strong> — 4 pairs, matching |A|·|B| = 2×2 = 4.'},
+  {q:'If |A| = 4 and |B| = 5, find |A×B|.',
+   a:'|A×B| = |A|·|B| = 4×5 = <strong>20</strong>.'},
+  {q:'Show that A×B ≠ B×A using A = {1,2}, B = {3,4}.',
+   a:'A×B = {(1,3),(1,4),(2,3),(2,4)}.<br>B×A = {(3,1),(3,2),(4,1),(4,2)}.<br>Not a single pair is shared between the two lists — <strong>A×B ≠ B×A</strong>, confirmed directly.'},
+  {q:'What is A×∅ for any set A? Explain why.',
+   a:'<strong>A×∅ = ∅.</strong> To build a pair (a,b) you need a genuine b∈∅ — but ∅ has no elements at all, so not a single pair can ever be formed, no matter how large A is.'},
+  {q:'Find A×A for A = {1,2,3}.',
+   a:'A×A = <strong>{(1,1),(1,2),(1,3),(2,1),(2,2),(2,3),(3,1),(3,2),(3,3)}</strong> — 9 pairs (3²), including the three "diagonal" pairs (1,1),(2,2),(3,3) where both coordinates match.'}
+];
+const solvedContainer = document.getElementById('solvedContainer');
+SOLVED.forEach((s,i)=>{
+  const card=document.createElement('div'); card.className='solved-card';
+  const pid='solved6-panel-'+i;
+  card.innerHTML = `<div class="solved-num">Example ${i+1}</div><div class="solved-q">${s.q}</div>
+    <button class="solved-reveal-btn">Reveal Solution</button>
+    <div class="solved-panel" id="${pid}"><div class="solved-panel-inner">${s.a}</div></div>`;
+  card.querySelector('.solved-reveal-btn').addEventListener('click', ()=>{ document.getElementById(pid).classList.toggle('show'); });
+  solvedContainer.appendChild(card);
+});
+
+/* ===================== exercises ===================== */
+const EXERCISES = [
+  {q:'Let A = {x,y}, B = {1,2,3}. Find A×B.', a:'<span class="mono">{(x,1),(x,2),(x,3),(y,1),(y,2),(y,3)}</span> — 6 pairs.'},
+  {q:'If |A| = 3 and |B| = 7, find |A×B|.', a:'3×7 = <strong>21</strong>.'},
+  {q:'For A={1,2}, B={1,2}: is (2,1) the same element as (1,2) in A×B?', a:'<strong>No.</strong> Ordered pairs care about position — (2,1) and (1,2) are two distinct elements of A×B, even though they contain the same two numbers.'},
+  {q:'If A×B = ∅, what can you conclude about A and B?', a:'<strong>At least one of A or B must be the empty set.</strong> Since |A×B| = |A|·|B|, the product can only be 0 if one of the factors is 0.'},
+  {q:'Find A×A for A = {0,1}.', a:'<span class="mono">{(0,0),(0,1),(1,0),(1,1)}</span> — 4 pairs. (This is exactly how a computer represents 2 bits of binary information!)'}
+];
+const exContainer = document.getElementById('exerciseContainer');
+EXERCISES.forEach((ex,i)=>{
+  const card=document.createElement('div'); card.className='ux-card';
+  const pid='ux6-panel-'+i;
+  card.innerHTML = `<div class="ux-num">Exercise ${i+1}</div><div class="ux-q">${ex.q}</div>
+    <textarea class="ux-scratch" placeholder="Write your answer here first..."></textarea>
+    <button class="ux-reveal-btn">Reveal Answer</button>
+    <div class="ux-panel" id="${pid}"><div class="ux-panel-inner">${ex.a}</div></div>`;
+  card.querySelector('.ux-reveal-btn').addEventListener('click', ()=>{ document.getElementById(pid).classList.toggle('show'); });
+  exContainer.appendChild(card);
+});
+</script>
+</body>
+</html>
