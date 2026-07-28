@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solved Examination Problems · Prove It Yourself</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pcb:#0F1B15; --pcb-light:#17251D; --pcb-line:#25392C;
+    --copper:#C08552; --phosphor:#6FE3A6; --warn:#E0794F; --bonus:#D9A441;
+    --paper:#F3EEDF; --ink:#211C12; --ink-soft:#6B6250; --purple:#8B6FC9;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--pcb);color:var(--paper);font-family:'IBM Plex Sans',sans-serif;padding:0 0 100px;line-height:1.6;
+    background-image:radial-gradient(circle at 1px 1px, rgba(111,227,166,0.05) 1px, transparent 0); background-size:26px 26px;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  ::selection{background:var(--phosphor);color:var(--pcb);}
+  a:focus-visible, button:focus-visible, .toggle:focus-visible{outline:2px solid var(--phosphor); outline-offset:3px;}
+
+  .hero{position:relative;padding:48px 16px 34px;text-align:center;overflow:hidden;border-bottom:1px solid var(--pcb-line);background:linear-gradient(180deg,#0B1410 0%, var(--pcb) 100%);}
+  .hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;background-image:linear-gradient(var(--pcb-line) 1px, transparent 1px),linear-gradient(90deg, var(--pcb-line) 1px, transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse at center, black 0%, transparent 72%);}
+  .hero-inner{position:relative;z-index:1;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(24px,5vw,40px);margin:0 0 10px;color:var(--paper);text-shadow:0 0 30px rgba(111,227,166,.2);}
+  .sub{text-align:center;color:#B9C4B9;font-size:14.5px;margin:0 auto;max-width:620px;line-height:1.6;}
+
+  .panel-nav{position:sticky;top:0;z-index:40;background:rgba(15,27,21,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--pcb-line);padding:10px 16px;}
+  .panel-nav-inner{max-width:900px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+  .nav-led{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8FA093;text-decoration:none;padding:5px 11px;border-radius:20px;border:1px solid transparent;transition:.2s ease;}
+  .nav-led:hover{color:var(--paper);border-color:var(--pcb-line);}
+
+  .wrap{max-width:900px;margin:0 auto;padding:0 16px;}
+  .howto{margin:22px auto 0;background:var(--pcb-light);border:1px dashed var(--pcb-line);border-radius:12px;padding:14px 18px;font-size:13px;line-height:1.6;color:#B9C4B9;}
+  .howto strong{color:var(--paper);}
+
+  .problem{max-width:900px;margin:0 auto;padding:56px 16px 0;scroll-margin-top:64px;}
+  .p-head{margin-bottom:18px;}
+  .p-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
+  .p-title{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(19px,3.6vw,25px);margin:0 0 12px;color:var(--paper);}
+  .p-statement{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:12px;padding:14px 18px;font-size:14.5px;color:#DDE6DF;line-height:1.6;}
+  .p-statement .mono{font-family:'IBM Plex Mono',monospace;background:rgba(0,0,0,.25);color:var(--phosphor);padding:1px 6px;border-radius:4px;}
+
+  .goal-banner{text-align:center;background:var(--pcb-light);color:var(--paper);border:1px solid var(--pcb-line);border-radius:14px;padding:14px 16px;margin:16px 0;font-family:'IBM Plex Mono',monospace;font-size:clamp(13px,2.4vw,17px);}
+
+  /* ============ TRUTH TABLE BUILDER ============ */
+  .tt-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin:14px 0;}
+  .tt-score{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#8FA093;}
+  .tt-score strong{color:var(--phosphor);}
+  .tt-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .tbtn{background:transparent;border:1.5px solid var(--pcb-line);color:#B9C4B9;border-radius:20px;padding:5px 12px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;transition:.15s ease;}
+  .tbtn:hover{background:var(--pcb-light);color:var(--paper);border-color:var(--copper);}
+  .tbtn.primary{background:rgba(111,227,166,.12);border-color:var(--phosphor);color:var(--phosphor);}
+  .tbtn.primary:hover{background:rgba(111,227,166,.22);}
+
+  .table-scroll{overflow-x:auto;border-radius:14px;box-shadow:0 14px 30px -18px rgba(0,0,0,.5);background:var(--pcb-light);border:1px solid var(--pcb-line);padding:10px 8px;margin-bottom:14px;}
+  table.ttable{border-collapse:separate;border-spacing:6px 4px;width:100%;}
+  table.ttable th{background:#1C2B21;padding:7px 7px 9px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.02em;color:#8FA093;border-radius:7px;white-space:nowrap;}
+  table.ttable th.given{background:#20301F;color:var(--copper);font-size:13px;}
+  table.ttable th.final{background:#123024;color:var(--phosphor);}
+  table.ttable td{text-align:center;padding:6px 5px;background:#132018;border-radius:7px;}
+  table.ttable tr:nth-child(even) td{background:#0F1911;}
+  table.ttable td.given{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;background:#20301F;color:var(--copper);}
+  table.ttable tr:nth-child(even) td.given{background:#1A2818;}
+  table.ttable td.final-col{background:#0E2019;}
+
+  .cell-wrap{position:relative;display:inline-block;}
+  .toggle{position:relative;width:40px;height:21px;border-radius:20px;cursor:pointer;background:rgba(0,0,0,.3);border:1.5px solid var(--warn);display:inline-flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:700;user-select:none;transition:border-color .2s ease, box-shadow .2s ease;}
+  .toggle .lab{position:absolute;width:50%;text-align:center;transition:opacity .2s ease;}
+  .toggle .lab.t{left:0;color:var(--phosphor);opacity:.35;} .toggle .lab.f{right:0;color:var(--warn);opacity:1;}
+  .toggle.on .lab.t{opacity:1;} .toggle.on .lab.f{opacity:.35;}
+  .toggle .knob{position:absolute;top:2px;left:21px;width:15px;height:15px;border-radius:50%;background:linear-gradient(180deg,#E0794F,#B5493D);box-shadow:0 1px 3px rgba(0,0,0,.5);transition:left .2s ease, background .2s ease;}
+  .toggle.on{border-color:var(--phosphor);box-shadow:0 0 8px rgba(111,227,166,.35);}
+  .toggle.on .knob{left:2px;background:linear-gradient(180deg,#BFFFE0,#6FE3A6);}
+  .cell-wrap.ok .toggle{box-shadow:0 0 0 2.5px rgba(111,227,166,.35);}
+  .cell-wrap.bad .toggle{box-shadow:0 0 0 2.5px rgba(224,121,79,.35);}
+  .vmark{position:absolute;top:-7px;right:-7px;width:14px;height:14px;border-radius:50%;font-size:8px;line-height:14px;text-align:center;font-weight:700;color:#0B140F;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .cell-wrap.ok .vmark{opacity:1;transform:scale(1);background:var(--phosphor);}
+  .cell-wrap.bad .vmark{opacity:1;transform:scale(1);background:var(--warn);color:#fff;}
+
+  .verdict-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:12px;padding:14px 16px;margin-bottom:8px;}
+  .verdict-label{font-family:'IBM Plex Mono',monospace;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:#8FA093;}
+  .seg{display:inline-flex;border:1.5px solid var(--pcb-line);border-radius:20px;overflow:hidden;background:rgba(0,0,0,.25);}
+  .seg button{border:none;background:transparent;padding:7px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:#8FA093;transition:.15s ease;}
+  .seg button.sel{background:rgba(111,227,166,.16);color:var(--phosphor);}
+  .seg button.sel.bad-sel{background:rgba(224,121,79,.16);color:var(--warn);}
+  .verdict-icon{width:18px;height:18px;border-radius:50%;font-size:11px;line-height:18px;text-align:center;font-weight:700;color:#0B140F;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .verdict-icon.show{opacity:1;transform:scale(1);}
+  .verdict-icon.ok{background:var(--phosphor);} .verdict-icon.bad{background:var(--warn);color:#fff;}
+
+  .explain-box{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .explain-box.show{max-height:260px;opacity:1;margin-top:4px;}
+  .explain-inner{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:10px;padding:12px 16px;font-size:13px;line-height:1.6;color:#B9C4B9;}
+  .explain-inner strong{color:var(--paper);}
+
+  /* ============ STEPPER (algebraic proof) ============ */
+  .stepper-box{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:16px;padding:20px 22px 18px;margin:16px 0;}
+  .stepper-count{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:#8FA093;text-align:center;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;}
+  .stepper-dots{display:flex;gap:6px;justify-content:center;margin-bottom:16px;flex-wrap:wrap;}
+  .st-dot{width:9px;height:9px;border-radius:50%;background:var(--pcb-line);border:none;cursor:pointer;padding:0;transition:.2s ease;}
+  .st-dot.on{background:var(--phosphor);box-shadow:0 0 8px var(--phosphor);}
+  .st-dot.past{background:var(--copper);opacity:.6;}
+  .stepper-predictbar{display:flex;align-items:center;gap:9px;margin-bottom:14px;font-family:'IBM Plex Sans',sans-serif;font-size:.8rem;color:#8FA093;}
+  .pswitch{width:42px;height:23px;border-radius:999px;border:1.5px solid var(--pcb-line);cursor:pointer;position:relative;background:rgba(0,0,0,.3);transition:.2s ease;flex-shrink:0;}
+  .pswitch .k{position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:linear-gradient(180deg,#D8D4C7,#A79F8C);transition:.2s ease;box-shadow:0 1px 3px rgba(0,0,0,.4);}
+  .pswitch.on{background:rgba(111,227,166,.14);border-color:var(--phosphor);box-shadow:0 0 8px rgba(111,227,166,.3);}
+  .pswitch.on .k{left:20px;background:linear-gradient(180deg,#BFFFE0,#6FE3A6);}
+  .stepper-expr{font-family:'IBM Plex Mono',monospace;font-size:clamp(.85rem,2.4vw,1.15rem);text-align:center;line-height:1.8;padding:16px 6px;min-height:2.2em;color:var(--paper);}
+  .st-mark{background:rgba(217,164,65,.16);color:var(--paper);border-bottom:2.5px solid var(--bonus);padding:1px 5px;border-radius:5px;}
+  .stepper-lawrow{display:flex;align-items:center;justify-content:center;gap:10px;margin:4px 0;}
+  .stepper-lawbadge{font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:.82rem;background:rgba(111,227,166,.1);color:var(--phosphor);border:1.5px solid var(--phosphor);padding:6px 14px;border-radius:10px;cursor:default;transition:.2s ease;}
+  .stepper-lawbadge.given{background:rgba(255,255,255,.04);color:#8FA093;border-color:var(--pcb-line);}
+  .stepper-box.predict .stepper-lawbadge:not(.given){filter:blur(5px);cursor:pointer;}
+  .stepper-box.predict .stepper-lawbadge.revealed{filter:none;cursor:default;}
+  .stepper-navrow{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;}
+  .stepper-navbtn{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:.76rem;border:1.5px solid var(--pcb-line);background:transparent;color:#B9C4B9;padding:7px 15px;border-radius:10px;cursor:pointer;transition:.15s ease;text-transform:uppercase;}
+  .stepper-navbtn:hover{border-color:var(--copper);color:var(--paper);}
+  .stepper-navbtn:disabled{opacity:.3;cursor:not-allowed;}
+  .stepper-navbtn.primary{background:rgba(111,227,166,.12);color:var(--phosphor);border-color:var(--phosphor);}
+
+  /* ============ CONSTRUCTION REVEAL CARDS ============ */
+  .construct-card{background:var(--paper);color:var(--ink);border-radius:8px;padding:16px 20px;margin-bottom:14px;box-shadow:0 12px 24px -16px rgba(0,0,0,.5);}
+  .construct-tag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:10px;padding:3px 11px;border-radius:20px;margin-bottom:10px;color:#fff;background:var(--copper);text-transform:uppercase;letter-spacing:.04em;}
+  .construct-card .qtext{font-size:14px;margin:0 0 8px;}
+  .construct-scratch{width:100%;border:1.5px dashed rgba(33,28,18,.25);border-radius:8px;background:rgba(255,255,255,.5);padding:8px 11px;font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;color:var(--ink);resize:vertical;min-height:36px;margin:6px 0;}
+  .c-reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:5px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .c-reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .c-reveal-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .c-reveal-panel.show{max-height:200px;opacity:1;margin-top:8px;}
+  .c-reveal-inner{border-top:1.5px dashed rgba(33,28,18,.2);padding-top:8px;font-size:13.5px;}
+  .c-reveal-inner .mono{font-family:'IBM Plex Mono',monospace;background:#fff;border:1px solid rgba(33,28,18,.15);padding:1px 6px;border-radius:4px;}
+
+  .mono{font-family:'IBM Plex Mono',monospace;background:rgba(0,0,0,.25);color:var(--copper);padding:1px 6px;border-radius:4px;}
+
+  footer{text-align:center;font-size:11.5px;color:#5C6B60;margin-top:60px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;}
+  footer .ok{color:var(--phosphor);}
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+      <h1 class="page-title">Solved Examination Problems</h1>
+      <p class="sub">Six worked problems, nothing pre-filled. Build every truth table yourself, and blur every law name until you're ready to check your guess.</p>
+    </div>
+  </div>
+
+  <div class="panel-nav">
+    <div class="panel-nav-inner" id="navRow"></div>
+  </div>
+
+  <div class="wrap">
+    <div class="howto"><strong>How this page works:</strong> truth-table problems give you fixed p/q/r columns and blank toggle columns for everything else — fill them in, then check. Algebraic-proof problems give you one line at a time with the law <em>blurred</em> — guess it before you tap. Construction problems give you a scratch box — write your own answer before revealing.</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 1(a) -->
+  <!-- ============================================================ -->
+  <div class="problem" id="p1a">
+    <div class="p-head">
+      <div class="p-tag">Problem 1(a)</div>
+      <h2 class="p-title">Tautology, Contradiction, or Contingency?</h2>
+      <div class="p-statement">Check whether the compound proposition <span class="mono">(p∨q)→(q∧r) ↔ (p∧¬r)</span> is a tautology, contradiction, or contingency.</div>
+    </div>
+    <div id="tt-1a"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 1(b) -->
+  <!-- ============================================================ -->
+  <div class="problem" id="p1b">
+    <div class="p-head">
+      <div class="p-tag">Problem 1(b)</div>
+      <h2 class="p-title">Prove It's a Tautology — Without a Truth Table</h2>
+      <div class="p-statement">Show that <span class="mono">(p∧q)∧(p→r)∧(q→r)→r</span> is a tautology using only the laws of propositional logic.</div>
+    </div>
+    <div id="st-1b"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 2(a) -->
+  <!-- ============================================================ -->
+  <div class="problem" id="p2a">
+    <div class="p-head">
+      <div class="p-tag">Problem 2(a)</div>
+      <h2 class="p-title">Converse, Inverse, Contrapositive</h2>
+      <div class="p-statement">For each conditional statement below, write the Converse, Inverse, and Contrapositive — in plain English.</div>
+    </div>
+    <div id="construct-2a"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 2(b) -->
+  <!-- ============================================================ -->
+  <div class="problem" id="p2b">
+    <div class="p-head">
+      <div class="p-tag">Problem 2(b)</div>
+      <h2 class="p-title">Negate It With De Morgan's Law</h2>
+      <div class="p-statement">"If it does not rain or if there is no traffic dislocation, then the sports day will be held and the cultural program will go on." Find the negation.</div>
+    </div>
+    <div class="p-statement" style="margin-top:10px;">
+      <span class="mono">p</span>: It rains &nbsp;·&nbsp; <span class="mono">q</span>: There is traffic dislocation &nbsp;·&nbsp; <span class="mono">r</span>: Sports day is held &nbsp;·&nbsp; <span class="mono">s</span>: Cultural program goes on
+    </div>
+    <div id="st-2b"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 3(a) -->
+  <!-- ============================================================ -->
+  <div class="problem" id="p3a">
+    <div class="p-head">
+      <div class="p-tag">Problem 3(a)</div>
+      <h2 class="p-title">Prove an Equivalence — Two Ways</h2>
+      <div class="p-statement">Prove that <span class="mono">(p→r)∨(q→r) ≡ (p∧q)→r</span> — once with a truth table, once without.</div>
+    </div>
+    <div class="goal-banner">(i) With a truth table</div>
+    <div id="tt-3a"></div>
+    <div class="goal-banner">(ii) Without a truth table</div>
+    <div id="st-3a"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 3(b) -->
+  <!-- ============================================================ -->
+  <div class="problem" id="p3b">
+    <div class="p-head">
+      <div class="p-tag">Problem 3(b)</div>
+      <h2 class="p-title">Are X and Y Actually the Same?</h2>
+      <div class="p-statement">
+        <strong>X:</strong> "If Alice is both smart and honest, then she is not intelligent." &nbsp;→&nbsp; <span class="mono">X: (p∧q)→¬r</span><br>
+        <strong>Y:</strong> "If Alice is either smart or not intelligent, then she is not honest." &nbsp;→&nbsp; <span class="mono">Y: (p∨¬r)→¬q</span><br>
+        <span class="mono">p</span>: Alice is smart &nbsp;·&nbsp; <span class="mono">q</span>: Alice is honest &nbsp;·&nbsp; <span class="mono">r</span>: Alice is intelligent
+      </div>
+    </div>
+    <div id="tt-3b"></div>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Solved Examination Problems &nbsp;—&nbsp; <span class="ok">CIRCUIT COMPLETE ✓</span></footer>
+
+<script>
+/* =====================================================================
+   Nav
+   ===================================================================== */
+const navItems = [
+  {id:'p1a', label:'1(a) Classify'},
+  {id:'p1b', label:'1(b) Prove Tautology'},
+  {id:'p2a', label:'2(a) Converse/Inverse'},
+  {id:'p2b', label:"2(b) De Morgan's"},
+  {id:'p3a', label:'3(a) Both Proofs'},
+  {id:'p3b', label:'3(b) Equivalent?'}
+];
+const navRow = document.getElementById('navRow');
+navItems.forEach(n=>{
+  const a = document.createElement('a');
+  a.href = '#'+n.id; a.className='nav-led'; a.textContent = n.label;
+  navRow.appendChild(a);
+});
+
+/* =====================================================================
+   Shared helpers
+   ===================================================================== */
+function rowsFor(n){
+  const out = [];
+  const gen = (arr)=>{ if(arr.length===n){ out.push(arr.slice()); return; } gen(arr.concat(true)); gen(arr.concat(false)); };
+  gen([]);
+  return out;
+}
+const VNAMES = ['p','q','r','s'];
+
+/* =====================================================================
+   TRUTH TABLE BUILDER
+   config: {containerId, nvars, cols:[{sym,fn,final}], verdict:{type:'classify'|'equivalent', correct, options, note}}
+   ===================================================================== */
+function buildTruthTable(config){
+  const container = document.getElementById(config.containerId);
+  const rows = rowsFor(config.nvars);
+  const vnames = VNAMES.slice(0, config.nvars);
+  const totalCells = rows.length * config.cols.length + (config.verdict ? 1 : 0);
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'tt-toolbar';
+  toolbar.innerHTML = `<span class="tt-score">This problem: <strong data-local>0</strong> / ${totalCells}</span>
+    <span class="tt-btns">
+      <button class="tbtn primary" data-act="check">Check</button>
+      <button class="tbtn" data-act="reveal">Reveal</button>
+      <button class="tbtn" data-act="reset">Reset</button>
+    </span>`;
+  container.appendChild(toolbar);
+
+  const scrollWrap = document.createElement('div');
+  scrollWrap.className = 'table-scroll';
+  const table = document.createElement('table');
+  table.className = 'ttable';
+  const headTr = document.createElement('tr');
+  vnames.forEach(v=>{
+    const th = document.createElement('th'); th.className='given'; th.textContent=v; headTr.appendChild(th);
+  });
+  config.cols.forEach(c=>{
+    const th = document.createElement('th'); if(c.final) th.className='final'; th.textContent=c.sym; headTr.appendChild(th);
+  });
+  table.appendChild(headTr);
+
+  rows.forEach(row=>{
+    const tr = document.createElement('tr');
+    row.forEach(v=>{
+      const td = document.createElement('td'); td.className='given'; td.textContent = v?'T':'F'; tr.appendChild(td);
+    });
+    config.cols.forEach(c=>{
+      const td = document.createElement('td'); if(c.final) td.className='final-col';
+      const correct = c.fn(...row);
+      const wrap = document.createElement('div');
+      wrap.className = 'cell-wrap'; wrap.dataset.correct = correct?'1':'0'; wrap.dataset.value='0';
+      wrap.innerHTML = `<div class="toggle" role="button" tabindex="0"><span class="lab t">T</span><span class="lab f">F</span><span class="knob"></span></div><span class="vmark"></span>`;
+      const tgl = wrap.querySelector('.toggle');
+      const flip = ()=>{
+        const on = wrap.dataset.value==='1';
+        wrap.dataset.value = on?'0':'1';
+        tgl.classList.toggle('on', !on);
+        wrap.classList.remove('ok','bad'); wrap.querySelector('.vmark').textContent='';
+        updateTTLocal(container); updateGrandScore();
+      };
+      tgl.addEventListener('click', flip);
+      tgl.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){flip(); e.preventDefault();} });
+      td.appendChild(wrap); tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
+  scrollWrap.appendChild(table);
+  container.appendChild(scrollWrap);
+
+  let vSeg = null, vIcon = null, explainBox = null;
+  if(config.verdict){
+    const vrow = document.createElement('div');
+    vrow.className = 'verdict-row';
+    const segHtml = config.verdict.options.map(o=>`<button data-val="${o}" type="button">${o}</button>`).join('');
+    vrow.innerHTML = `<span class="verdict-label">${config.verdict.question}</span><div class="seg" data-role="verdict">${segHtml}</div><span class="verdict-icon"></span>`;
+    container.appendChild(vrow);
+    vSeg = vrow.querySelector('.seg');
+    vIcon = vrow.querySelector('.verdict-icon');
+    vSeg.querySelectorAll('button').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        vSeg.querySelectorAll('button').forEach(x=>x.classList.remove('sel','bad-sel'));
+        b.classList.add('sel');
+        vSeg.dataset.value = b.dataset.val;
+        vIcon.classList.remove('show','ok','bad');
+        if(explainBox) explainBox.classList.remove('show');
+        updateTTLocal(container); updateGrandScore();
+      });
+    });
+    explainBox = document.createElement('div');
+    explainBox.className = 'explain-box';
+    explainBox.innerHTML = `<div class="explain-inner">${config.verdict.note}</div>`;
+    container.appendChild(explainBox);
+  }
+
+  container.dataset.total = totalCells;
+
+  toolbar.querySelectorAll('[data-act]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const act = btn.dataset.act;
+      if(act==='check') checkTT(container, config, vSeg, vIcon, explainBox);
+      if(act==='reveal') revealTT(container, config, vSeg, vIcon, explainBox);
+      if(act==='reset') resetTT(container, vSeg, vIcon, explainBox);
+    });
+  });
+}
+
+function updateTTLocal(container){
+  let correct = 0;
+  container.querySelectorAll('.cell-wrap').forEach(w=>{ if(w.dataset.value===w.dataset.correct) correct++; });
+  const seg = container.querySelector('[data-role="verdict"]');
+  if(seg && seg.dataset.value !== undefined && seg.dataset.value === seg.dataset.correct) correct++;
+  const el = container.querySelector('[data-local]');
+  if(el) el.textContent = correct;
+}
+
+function checkTT(container, config, vSeg, vIcon, explainBox){
+  container.querySelectorAll('.cell-wrap').forEach(w=>{
+    const ok = w.dataset.value===w.dataset.correct;
+    w.classList.remove('ok','bad'); w.classList.add(ok?'ok':'bad');
+    w.querySelector('.vmark').textContent = ok?'✓':'✗';
+  });
+  if(vSeg){
+    vSeg.dataset.correct = config.verdict.correct;
+    if(vSeg.dataset.value !== undefined){
+      const ok = vSeg.dataset.value === config.verdict.correct;
+      vIcon.classList.add('show', ok?'ok':'bad');
+      vIcon.textContent = ok?'✓':'✗';
+      if(!ok) vSeg.querySelector(`button.sel`).classList.add('bad-sel');
+    }
+    explainBox.classList.add('show');
+  }
+  updateTTLocal(container); updateGrandScore();
+}
+function revealTT(container, config, vSeg, vIcon, explainBox){
+  container.querySelectorAll('.cell-wrap').forEach(w=>{
+    w.dataset.value = w.dataset.correct;
+    w.querySelector('.toggle').classList.toggle('on', w.dataset.correct==='1');
+    w.classList.remove('ok','bad'); w.classList.add('ok');
+    w.querySelector('.vmark').textContent = '✓';
+  });
+  if(vSeg){
+    vSeg.dataset.correct = config.verdict.correct;
+    vSeg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','bad-sel'));
+    const btn = vSeg.querySelector(`button[data-val="${config.verdict.correct}"]`);
+    if(btn) btn.classList.add('sel');
+    vSeg.dataset.value = config.verdict.correct;
+    vIcon.classList.add('show','ok'); vIcon.textContent='✓';
+    explainBox.classList.add('show');
+  }
+  updateTTLocal(container); updateGrandScore();
+}
+function resetTT(container, vSeg, vIcon, explainBox){
+  container.querySelectorAll('.cell-wrap').forEach(w=>{
+    w.dataset.value='0'; w.querySelector('.toggle').classList.remove('on');
+    w.classList.remove('ok','bad'); w.querySelector('.vmark').textContent='';
+  });
+  if(vSeg){
+    delete vSeg.dataset.value;
+    vSeg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','bad-sel'));
+    vIcon.classList.remove('show','ok','bad');
+    explainBox.classList.remove('show');
+  }
+  updateTTLocal(container); updateGrandScore();
+}
+
+function updateGrandScore(){ /* no single global counter on this page — each problem scores itself */ }
+
+/* =====================================================================
+   STEPPER (algebraic law-guessing proof)
+   ===================================================================== */
+function buildStepper(containerId, steps){
+  const container = document.getElementById(containerId);
+  const box = document.createElement('div');
+  box.className = 'stepper-box';
+  box.innerHTML = `
+    <div class="stepper-predictbar">
+      <div class="pswitch" data-role="predict"><div class="k"></div></div>
+      <span>Predict mode — blur the law until you tap it</span>
+    </div>
+    <div class="stepper-count"></div>
+    <div class="stepper-dots"></div>
+    <div class="stepper-expr"></div>
+    <div class="stepper-lawrow"><span class="stepper-lawbadge"></span></div>
+    <div class="stepper-navrow">
+      <button class="stepper-navbtn" data-role="prev">‹ Previous</button>
+      <button class="stepper-navbtn primary" data-role="next">Next ›</button>
+    </div>
+  `;
+  container.appendChild(box);
+
+  let idx = 0;
+  const countEl = box.querySelector('.stepper-count');
+  const dotsEl = box.querySelector('.stepper-dots');
+  const exprEl = box.querySelector('.stepper-expr');
+  const lawEl = box.querySelector('.stepper-lawbadge');
+  const prevBtn = box.querySelector('[data-role="prev"]');
+  const nextBtn = box.querySelector('[data-role="next"]');
+  const predictSwitch = box.querySelector('[data-role="predict"]');
+
+  steps.forEach((_, i)=>{
+    const d = document.createElement('button');
+    d.className = 'st-dot'; d.type='button';
+    d.addEventListener('click', ()=>{ idx=i; render(); });
+    dotsEl.appendChild(d);
+  });
+
+  predictSwitch.addEventListener('click', ()=>{
+    predictSwitch.classList.toggle('on');
+    box.classList.toggle('predict', predictSwitch.classList.contains('on'));
+  });
+
+  function render(){
+    countEl.textContent = `LINE ${idx+1} OF ${steps.length}`;
+    Array.from(dotsEl.children).forEach((d,i)=>{
+      d.classList.toggle('on', i===idx);
+      d.classList.toggle('past', i<idx);
+    });
+    exprEl.innerHTML = steps[idx].expr;
+    lawEl.textContent = steps[idx].law;
+    lawEl.className = 'stepper-lawbadge' + (steps[idx].given ? ' given' : '');
+    lawEl.classList.remove('revealed');
+    prevBtn.disabled = idx===0;
+    nextBtn.disabled = idx===steps.length-1;
+  }
+  lawEl.addEventListener('click', ()=>{ lawEl.classList.add('revealed'); });
+  prevBtn.addEventListener('click', ()=>{ if(idx>0){idx--; render();} });
+  nextBtn.addEventListener('click', ()=>{ if(idx<steps.length-1){idx++; render();} });
+  render();
+}
+
+/* =====================================================================
+   CONSTRUCTION REVEAL CARDS
+   ===================================================================== */
+let ccounter = 0;
+function buildConstructCard(container, tag, question, answer){
+  ccounter++;
+  const id = 'cc-'+ccounter;
+  const card = document.createElement('div');
+  card.className = 'construct-card';
+  card.innerHTML = `
+    <span class="construct-tag">${tag}</span>
+    <p class="qtext">${question}</p>
+    <textarea class="construct-scratch" placeholder="Write your own version here..."></textarea>
+    <button class="c-reveal-btn">Reveal Answer</button>
+    <div class="c-reveal-panel" id="${id}"><div class="c-reveal-inner">${answer}</div></div>
+  `;
+  card.querySelector('.c-reveal-btn').addEventListener('click', ()=>{
+    document.getElementById(id).classList.toggle('show');
+  });
+  container.appendChild(card);
+}
+
+/* =====================================================================
+   BUILD PROBLEM 1(a)
+   ===================================================================== */
+buildTruthTable({
+  containerId:'tt-1a', nvars:3,
+  cols:[
+    {sym:'p∨q', fn:(p,q,r)=>p||q},
+    {sym:'q∧r', fn:(p,q,r)=>q&&r},
+    {sym:'(p∨q)→(q∧r)', fn:(p,q,r)=>(!(p||q))||(q&&r)},
+    {sym:'¬r', fn:(p,q,r)=>!r},
+    {sym:'p∧¬r', fn:(p,q,r)=>p&&(!r)},
+    {sym:'↔ (final)', fn:(p,q,r)=>((!(p||q))||(q&&r))===(p&&(!r)), final:true}
+  ],
+  verdict:{
+    question:'Classification?', options:['Tautology','Contradiction','Contingency'], correct:'Contingency',
+    note:'<strong>Contingency.</strong> The final column contains both T and F values (True in rows TFT and FTF, False everywhere else) — so it\'s neither always true nor always false.'
+  }
+});
+
+/* =====================================================================
+   BUILD PROBLEM 1(b) — stepper
+   ===================================================================== */
+buildStepper('st-1b', [
+  {expr:'((p∧q)∧(p→r)∧(q→r))→r', law:'Given', given:true},
+  {expr:'((p∧q)∧<mark class="st-mark">(¬p∨r)</mark>∧<mark class="st-mark">(¬q∨r)</mark>)→r', law:'Implication Law: a→b ≡ ¬a∨b'},
+  {expr:'<mark class="st-mark">¬</mark>((p∧q)∧(¬p∨r)∧(¬q∨r))<mark class="st-mark">∨r</mark>', law:'Implication Law (applied to the outer →)'},
+  {expr:'<mark class="st-mark">¬(p∧q)∨¬(¬p∨r)∨¬(¬q∨r)</mark>∨r', law:"De Morgan's Law"},
+  {expr:'<mark class="st-mark">(¬p∨¬q)</mark>∨<mark class="st-mark">(p∧¬r)</mark>∨<mark class="st-mark">(q∧¬r)</mark>∨r', law:"De Morgan's Law &amp; Involution Law ¬(¬a) ≡ a"},
+  {expr:'(¬p∨¬q)∨<mark class="st-mark">((p∨q)∧¬r)</mark>∨r', law:'Distributive Law'},
+  {expr:'(¬p∨¬q)∨<mark class="st-mark">((p∨q∨r)∧(¬r∨r))</mark>', law:'Distributive Law (folding the trailing ∨r back in)'},
+  {expr:'(¬p∨¬q)∨((p∨q∨r)∧<mark class="st-mark">T</mark>)', law:'Tautology Law: ¬a∨a ≡ T'},
+  {expr:'(¬p∨¬q)∨<mark class="st-mark">(p∨q∨r)</mark>', law:'Identity Law: A∧T ≡ A'},
+  {expr:'<mark class="st-mark">(¬p∨p)</mark>∨<mark class="st-mark">(¬q∨q)</mark>∨r', law:'Associative &amp; Commutative Laws (regrouping)'},
+  {expr:'<mark class="st-mark">T</mark>∨<mark class="st-mark">T</mark>∨r', law:'Tautology Law: ¬a∨a ≡ T'},
+  {expr:'<mark class="st-mark">T</mark>', law:'Dominance Law: a∨T ≡ T'}
+]);
+
+/* =====================================================================
+   BUILD PROBLEM 2(a) — construction cards
+   ===================================================================== */
+(function(){
+  const c = document.getElementById('construct-2a');
+
+  const s1 = document.createElement('div');
+  s1.className = 'goal-banner';
+  s1.textContent = '"If a student studies hard, then they will pass the exam." — p: student studies hard, q: student passes exam. p → q.';
+  c.appendChild(s1);
+  buildConstructCard(c, 'Converse (q → p)', 'Swap the two halves. What do you get?', '<span class="mono">q → p</span>: "If a student passes the exam, then they studied hard."');
+  buildConstructCard(c, 'Inverse (¬p → ¬q)', 'Negate both halves, keep the order. What do you get?', '<span class="mono">¬p → ¬q</span>: "If a student does not study hard, then they will not pass the exam."');
+  buildConstructCard(c, 'Contrapositive (¬q → ¬p)', 'Swap AND negate. What do you get?', '<span class="mono">¬q → ¬p</span>: "If a student does not pass the exam, then they did not study hard."');
+
+  const s2 = document.createElement('div');
+  s2.className = 'goal-banner';
+  s2.textContent = '"If a shape is a square, then it has four equal sides." — r: shape is square, s: shape has four equal sides. r → s.';
+  c.appendChild(s2);
+  buildConstructCard(c, 'Converse (s → r)', 'Swap the two halves. What do you get?', '<span class="mono">s → r</span>: "If a shape has four equal sides, then it is a square."');
+  buildConstructCard(c, 'Inverse (¬r → ¬s)', 'Negate both halves, keep the order. What do you get?', '<span class="mono">¬r → ¬s</span>: "If a shape is not a square, then it does not have four equal sides."');
+  buildConstructCard(c, 'Contrapositive (¬s → ¬r)', 'Swap AND negate. What do you get?', '<span class="mono">¬s → ¬r</span>: "If a shape does not have four equal sides, then it is not a square."');
+})();
+
+/* =====================================================================
+   BUILD PROBLEM 2(b) — stepper
+   ===================================================================== */
+buildStepper('st-2b', [
+  {expr:'¬[(¬p∨¬q)→(r∧s)]', law:'Given: this is the negation we must simplify', given:true},
+  {expr:'¬[<mark class="st-mark">¬(¬p∨¬q)∨(r∧s)</mark>]', law:'Implication Law: A→B ≡ ¬A∨B'},
+  {expr:'<mark class="st-mark">(¬p∨¬q)</mark>∧<mark class="st-mark">(¬r∨¬s)</mark>', law:"De Morgan's Law (+ Involution Law cancels the double negation on the first bracket)"}
+]);
+
+/* =====================================================================
+   BUILD PROBLEM 3(a) — truth table + stepper
+   ===================================================================== */
+buildTruthTable({
+  containerId:'tt-3a', nvars:3,
+  cols:[
+    {sym:'p→r', fn:(p,q,r)=>(!p)||r},
+    {sym:'q→r', fn:(p,q,r)=>(!q)||r},
+    {sym:'LHS: (p→r)∨(q→r)', fn:(p,q,r)=>((!p)||r)||((!q)||r)},
+    {sym:'p∧q', fn:(p,q,r)=>p&&q},
+    {sym:'RHS: (p∧q)→r', fn:(p,q,r)=>(!(p&&q))||r, final:true}
+  ],
+  verdict:{
+    question:'Are LHS and RHS equivalent?', options:['Yes','No'], correct:'Yes',
+    note:'<strong>Yes.</strong> LHS and RHS match in all 8 rows — that\'s exactly what "≡" means.'
+  }
+});
+buildStepper('st-3a', [
+  {expr:'(p→r)∨(q→r)', law:'Given: this is the LHS', given:true},
+  {expr:'<mark class="st-mark">(¬p∨r)</mark>∨<mark class="st-mark">(¬q∨r)</mark>', law:'Implication Law'},
+  {expr:'<mark class="st-mark">(¬p∨¬q)</mark>∨<mark class="st-mark">(r∨r)</mark>', law:'Associative &amp; Commutative Laws'},
+  {expr:'(¬p∨¬q)∨<mark class="st-mark">r</mark>', law:'Idempotent Law'},
+  {expr:'<mark class="st-mark">¬(p∧q)</mark>∨r', law:"De Morgan's Law"},
+  {expr:'<mark class="st-mark">(p∧q)→r</mark>', law:'Implication Law — this is the RHS, so LHS ≡ RHS'}
+]);
+
+/* =====================================================================
+   BUILD PROBLEM 3(b)
+   ===================================================================== */
+buildTruthTable({
+  containerId:'tt-3b', nvars:3,
+  cols:[
+    {sym:'p∧q', fn:(p,q,r)=>p&&q},
+    {sym:'¬r', fn:(p,q,r)=>!r},
+    {sym:'X: (p∧q)→¬r', fn:(p,q,r)=>(!(p&&q))||(!r)},
+    {sym:'p∨¬r', fn:(p,q,r)=>p||(!r)},
+    {sym:'¬q', fn:(p,q,r)=>!q},
+    {sym:'Y: (p∨¬r)→¬q', fn:(p,q,r)=>(!(p||(!r)))||(!q), final:true}
+  ],
+  verdict:{
+    question:'Are X and Y logically equivalent?', options:['Yes','No'], correct:'No',
+    note:'<strong>No!</strong> Look at row p=T, q=T, r=F: X comes out True, but Y comes out False. One mismatched row is all it takes — X and Y are <em>not</em> equivalent, even though they sound similar in English.'
+  }
+});
+</script>
+</body>
+</html>

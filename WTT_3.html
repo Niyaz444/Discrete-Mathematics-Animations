@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proving Without Truth Tables · Problem 1.16</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);font-family:'IBM Plex Sans',sans-serif;color:var(--ink);padding:32px 16px 90px;}
+  .wrap{max-width:820px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(23px,4.5vw,34px);margin:0 0 6px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14.5px;margin:0 auto 26px;max-width:600px;line-height:1.6;}
+
+  .toolbar{
+    position:sticky; top:10px; z-index:30;
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+    background:var(--ink); color:#F4F2EA; border-radius:14px; padding:12px 18px; margin-bottom:24px;
+    box-shadow:0 12px 28px -16px rgba(28,43,51,.6);
+    font-family:'IBM Plex Mono',monospace; font-size:13px;
+  }
+  .toolbar .score span{color:var(--gold);font-weight:700;font-size:16px;}
+  .toolbar .btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .tbtn{background:transparent;border:1.5px solid #F4F2EA;color:#F4F2EA;border-radius:20px;padding:6px 13px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;transition:.15s ease;}
+  .tbtn:hover{background:#F4F2EA;color:var(--ink);}
+  .tbtn.primary{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .tbtn.primary:hover{background:#256150;}
+
+  .howto{background:#fff;border:1px dashed var(--line);border-radius:12px;padding:14px 18px;margin-bottom:26px;font-size:13.5px;line-height:1.65;color:var(--ink-soft);box-shadow:0 6px 16px -12px rgba(28,43,51,.35);}
+  .howto strong{color:var(--ink);}
+
+  /* ---------- Laws reference ---------- */
+  .laws-box{background:#fff;border-left:4px solid var(--teal);border-radius:0 10px 10px 0;padding:16px 18px;margin-bottom:34px;box-shadow:0 6px 16px -12px rgba(28,43,51,.4);}
+  .laws-box h3{font-family:'Fraunces',serif;font-weight:600;font-size:16px;margin:0 0 10px;color:var(--teal);}
+  .laws-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px 20px;font-size:13px;line-height:1.6;}
+  .laws-grid .mono{font-family:'IBM Plex Mono',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;}
+
+  /* ---------- Proof goal banner ---------- */
+  .goal-banner{text-align:center;background:var(--ink);color:#F4F2EA;border-radius:14px;padding:18px 20px;margin:44px 0 22px;font-family:'IBM Plex Mono',monospace;font-size:clamp(14px,2.6vw,18px);box-shadow:0 12px 26px -16px rgba(28,43,51,.55);}
+  .goal-banner .tag{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:8px;}
+  .part-title{font-family:'Fraunces',serif;font-weight:600;font-size:20px;text-align:center;margin-bottom:4px;}
+
+  /* ---------- Proof chain ---------- */
+  .proof-chain{position:relative;padding-left:0;}
+  .line-card{
+    background:var(--card); border-radius:12px; padding:14px 18px; margin-bottom:0;
+    border:1.5px solid rgba(28,43,51,.08); box-shadow:0 6px 16px -12px rgba(28,43,51,.35);
+    font-family:'IBM Plex Mono',monospace; font-size:14.5px; text-align:center; line-height:1.5;
+  }
+  .line-card .line-num{display:block;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+  .line-card.final{border-color:var(--teal); background:#F3FAF7;}
+
+  .connector{display:flex;flex-direction:column;align-items:center;padding:10px 0;}
+  .connector .arrow{font-size:18px;color:var(--ink-soft);}
+
+  .law-card{
+    width:100%; max-width:560px; background:var(--card); border-radius:12px; padding:14px 18px;
+    border:1.5px solid rgba(28,43,51,.08); box-shadow:0 6px 16px -12px rgba(28,43,51,.35); margin:6px 0;
+  }
+  .law-card.correct{border-color:var(--teal); background:#F3FAF7;}
+  .law-card.incorrect{border-color:var(--brick); background:#FCF3F2;}
+  .law-q{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);margin-bottom:8px;text-align:center;}
+  .law-opts{display:flex;flex-direction:column;gap:6px;}
+  .law-opt{text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;transition:.15s ease;font-family:'IBM Plex Sans',sans-serif;}
+  .law-opt:hover{border-color:var(--ink);}
+  .law-opt.sel{border-color:var(--ink);background:#F1EFE6;font-weight:600;}
+  .law-opt.correct{border-color:var(--teal);background:#EAF4F0;color:var(--teal);font-weight:600;}
+  .law-opt.wrong{border-color:var(--brick);background:#F8ECEA;color:var(--brick);font-weight:600;}
+  .law-explain{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .law-explain.show{max-height:160px;opacity:1;margin-top:10px;}
+  .law-explain-inner{border-top:1px dashed var(--line);padding-top:8px;font-size:12.5px;line-height:1.55;color:var(--ink-soft);}
+  .law-explain-inner strong{color:var(--ink);}
+
+  .qed{text-align:right;font-family:'IBM Plex Sans',serif;font-weight:700;font-size:16px;margin-top:14px;color:var(--ink);}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:48px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Proving Without Truth Tables</h1>
+  <p class="sub">Problem 1.16 — every step is a known law of equivalence. Read each line, then identify the law that justifies the next one.</p>
+
+  <div class="toolbar">
+    <div class="score">Score: <span id="scoreDisplay">0 / 16</span> correct</div>
+    <div class="btns">
+      <button class="tbtn primary" onclick="checkAll()">Check My Answers</button>
+      <button class="tbtn" onclick="revealAll()">Reveal All</button>
+      <button class="tbtn" onclick="resetAll()">Reset All</button>
+    </div>
+  </div>
+
+  <div class="howto"><strong>How this works:</strong> each proof is a chain of equivalent expressions. Between two lines sits a hidden question — which law turned the line above into the line below? Pick an option, then check yourself. This is exactly the skill behind proving implications algebraically instead of building an 8-row truth table.</div>
+
+  <div class="laws-box">
+    <h3>Reference — Laws of Equivalence</h3>
+    <div class="laws-grid">
+      <div><span class="mono">A∨F ≡ A</span> &nbsp;·&nbsp; <span class="mono">A∧T ≡ A</span> — Identity Law</div>
+      <div><span class="mono">A∨T ≡ T</span> &nbsp;·&nbsp; <span class="mono">A∧F ≡ F</span> — Domination Law</div>
+      <div><span class="mono">A∨A ≡ A</span> &nbsp;·&nbsp; <span class="mono">A∧A ≡ A</span> — Idempotent Law</div>
+      <div><span class="mono">A∨¬A ≡ T</span> &nbsp;·&nbsp; <span class="mono">A∧¬A ≡ F</span> — Negation Law</div>
+      <div><span class="mono">¬¬A ≡ A</span> — Double Negation Law</div>
+      <div><span class="mono">A∨B ≡ B∨A</span> — Commutative Law</div>
+      <div><span class="mono">A∧(B∨C) ≡ (A∧B)∨(A∧C)</span> — Distributive Law</div>
+      <div><span class="mono">¬(A∨B) ≡ ¬A∧¬B</span> — De Morgan's Law</div>
+      <div><span class="mono">A→B ≡ ¬A∨B</span> — Implication Law</div>
+      <div><span class="mono">A∨(A∧B) ≡ A</span> — Absorption Law</div>
+      <div><span class="mono">A→A ≡ T</span> — Self-Implication</div>
+    </div>
+  </div>
+
+  <div id="proofsContainer"></div>
+
+  <footer>Discrete Mathematics · Module 1 · Problem 1.16 — Proofs Without Truth Tables</footer>
+</div>
+
+<script>
+const parts = [
+{
+  title: 'Part (i)', vars:'p, q, r',
+  goal: '[(p ∨ q) ∧ (p → r) ∧ (q → r)] → r',
+  lines: [
+    '(p∨q) ∧ (p→r) ∧ (q→r) → r',
+    '(p∨q) ∧ ((p∨q)→r) → r',
+    '(p∨q) ∧ (¬(p∨q)∨r) → r',
+    'F ∨ ((p∨q)∧r) → r',
+    '(p∨q)∧r → r',
+    '¬((p∨q)∧r) ∨ r',
+    '¬((p∧r)∨(q∧r)) ∨ r',
+    '(¬(p∧r) ∧ ¬(q∧r)) ∨ r',
+    '(¬(p∧r)∨r) ∧ (¬(q∧r)∨r)',
+    '(¬p∨¬r∨r) ∧ (¬q∨¬r∨r)',
+    '(¬p∨T) ∧ (¬q∨T)',
+    'T ∧ T',
+    'T'
+  ],
+  transitions: [
+    {opts:['Commutative Law','De Morgan\'s Law','(p→r)∧(q→r) ≡ (p∨q)→r — two implications sharing a consequent combine into one','Absorption Law'], correct:2,
+     why:'(p→r) and (q→r) share the same consequent r, so they combine into (p∨q)→r — if either antecedent holds, r follows.'},
+    {opts:['Implication Law: A→B ≡ ¬A∨B','De Morgan\'s Law','Distributive Law','Double Negation Law'], correct:0,
+     why:'(p∨q)→r is rewritten as ¬(p∨q)∨r using the Implication Law.'},
+    {opts:['Commutative Law','Idempotent Law','De Morgan\'s Law','Distributive Law, then Negation Law: A∧¬A ≡ F'], correct:3,
+     why:'(p∨q)∧(¬(p∨q)∨r) distributes to ((p∨q)∧¬(p∨q)) ∨ ((p∨q)∧r); the first part is F by the Negation Law.'},
+    {opts:['Domination Law','Identity Law: F∨A ≡ A','Absorption Law','Associative Law'], correct:1,
+     why:'F∨((p∨q)∧r) simplifies directly to (p∨q)∧r.'},
+    {opts:['Implication Law: A→B ≡ ¬A∨B','Commutative Law','De Morgan\'s Law','Idempotent Law'], correct:0,
+     why:'((p∨q)∧r)→r is rewritten as ¬((p∨q)∧r)∨r.'},
+    {opts:['De Morgan\'s Law','Commutative Law','Distributive Law: (p∨q)∧r ≡ (p∧r)∨(q∧r)','Absorption Law'], correct:2,
+     why:'(p∨q)∧r distributes into (p∧r)∨(q∧r) inside the negation.'},
+    {opts:['Distributive Law','De Morgan\'s Law: ¬(A∨B) ≡ ¬A∧¬B','Implication Law','Idempotent Law'], correct:1,
+     why:'¬((p∧r)∨(q∧r)) becomes ¬(p∧r)∧¬(q∧r) by De Morgan\'s Law.'},
+    {opts:['Commutative Law','Associative Law','De Morgan\'s Law','Distributive Law: (A∧B)∨C ≡ (A∨C)∧(B∨C)'], correct:3,
+     why:'OR distributes over AND: (¬(p∧r)∧¬(q∧r))∨r becomes (¬(p∧r)∨r)∧(¬(q∧r)∨r).'},
+    {opts:['De Morgan\'s Law: ¬(A∧B) ≡ ¬A∨¬B','Distributive Law','Implication Law','Commutative Law'], correct:0,
+     why:'¬(p∧r) becomes ¬p∨¬r, and ¬(q∧r) becomes ¬q∨¬r — De Morgan\'s Law applied to each bracket.'},
+    {opts:['Identity Law','Domination Law','Negation Law (Excluded Middle): A∨¬A ≡ T','Idempotent Law'], correct:2,
+     why:'¬r∨r is always True by the Negation Law (a statement or its negation is always true).'},
+    {opts:['Identity Law','Domination Law: A∨T ≡ T','Absorption Law','Double Negation Law'], correct:1,
+     why:'¬p∨T and ¬q∨T both collapse to T by the Domination Law — anything OR\'d with T is T.'},
+    {opts:['Domination Law','Identity Law','Commutative Law','Idempotent Law: A∧A ≡ A'], correct:3,
+     why:'T∧T simplifies to T.'}
+  ]
+},
+{
+  title: 'Part (ii)', vars:'p, q, r',
+  goal: '[((p∨¬p)→q) → ((p∨¬p)→r)] → (q→r)',
+  lines: [
+    '[((p∨¬p)→q) → ((p∨¬p)→r)] → (q→r)',
+    '[(T→q) → (T→r)] → (q→r)',
+    '[(F∨q) → (F∨r)] → (q→r)',
+    '(q→r) → (q→r)',
+    'T'
+  ],
+  transitions: [
+    {opts:['Negation Law (Excluded Middle): A∨¬A ≡ T','Identity Law','Domination Law','Idempotent Law'], correct:0,
+     why:'p∨¬p is always True — one of a statement and its negation must hold.'},
+    {opts:['Distributive Law','De Morgan\'s Law','Implication Law: A→B ≡ ¬A∨B, then ¬T ≡ F','Absorption Law'], correct:2,
+     why:'T→q rewrites to ¬T∨q, and ¬T is F by the Negation Law, giving F∨q.'},
+    {opts:['Domination Law','Identity Law: F∨A ≡ A','Commutative Law','Idempotent Law'], correct:1,
+     why:'F∨q simplifies to q, and F∨r simplifies to r, leaving (q→r)→(q→r).'},
+    {opts:['Domination Law','Distributive Law','De Morgan\'s Law','Self-Implication: A→A ≡ T — any statement implies itself'], correct:3,
+     why:'(q→r)→(q→r) has an identical antecedent and consequent, so it\'s always True — the same pattern as p→p.'}
+  ]
+}
+];
+
+const container = document.getElementById('proofsContainer');
+let TOTAL = 0;
+
+parts.forEach((part, pi)=>{
+  const section = document.createElement('div');
+  section.innerHTML = `
+    <div class="goal-banner"><span class="tag">Problem 1.16 · ${part.title} · Variables ${part.vars}</span>${part.goal}</div>
+    <div class="part-title">Prove this is a tautology</div>
+  `;
+  container.appendChild(section);
+
+  const chain = document.createElement('div');
+  chain.className = 'proof-chain';
+
+  part.lines.forEach((lineText, li)=>{
+    const lineCard = document.createElement('div');
+    lineCard.className = 'line-card' + (li===part.lines.length-1 ? ' final' : '');
+    lineCard.innerHTML = `<span class="line-num">${li===0 ? 'Start' : 'Line ' + li}</span>${li===0 ? '' : '≡ '}${lineText}`;
+    chain.appendChild(lineCard);
+
+    if(li < part.transitions.length){
+      const trans = part.transitions[li];
+      const connector = document.createElement('div');
+      connector.className = 'connector';
+
+      const lawCard = document.createElement('div');
+      lawCard.className = 'law-card';
+      lawCard.dataset.correct = trans.correct;
+      lawCard.innerHTML = `
+        <div class="law-q">Which law justifies this step?</div>
+        <div class="law-opts">
+          ${trans.opts.map((o,oi)=>`<button class="law-opt" data-val="${oi}" type="button">${o}</button>`).join('')}
+        </div>
+        <div class="law-explain"><div class="law-explain-inner"><strong>Why:</strong> ${trans.why}</div></div>
+      `;
+      connector.innerHTML = `<span class="arrow">↓</span>`;
+      connector.appendChild(lawCard);
+      connector.innerHTML += `<span class="arrow">↓</span>`;
+      chain.appendChild(connector);
+      TOTAL++;
+    }
+  });
+
+  const qed = document.createElement('div');
+  qed.className = 'qed';
+  qed.textContent = '■  Q.E.D.';
+  chain.appendChild(qed);
+
+  container.appendChild(chain);
+
+  chain.querySelectorAll('.law-card').forEach(card=>{
+    card.querySelectorAll('.law-opt').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        card.querySelectorAll('.law-opt').forEach(b=>b.classList.remove('sel','correct','wrong'));
+        btn.classList.add('sel');
+        card.dataset.value = btn.dataset.val;
+        card.classList.remove('correct','incorrect');
+        card.querySelector('.law-explain').classList.remove('show');
+        updateScoreLive();
+      });
+    });
+  });
+});
+
+document.getElementById('scoreDisplay').textContent = '0 / ' + TOTAL;
+
+function allLawCards(){ return document.querySelectorAll('.law-card'); }
+
+function countScore(){
+  let correct = 0;
+  allLawCards().forEach(card=>{
+    if(card.dataset.value !== undefined && card.dataset.value === card.dataset.correct) correct++;
+  });
+  return correct;
+}
+function updateScoreLive(){
+  document.getElementById('scoreDisplay').textContent = countScore() + ' / ' + TOTAL;
+}
+
+function checkAll(){
+  allLawCards().forEach(card=>{
+    if(card.dataset.value !== undefined){
+      const ok = card.dataset.value === card.dataset.correct;
+      card.querySelectorAll('.law-opt').forEach(b=>{
+        if(b.dataset.val === card.dataset.correct) b.classList.add('correct');
+        else if(b.dataset.val === card.dataset.value) b.classList.add('wrong');
+      });
+      card.classList.remove('correct','incorrect');
+      card.classList.add(ok ? 'correct':'incorrect');
+    }
+    card.querySelector('.law-explain').classList.add('show');
+  });
+  updateScoreLive();
+}
+
+function revealAll(){
+  allLawCards().forEach(card=>{
+    card.querySelectorAll('.law-opt').forEach(b=>b.classList.remove('sel','wrong'));
+    card.querySelector(`.law-opt[data-val="${card.dataset.correct}"]`).classList.add('correct');
+    card.dataset.value = card.dataset.correct;
+    card.classList.remove('incorrect');
+    card.classList.add('correct');
+    card.querySelector('.law-explain').classList.add('show');
+  });
+  updateScoreLive();
+}
+
+function resetAll(){
+  allLawCards().forEach(card=>{
+    delete card.dataset.value;
+    card.querySelectorAll('.law-opt').forEach(b=>b.classList.remove('sel','correct','wrong'));
+    card.classList.remove('correct','incorrect');
+    card.querySelector('.law-explain').classList.remove('show');
+  });
+  updateScoreLive();
+}
+</script>
+</body>
+</html>

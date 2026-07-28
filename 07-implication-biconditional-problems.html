@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Implication &amp; Biconditional · 10 Problems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pcb:#0F1B15; --pcb-light:#17251D; --pcb-line:#25392C;
+    --copper:#C08552; --phosphor:#6FE3A6; --warn:#E0794F; --bonus:#D9A441;
+    --paper:#F3EEDF; --ink:#211C12; --ink-soft:#6B6250; --purple:#8B6FC9;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--pcb);color:var(--paper);font-family:'IBM Plex Sans',sans-serif;padding:0 0 100px;line-height:1.6;
+    background-image:radial-gradient(circle at 1px 1px, rgba(111,227,166,0.05) 1px, transparent 0); background-size:26px 26px;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  ::selection{background:var(--phosphor);color:var(--pcb);}
+  a:focus-visible, button:focus-visible{outline:2px solid var(--phosphor); outline-offset:3px;}
+
+  .hero{position:relative;padding:48px 16px 34px;text-align:center;overflow:hidden;border-bottom:1px solid var(--pcb-line);background:linear-gradient(180deg,#0B1410 0%, var(--pcb) 100%);}
+  .hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;background-image:linear-gradient(var(--pcb-line) 1px, transparent 1px),linear-gradient(90deg, var(--pcb-line) 1px, transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse at center, black 0%, transparent 72%);}
+  .hero-inner{position:relative;z-index:1;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(24px,5vw,38px);margin:0 0 10px;color:var(--paper);text-shadow:0 0 30px rgba(111,227,166,.2);}
+  .sub{text-align:center;color:#B9C4B9;font-size:14.5px;margin:0 auto;max-width:600px;line-height:1.6;}
+
+  .panel-nav{position:sticky;top:0;z-index:40;background:rgba(15,27,21,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--pcb-line);padding:10px 16px;}
+  .panel-nav-inner{max-width:900px;margin:0 auto;display:flex;gap:5px;flex-wrap:wrap;justify-content:center;}
+  .nav-led{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8FA093;text-decoration:none;padding:5px 9px;border-radius:20px;border:1px solid transparent;transition:.2s ease;}
+  .nav-led:hover{color:var(--paper);border-color:var(--pcb-line);}
+
+  .wrap{max-width:900px;margin:0 auto;padding:0 16px;}
+  .howto{margin:22px auto 0;background:var(--pcb-light);border:1px dashed var(--pcb-line);border-radius:12px;padding:14px 18px;font-size:13px;line-height:1.6;color:#B9C4B9;}
+  .howto strong{color:var(--paper);}
+
+  .problem{max-width:900px;margin:0 auto;padding:52px 16px 0;scroll-margin-top:64px;}
+  .p-head{margin-bottom:16px;}
+  .p-toprow{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;}
+  .p-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.1em;}
+  .p-title{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(18px,3.4vw,23px);margin:0 0 12px;color:var(--paper);}
+  .p-statement{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:12px;padding:14px 18px;font-size:14.5px;color:#DDE6DF;line-height:1.65;}
+  .p-cite{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5C6B60;margin-top:6px;text-align:right;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:rgba(0,0,0,.25);color:var(--copper);padding:1px 6px;border-radius:4px;}
+
+  /* ===== T/F verdict ===== */
+  .tf-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0 8px;}
+  .seg{display:inline-flex;border:1.5px solid var(--pcb-line);border-radius:20px;overflow:hidden;background:rgba(0,0,0,.25);}
+  .seg button{border:none;background:transparent;padding:9px 22px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:#8FA093;transition:.15s ease;}
+  .seg button.sel.true-sel{background:rgba(111,227,166,.18);color:var(--phosphor);}
+  .seg button.sel.false-sel{background:rgba(224,121,79,.18);color:var(--warn);}
+  .seg button.sel.bad-sel{background:rgba(224,121,79,.18);color:var(--warn);}
+  .verdict-icon{width:20px;height:20px;border-radius:50%;font-size:12px;line-height:20px;text-align:center;font-weight:700;color:#0B140F;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .verdict-icon.show{opacity:1;transform:scale(1);}
+  .verdict-icon.ok{background:var(--phosphor);} .verdict-icon.bad{background:var(--warn);color:#fff;}
+  .tf-btns{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;}
+  .tbtn{background:transparent;border:1.5px solid var(--pcb-line);color:#B9C4B9;border-radius:20px;padding:6px 13px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;transition:.15s ease;}
+  .tbtn:hover{background:var(--pcb-light);color:var(--paper);border-color:var(--copper);}
+  .explain-box{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .explain-box.show{max-height:260px;opacity:1;margin-top:10px;}
+  .explain-inner{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:10px;padding:12px 16px;font-size:13px;line-height:1.6;color:#B9C4B9;}
+  .explain-inner strong{color:var(--paper);}
+
+  /* ===== construction reveal cards ===== */
+  .construct-card{background:var(--paper);color:var(--ink);border-radius:8px;padding:16px 20px;margin-bottom:14px;box-shadow:0 12px 24px -16px rgba(0,0,0,.5);}
+  .construct-tag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:10px;padding:3px 11px;border-radius:20px;margin-bottom:10px;color:#fff;background:var(--copper);text-transform:uppercase;letter-spacing:.04em;}
+  .construct-card .qtext{font-size:14px;margin:0 0 8px;}
+  .construct-scratch{width:100%;border:1.5px dashed rgba(33,28,18,.25);border-radius:8px;background:rgba(255,255,255,.5);padding:8px 11px;font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;color:var(--ink);resize:vertical;min-height:36px;margin:6px 0;}
+  .c-reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:5px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .c-reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .c-reveal-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .c-reveal-panel.show{max-height:200px;opacity:1;margin-top:8px;}
+  .c-reveal-inner{border-top:1.5px dashed rgba(33,28,18,.2);padding-top:8px;font-size:13.5px;}
+  .c-reveal-inner .mono2{font-family:'IBM Plex Mono',monospace;background:#fff;border:1px solid rgba(33,28,18,.15);padding:1px 6px;border-radius:4px;}
+
+  /* ===== puzzle cards ===== */
+  .puzzle-card{background:var(--pcb-light);border:1.5px solid var(--warn);border-radius:14px;padding:18px 20px;margin-top:14px;}
+  .puzzle-tag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--warn);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+  .puzzle-scratch{width:100%;border:1.5px dashed var(--pcb-line);border-radius:8px;background:rgba(0,0,0,.2);padding:9px 12px;font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;color:var(--paper);resize:vertical;min-height:50px;margin:8px 0;}
+  .big-reveal-btn{
+    display:block; width:100%; font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:13px; letter-spacing:.03em;
+    background:rgba(111,227,166,.14); border:2px solid var(--phosphor); color:var(--phosphor);
+    padding:13px 18px; border-radius:10px; cursor:pointer; transition:.2s ease; text-transform:uppercase;
+  }
+  .big-reveal-btn:hover{background:rgba(111,227,166,.24); box-shadow:0 0 16px rgba(111,227,166,.3);}
+  .puzzle-steps{max-height:0;overflow:hidden;opacity:0;transition:max-height .6s ease,opacity .3s ease,margin .3s ease;}
+  .puzzle-steps.show{max-height:900px;opacity:1;margin-top:12px;}
+  .pstep{background:#0E1912;border-left:3px solid var(--copper);border-radius:0 8px 8px 0;padding:9px 14px;margin-bottom:8px;font-size:13px;color:#DDE6DF;}
+  .pstep b{color:var(--copper);}
+  .pstep.final{border-left-color:var(--phosphor);}
+  .badges{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+  .badge{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;padding:8px 16px;border-radius:10px;border:1.5px solid;}
+  .badge.knight{color:var(--phosphor);border-color:var(--phosphor);background:rgba(111,227,166,.1);}
+  .badge.knave{color:var(--warn);border-color:var(--warn);background:rgba(224,121,79,.1);}
+
+  footer{text-align:center;font-size:11.5px;color:#5C6B60;margin-top:60px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;}
+  footer .ok{color:var(--phosphor);}
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+      <h1 class="page-title">Implication &amp; Biconditional</h1>
+      <p class="sub">Ten problems, easy to hard. Decide first, then reveal — nothing is shown until you've made a call.</p>
+    </div>
+  </div>
+
+  <div class="panel-nav">
+    <div class="panel-nav-inner" id="navRow"></div>
+  </div>
+
+  <div class="wrap"><div class="howto"><strong>How this page works:</strong> for True/False questions, pick your answer before checking. For "rewrite" and "converse/inverse/contrapositive" questions, write your own attempt in the scratch box first. For the two knights-and-knaves puzzles, work out your reasoning before revealing the step-by-step deduction.</div></div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q1">
+    <div class="p-head">
+      <div class="p-toprow"><span class="p-tag">Problem 1</span></div>
+      <h2 class="p-title">True or False?</h2>
+      <div class="p-statement">Determine whether the biconditional <em>"2 + 2 = 4 if and only if 1 + 1 = 2"</em> is true or false.</div>
+    </div>
+    <div id="tf-1"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q2">
+    <div class="p-head">
+      <div class="p-toprow"><span class="p-tag">Problem 2</span></div>
+      <h2 class="p-title">True or False?</h2>
+      <div class="p-statement">Determine the truth value of: <em>"If 1 + 1 = 2, then 2 + 2 = 5."</em></div>
+    </div>
+    <div id="tf-2"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q3">
+    <div class="p-head">
+      <div class="p-toprow"><span class="p-tag">Problem 3</span></div>
+      <h2 class="p-title">True or False?</h2>
+      <div class="p-statement">Determine the truth value of: <em>"If 1 + 1 = 3, then unicorns exist."</em></div>
+    </div>
+    <div id="tf-3"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q4">
+    <div class="p-head">
+      <div class="p-toprow"><span class="p-tag">Problem 4</span></div>
+      <h2 class="p-title">Converse, Contrapositive, Inverse</h2>
+      <div class="p-statement">State the converse, contrapositive, and inverse of: <em>"If it snows today, I will ski tomorrow."</em></div>
+    </div>
+    <div id="construct-4"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q5">
+    <div class="p-head">
+      <div class="p-toprow"><span class="p-tag">Problem 5</span></div>
+      <h2 class="p-title">Rewrite as "If p, then q"</h2>
+      <div class="p-statement">Rewrite the statement <em>"Willy gets caught whenever he cheats"</em> in the form "if p, then q."</div>
+    </div>
+    <div id="construct-5"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q6">
+    <div class="p-head">
+      <div class="p-toprow"><span class="p-tag">Problem 6</span></div>
+      <h2 class="p-title">Rewrite as "If p, then q"</h2>
+      <div class="p-statement">Rewrite the statement <em>"The apple trees will bloom if it stays warm for a week"</em> in the form "if p, then q."</div>
+    </div>
+    <div id="construct-6"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q7">
+    <div class="p-head">
+      <div class="p-toprow"><span class="p-tag">Problem 7</span></div>
+      <h2 class="p-title">Rewrite as "If p, then q"</h2>
+      <div class="p-statement">Rewrite the statement <em>"That you get the job implies that you had the best credentials"</em> in the form "if p, then q."</div>
+    </div>
+    <div id="construct-7"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q8">
+    <div class="p-head">
+      <div class="p-toprow"><span class="p-tag">Problem 8</span></div>
+      <h2 class="p-title">Converse, Contrapositive, Inverse</h2>
+      <div class="p-statement">State the converse, contrapositive, and inverse of: <em>"I come to class whenever there is going to be a quiz."</em></div>
+    </div>
+    <div id="construct-8"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q9">
+    <div class="p-head">
+      <div class="p-toprow"><span class="p-tag">Problem 9</span></div>
+      <h2 class="p-title">Knights and Knaves</h2>
+      <div class="p-statement">A says, <em>"At least one of us is a knave,"</em> and B says nothing. Determine whether A and B are knights or knaves. (Knights always tell the truth; knaves always lie.)</div>
+    </div>
+    <div class="puzzle-card">
+      <div class="puzzle-tag">Work it out first</div>
+      <textarea class="puzzle-scratch" placeholder="Try both cases yourself: what happens if A is a knave? What happens if A is a knight?"></textarea>
+      <button class="big-reveal-btn" id="reveal-9">Show the Answer &amp; Deduction ▾</button>
+      <div class="puzzle-steps" id="steps-9">
+        <div class="pstep"><b>Case 1 — suppose A is a knave.</b> Then everything A says is false. A said "at least one of us is a knave" — if that's false, then <em>neither</em> of us is a knave, meaning A is a knight. But we assumed A is a knave. Contradiction!</div>
+        <div class="pstep"><b>So A cannot be a knave.</b> A must be a knight.</div>
+        <div class="pstep"><b>Since A is a knight,</b> A's statement is true: "at least one of us is a knave" really is true. A isn't the knave (A is a knight) — so it must be B.</div>
+        <div class="pstep final"><b>Conclusion:</b> A is a knight, B is a knave.</div>
+        <div class="badges"><span class="badge knight">A = Knight</span><span class="badge knave">B = Knave</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q10">
+    <div class="p-head">
+      <div class="p-toprow"><span class="p-tag">Problem 10</span></div>
+      <h2 class="p-title">Knights and Knaves</h2>
+      <div class="p-statement">A says, <em>"I am a knave or B is a knight,"</em> and B says nothing. Determine whether A and B are knights or knaves.</div>
+    </div>
+    <div class="puzzle-card">
+      <div class="puzzle-tag">Work it out first</div>
+      <textarea class="puzzle-scratch" placeholder="Same approach: try assuming A is a knave, then try assuming A is a knight."></textarea>
+      <button class="big-reveal-btn" id="reveal-10">Show the Answer &amp; Deduction ▾</button>
+      <div class="puzzle-steps" id="steps-10">
+        <div class="pstep"><b>Case 1 — suppose A is a knave.</b> Then A's statement is false. A said "I am a knave or B is a knight." For an OR to be false, <em>both</em> halves must be false — meaning "A is a knave" is false. But that directly contradicts our assumption that A is a knave!</div>
+        <div class="pstep"><b>So A cannot be a knave.</b> A must be a knight.</div>
+        <div class="pstep"><b>Since A is a knight,</b> A's statement must be true: "I am a knave or B is a knight." A is definitely not a knave (A is a knight), so for the OR to hold, the other half must carry it — B must be a knight.</div>
+        <div class="pstep final"><b>Conclusion:</b> A is a knight, B is a knight.</div>
+        <div class="badges"><span class="badge knight">A = Knight</span><span class="badge knight">B = Knight</span></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Implication &amp; Biconditional &nbsp;—&nbsp; <span class="ok">CIRCUIT COMPLETE ✓</span></footer>
+
+<script>
+/* ===================== nav ===================== */
+const navItems = ['1','2','3','4','5','6','7','8','9','10'];
+const navRow = document.getElementById('navRow');
+navItems.forEach(n=>{ const a=document.createElement('a'); a.href='#q'+n; a.className='nav-led'; a.textContent='Q'+n; navRow.appendChild(a); });
+
+/* ===================== T/F verdict builder ===================== */
+function buildTF(containerId, correct, note){
+  const container = document.getElementById(containerId);
+  const row = document.createElement('div');
+  row.className = 'tf-row';
+  row.innerHTML = `
+    <div class="seg" data-role="tf"><button data-val="True">True</button><button data-val="False">False</button></div>
+    <span class="verdict-icon"></span>
+    <span class="tf-btns"><button class="tbtn" data-act="reveal">Reveal</button><button class="tbtn" data-act="reset">Reset</button></span>
+  `;
+  container.appendChild(row);
+  const explainBox = document.createElement('div');
+  explainBox.className = 'explain-box';
+  explainBox.innerHTML = `<div class="explain-inner">${note}</div>`;
+  container.appendChild(explainBox);
+
+  const seg = row.querySelector('[data-role="tf"]');
+  const icon = row.querySelector('.verdict-icon');
+  seg.querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      seg.querySelectorAll('button').forEach(x=>x.classList.remove('sel','true-sel','false-sel','bad-sel'));
+      const ok = b.dataset.val === correct;
+      b.classList.add('sel', ok ? (correct==='True'?'true-sel':'false-sel') : 'bad-sel');
+      icon.classList.add('show', ok?'ok':'bad'); icon.textContent = ok?'✓':'✗';
+      explainBox.classList.add('show');
+    });
+  });
+  row.querySelector('[data-act="reveal"]').addEventListener('click', ()=>{
+    seg.querySelectorAll('button').forEach(x=>x.classList.remove('sel','true-sel','false-sel','bad-sel'));
+    const btn = seg.querySelector(`button[data-val="${correct}"]`);
+    btn.classList.add('sel', correct==='True'?'true-sel':'false-sel');
+    icon.classList.add('show','ok'); icon.textContent='✓';
+    explainBox.classList.add('show');
+  });
+  row.querySelector('[data-act="reset"]').addEventListener('click', ()=>{
+    seg.querySelectorAll('button').forEach(x=>x.classList.remove('sel','true-sel','false-sel','bad-sel'));
+    icon.classList.remove('show','ok','bad');
+    explainBox.classList.remove('show');
+  });
+}
+
+buildTF('tf-1', 'True', '<strong>True.</strong> Both sides of the biconditional are true statements: "2+2=4" is true, and "1+1=2" is true. True ↔ True = True.');
+buildTF('tf-2', 'False', '<strong>False.</strong> The antecedent "1+1=2" is true, but the consequent "2+2=5" is false. True → False is the one and only case where a conditional is false.');
+buildTF('tf-3', 'True', '<strong>True — vacuously.</strong> The antecedent "1+1=3" is false. Whenever the antecedent of a conditional is false, the whole conditional is automatically true, no matter what the consequent says (even something as wild as "unicorns exist").');
+
+/* ===================== construction reveal cards ===================== */
+let ccounter = 0;
+function buildConstructCard(containerId, tag, question, answer){
+  ccounter++;
+  const id = 'cc-'+ccounter;
+  const container = document.getElementById(containerId);
+  const card = document.createElement('div'); card.className='construct-card';
+  card.innerHTML = `<span class="construct-tag">${tag}</span><p class="qtext">${question}</p>
+    <textarea class="construct-scratch" placeholder="Write your own answer here first..."></textarea>
+    <button class="c-reveal-btn">Reveal Answer</button>
+    <div class="c-reveal-panel" id="${id}"><div class="c-reveal-inner">${answer}</div></div>`;
+  card.querySelector('.c-reveal-btn').addEventListener('click', ()=>{ document.getElementById(id).classList.toggle('show'); });
+  container.appendChild(card);
+}
+
+/* ---- Problem 4 ---- */
+(function(){
+  const goal = document.createElement('div');
+  goal.className='p-statement'; goal.style.marginBottom='14px';
+  goal.innerHTML = 'p: it snows today &nbsp;·&nbsp; q: I will ski tomorrow &nbsp;·&nbsp; Given: <span class="mono">p → q</span>';
+  document.getElementById('construct-4').appendChild(goal);
+  buildConstructCard('construct-4', 'Converse (q → p)', 'Swap the two halves.', '<span class="mono2">q → p</span>: "If I ski tomorrow, it snowed today."');
+  buildConstructCard('construct-4', 'Contrapositive (¬q → ¬p)', 'Swap AND negate.', '<span class="mono2">¬q → ¬p</span>: "If I do not ski tomorrow, then it did not snow today."');
+  buildConstructCard('construct-4', 'Inverse (¬p → ¬q)', 'Negate both halves, keep the order.', '<span class="mono2">¬p → ¬q</span>: "If it does not snow today, I will not ski tomorrow."');
+})();
+
+/* ---- Problem 5 ---- */
+buildConstructCard('construct-5', 'Identify p, q, then rewrite', '"Willy gets caught whenever he cheats" — what\'s the trigger (p) and what\'s the result (q)?',
+  'p: Willy cheats &nbsp;·&nbsp; q: Willy gets caught.<br><br><span class="mono2">If p, then q</span>: "If Willy cheats, then he gets caught."');
+
+/* ---- Problem 6 ---- */
+buildConstructCard('construct-6', 'Identify p, q, then rewrite', '"The apple trees will bloom if it stays warm for a week" — remember, "q if p" means p → q.',
+  'p: it stays warm for a week &nbsp;·&nbsp; q: the apple trees will bloom.<br><br><span class="mono2">If p, then q</span>: "If it stays warm for a week, then the apple trees will bloom."');
+
+/* ---- Problem 7 ---- */
+buildConstructCard('construct-7', 'Identify p, q, then rewrite', '"That you get the job implies that you had the best credentials" — "p implies q" is already p → q in disguise.',
+  'p: you get the job &nbsp;·&nbsp; q: you had the best credentials.<br><br><span class="mono2">If p, then q</span>: "If you get the job, then you had the best credentials."');
+
+/* ---- Problem 8 ---- */
+(function(){
+  const goal = document.createElement('div');
+  goal.className='p-statement'; goal.style.marginBottom='14px';
+  goal.innerHTML = 'p: there is going to be a quiz &nbsp;·&nbsp; q: I come to class &nbsp;·&nbsp; ("q whenever p" means p → q) Given: <span class="mono">p → q</span>';
+  document.getElementById('construct-8').appendChild(goal);
+  buildConstructCard('construct-8', 'Converse (q → p)', 'Swap the two halves.', '<span class="mono2">q → p</span>: "If I come to class, then there is going to be a quiz."');
+  buildConstructCard('construct-8', 'Contrapositive (¬q → ¬p)', 'Swap AND negate.', '<span class="mono2">¬q → ¬p</span>: "If I do not come to class, then there is not going to be a quiz."');
+  buildConstructCard('construct-8', 'Inverse (¬p → ¬q)', 'Negate both halves, keep the order.', '<span class="mono2">¬p → ¬q</span>: "If there is not going to be a quiz, then I do not come to class."');
+})();
+
+/* ===================== knights & knaves reveal ===================== */
+document.getElementById('reveal-9').addEventListener('click', ()=>{ document.getElementById('steps-9').classList.toggle('show'); });
+document.getElementById('reveal-10').addEventListener('click', ()=>{ document.getElementById('steps-10').classList.toggle('show'); });
+</script>
+</body>
+</html>

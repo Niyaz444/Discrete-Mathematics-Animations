@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algebraic Proofs Without Truth Tables — Problem 1.11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pcb:#0F1B15; --pcb-light:#17251D; --pcb-line:#25392C;
+  --copper:#C08552; --phosphor:#6FE3A6; --warn:#E0794F; --bonus:#D9A441;
+  --paper:#F3EEDF; --ink:#211C12; --ink-soft:#8FA093;
+  --T:#6FE3A6; --Tb:rgba(111,227,166,.12); --F:#E0794F; --Fb:rgba(224,121,79,.12);
+  --amber:#D9A441; --amberb:rgba(217,164,65,.16);
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--pcb); color:var(--paper); font-family:'IBM Plex Sans',system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(circle at 1px 1px, rgba(111,227,166,0.05) 1px, transparent 0); background-size:26px 26px;}
+h1,h2,h3,.ui,button{font-family:'IBM Plex Sans',system-ui,sans-serif}
+@media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+::selection{background:var(--phosphor);color:var(--pcb);}
+button:focus-visible, .pswitch:focus-visible{outline:2px solid var(--phosphor); outline-offset:3px;}
+
+.hero{position:relative; overflow:hidden; background:linear-gradient(180deg,#0B1410 0%, var(--pcb) 100%); color:var(--paper); text-align:center; padding:44px 20px 30px; border-bottom:1px solid var(--pcb-line);}
+.hero::before{
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+  background-image:linear-gradient(var(--pcb-line) 1px, transparent 1px), linear-gradient(90deg, var(--pcb-line) 1px, transparent 1px);
+  background-size:44px 44px; mask-image:radial-gradient(ellipse at center, black 0%, transparent 72%);
+}
+.hero > *{position:relative; z-index:1;}
+.hero .eyebrow{font-family:'IBM Plex Mono',monospace; letter-spacing:.2em; text-transform:uppercase; font-size:.68rem; color:var(--copper);}
+.hero h1{font-family:'Fraunces',serif; font-weight:700; font-size:clamp(1.5rem,4.5vw,2.3rem); margin:.35em 0 .15em; text-shadow:0 0 30px rgba(111,227,166,.2);}
+.hero p{font-family:'IBM Plex Sans',sans-serif; opacity:.85; margin:0 auto; font-size:.95rem; max-width:640px; color:#B9C4B9;}
+
+main{max-width:920px; margin:0 auto; padding:30px 18px 70px}
+
+.howto{background:var(--pcb-light); border:1px dashed var(--pcb-line); border-radius:10px;
+  padding:12px 16px; font-family:'IBM Plex Sans',sans-serif; font-size:.85rem; color:#B9C4B9; margin-bottom:20px}
+.howto b{color:var(--paper)}
+
+.pills{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px}
+.pill{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:.82rem; padding:9px 16px; border-radius:999px;
+  border:1.5px solid var(--pcb-line); background:var(--pcb-light); cursor:pointer; color:#8FA093; transition:.15s ease;}
+.pill:hover{border-color:var(--copper); color:var(--paper);}
+.pill.active{background:rgba(111,227,166,.12); border-color:var(--phosphor); color:var(--phosphor);}
+
+.target{font-family:'IBM Plex Sans',sans-serif; font-size:.86rem; color:#8FA093; margin:6px 0 18px}
+.target b{color:var(--copper)}
+
+.predictbar{display:flex; align-items:center; gap:10px; margin-bottom:18px; font-family:'IBM Plex Sans',sans-serif; font-size:.85rem; color:#8FA093}
+.pswitch{width:46px; height:26px; border-radius:999px; border:1.5px solid var(--pcb-line); cursor:pointer; position:relative; background:rgba(0,0,0,.3); transition:.2s ease;}
+.pswitch .k{position:absolute; top:2px; left:2px; width:19px; height:19px; border-radius:50%; background:linear-gradient(180deg,#D8D4C7,#A79F8C); transition:.2s ease; box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.pswitch.on{background:rgba(111,227,166,.14); border-color:var(--phosphor); box-shadow:0 0 10px rgba(111,227,166,.3);} .pswitch.on .k{left:22px; background:linear-gradient(180deg,#BFFFE0,#6FE3A6);}
+
+.stepper{background:var(--pcb-light); border:1px solid var(--pcb-line); border-radius:16px; padding:22px 24px 20px;
+  box-shadow:0 14px 30px -18px rgba(0,0,0,.55); margin-bottom:20px}
+.stepcount{font-family:'IBM Plex Mono',monospace; font-size:.76rem; color:#8FA093; text-align:center; margin-bottom:10px; text-transform:uppercase; letter-spacing:.05em;}
+.dots{display:flex; gap:6px; justify-content:center; margin-bottom:18px; flex-wrap:wrap}
+.dot{width:10px; height:10px; border-radius:50%; background:var(--pcb-line); border:none; cursor:pointer; padding:0; transition:.2s ease;}
+.dot.on{background:var(--phosphor); box-shadow:0 0 8px var(--phosphor);}
+.dot.past{background:var(--copper); opacity:.6}
+
+.expr{font-family:'IBM Plex Mono',monospace; font-size:clamp(1.05rem,3vw,1.4rem); text-align:center; line-height:1.9; padding:20px 10px; min-height:2.2em; color:var(--paper);}
+.expr i{font-style:italic; color:var(--copper)}
+.expr .cT{color:var(--T); font-weight:700; font-style:normal}
+.expr .cF{color:var(--F); font-weight:700; font-style:normal}
+mark.chg{background:var(--amberb); color:var(--paper); border-bottom:2.5px solid var(--amber); padding:1px 5px; border-radius:5px; box-decoration-break:clone; -webkit-box-decoration-break:clone}
+
+.lawrow{display:flex; align-items:center; justify-content:center; gap:10px; margin:6px 0 4px}
+.lawbadge{font-family:'IBM Plex Sans',sans-serif; font-weight:700; font-size:.86rem; background:rgba(111,227,166,.1); color:var(--phosphor);
+  border:1.5px solid var(--phosphor); padding:7px 16px; border-radius:10px; cursor:default; transition:.2s ease;}
+.lawbadge.given{background:rgba(255,255,255,.04); color:#8FA093; border-color:var(--pcb-line)}
+body.predict .lawbadge:not(.given){filter:blur(5px); cursor:pointer}
+body.predict .lawbadge.revealed{filter:none; cursor:default}
+.note{font-family:'IBM Plex Sans',sans-serif; font-size:.82rem; color:#8FA093; text-align:center; margin:2px 0 4px; min-height:1.3em}
+
+.navrow{display:flex; align-items:center; justify-content:center; gap:12px; margin-top:14px}
+.navbtn{font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:.82rem; letter-spacing:.02em; border:1.5px solid var(--pcb-line); background:transparent;
+  color:#B9C4B9; padding:9px 18px; border-radius:10px; cursor:pointer; transition:.15s ease; text-transform:uppercase;}
+.navbtn:hover{border-color:var(--copper); color:var(--paper)}
+.navbtn:disabled{opacity:.3; cursor:not-allowed}
+.navbtn.primary{background:rgba(111,227,166,.12); color:var(--phosphor); border-color:var(--phosphor);}
+.navbtn.primary:hover{background:rgba(111,227,166,.22);}
+
+.synth{background:var(--amberb); border:1.5px solid var(--bonus); border-radius:12px; padding:14px 18px;
+  font-family:'IBM Plex Sans',sans-serif; font-size:.87rem; color:#E9DCC0; margin-bottom:20px}
+.synth b{color:var(--paper)}
+
+.legend{font-family:'IBM Plex Mono',monospace; font-size:.76rem; color:#8FA093; text-align:center; margin:-6px 0 20px}
+.legend mark{background:var(--amberb); color:var(--paper); border-bottom:2px solid var(--amber); padding:0 5px; border-radius:4px}
+
+h3.tth{font-family:'IBM Plex Sans',sans-serif; font-weight:600; color:var(--phosphor); font-size:1rem; margin:0 0 10px}
+.transcript{background:var(--pcb-light); border:1px solid var(--pcb-line); border-radius:14px; padding:16px 18px; margin-bottom:20px}
+.trow{display:flex; align-items:baseline; gap:12px; padding:8px 6px; border-radius:8px; cursor:pointer; font-family:'IBM Plex Sans',sans-serif; font-size:.85rem; transition:.15s ease;}
+.trow:hover{background:rgba(255,255,255,.04)}
+.trow.cur{background:rgba(111,227,166,.08)}
+.trow .tn{color:#8FA093; min-width:18px; font-family:'IBM Plex Mono',monospace;}
+.trow .te{font-family:'IBM Plex Mono',monospace; font-size:.92rem; flex:1; color:var(--paper);}
+.trow .te i{font-style:italic; color:var(--copper)}
+.trow .tl{color:var(--copper); font-weight:600; white-space:nowrap; font-size:.76rem; font-family:'IBM Plex Mono',monospace;}
+
+.gloss{background:var(--pcb-light); border:1px solid var(--pcb-line); border-radius:14px; padding:16px 18px}
+.gloss summary{cursor:pointer; font-family:'IBM Plex Sans',sans-serif; font-weight:600; color:var(--paper); font-size:.94rem}
+.glist{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:8px 18px; margin-top:12px; font-family:'IBM Plex Sans',sans-serif; font-size:.82rem}
+.glist .gi b{color:var(--copper); display:block; margin-bottom:1px; font-family:'IBM Plex Mono',monospace; font-size:.8rem;}
+.glist .gi span{color:#8FA093}
+
+.footer{text-align:center; font-family:'IBM Plex Mono',monospace; color:#5C6B60; font-size:.78rem; letter-spacing:.03em; padding:8px 20px 50px}
+.footer .ok{color:var(--phosphor)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">Discrete Mathematics · Statement Calculus</div>
+  <h1>Algebraic Proofs Without Truth Tables</h1>
+  <p>Problem 1.11 — step through each equivalence one law at a time. No rows, no columns, just the algebra of logic doing the work.</p>
+</header>
+
+<main>
+  <div class="howto"><b>How to use this:</b> pick a proof below, then before you tap "Reveal", cover the law and ask yourself: <i>what single law turns this line into the next?</i> Toggle Predict mode to blur every law name until you tap it — good for genuine self-testing.</div>
+
+  <div class="pills" id="pills"></div>
+  <div class="target" id="targetLine"></div>
+
+  <div class="predictbar">
+    <button class="pswitch" id="predictSwitch" onclick="togglePredict()"><span class="k"></span></button>
+    <span>Predict mode — blur law names until tapped</span>
+  </div>
+
+  <div class="stepper">
+    <div class="stepcount" id="stepcount"></div>
+    <div class="dots" id="dots"></div>
+    <div class="expr" id="exprBox"></div>
+    <div class="lawrow"><span class="lawbadge" id="lawBadge" onclick="revealLaw()"></span></div>
+    <div class="note" id="noteBox"></div>
+    <div class="navrow">
+      <button class="navbtn" id="btnPrev" onclick="prevStep()">‹ Previous line</button>
+      <button class="navbtn primary" id="btnNext" onclick="nextStep()">Next line ›</button>
+    </div>
+  </div>
+
+  <div class="synth" id="synthBox" style="display:none"></div>
+
+  <div class="legend"><mark>highlighted</mark> = exactly the piece the law just acted on</div>
+
+  <div class="transcript">
+    <h3 class="tth">Proof so far</h3>
+    <div id="transRows"></div>
+  </div>
+
+  <details class="gloss">
+    <summary>Law glossary — quick reference</summary>
+    <div class="glist" id="glossList"></div>
+  </details>
+</main>
+
+<div class="footer">Every line here is the previous line rewritten by exactly one law — that's the whole idea of a proof "without truth tables." &nbsp;—&nbsp; <span class="ok">CIRCUIT COMPLETE ✓</span></div>
+
+<script>
+const proofs = {
+  i: {
+    label:'(i)',
+    title:'(¬p∨q) ∧ (p∧(p∧q)) ≡ p∧q',
+    steps:[
+      {expr:'(¬p∨q)∧(p∧(p∧q))', law:'Given', given:true},
+      {expr:'(¬p∨q)∧<mark class="chg">(p∧p)∧q</mark>', law:'Associative Law', note:'Regroup p∧(p∧q) as (p∧p)∧q — only the parentheses moved.'},
+      {expr:'(¬p∨q)∧(<mark class="chg">p</mark>∧q)', law:'Idempotent Law', note:'p∧p ≡ p'},
+      {expr:'<mark class="chg">(p∧q)∧(¬p∨q)</mark>', law:'Commutative Law', note:'Swap the order of the two conjuncts.'},
+      {expr:'<mark class="chg">((p∧q)∧¬p)∨((p∧q)∧q)</mark>', law:'Distributive Law', note:'Distribute (p∧q) over the ∨ inside (¬p∨q).'},
+      {expr:'(<mark class="chg">¬p∧(p∧q)</mark>)∨((p∧q)∧q)', law:'Commutative Law', note:'Reorder (p∧q)∧¬p as ¬p∧(p∧q).'},
+      {expr:'(<mark class="chg">(¬p∧p)∧q</mark>)∨(<mark class="chg">p∧(q∧q)</mark>)', law:'Associative Law', note:'Regroup both halves.'},
+      {expr:'(<mark class="chg">F</mark>∧q)∨(p∧(q∧q))', law:'Complement Law', note:'¬p∧p ≡ F'},
+      {expr:'(F∧q)∨(p∧<mark class="chg">q</mark>)', law:'Idempotent Law', note:'q∧q ≡ q'},
+      {expr:'<mark class="chg">F</mark>∨(p∧q)', law:'Domination Law', note:'F∧q ≡ F  (also called the Dominant / Null Law)'},
+      {expr:'<mark class="chg">p∧q</mark>', law:'Identity Law', note:'F∨X ≡ X — done.'}
+    ]
+  },
+  iia: {
+    label:'(ii)–a',
+    title:'p→(q→p) ≡ T',
+    steps:[
+      {expr:'p→(q→p)', law:'Given', given:true},
+      {expr:'<mark class="chg">¬p∨(q→p)</mark>', law:'Conditional Law', note:'X→Y ≡ ¬X∨Y, applied to the outer →.'},
+      {expr:'¬p∨<mark class="chg">(¬q∨p)</mark>', law:'Conditional Law', note:'Applied again to the inner q→p.'},
+      {expr:'<mark class="chg">¬q∨(p∨¬p)</mark>', law:'Commutative &amp; Associative Laws', note:'Regroup so that p and ¬p sit together.'},
+      {expr:'¬q∨<mark class="chg">T</mark>', law:'Complement Law', note:'p∨¬p ≡ T'},
+      {expr:'<mark class="chg">T</mark>', law:'Domination Law', note:'X∨T ≡ T — done.'}
+    ]
+  },
+  iib: {
+    label:'(ii)–b',
+    title:'¬p→(p→q) ≡ T',
+    steps:[
+      {expr:'¬p→(p→q)', law:'Given', given:true},
+      {expr:'<mark class="chg">p∨(p→q)</mark>', law:'Conditional Law', note:'¬p→X ≡ ¬(¬p)∨X ≡ p∨X'},
+      {expr:'p∨<mark class="chg">(¬p∨q)</mark>', law:'Conditional Law', note:'p→q ≡ ¬p∨q'},
+      {expr:'<mark class="chg">(p∨¬p)</mark>∨q', law:'Associative Law', note:'Regroup so p and ¬p sit together.'},
+      {expr:'<mark class="chg">T</mark>∨q', law:'Complement Law', note:'p∨¬p ≡ T'},
+      {expr:'<mark class="chg">T</mark>', law:'Domination Law', note:'T∨X ≡ T — done.'}
+    ],
+    synth:'Both chains reach <b>T</b>. If A ≡ T and B ≡ T, then A ≡ B — two things each equal to T must equal each other. That single fact is what licenses writing p→(q→p) ≡ ¬p→(p→q).'
+  },
+  iiia: {
+    label:'(iii)–a',
+    title:'¬(p↔q) ≡ (p∨q) ∧ ¬(p∧q)',
+    steps:[
+      {expr:'¬(p↔q)', law:'Given', given:true},
+      {expr:'¬<mark class="chg">[(p→q)∧(q→p)]</mark>', law:'Definition of ↔', note:'p↔q ≡ (p→q)∧(q→p)'},
+      {expr:'¬[<mark class="chg">(¬p∨q)∧(¬q∨p)</mark>]', law:'Conditional Law', note:'Rewrite both → as ¬∨.'},
+      {expr:'<mark class="chg">¬(¬p∨q) ∨ ¬(¬q∨p)</mark>', law:"De Morgan's Law", note:'¬(A∧B) ≡ ¬A∨¬B'},
+      {expr:'<mark class="chg">(p∧¬q) ∨ (q∧¬p)</mark>', law:"De Morgan's Law", note:'¬(¬X∨Y) ≡ X∧¬Y, applied to both terms.'},
+      {expr:'(p∧¬q) ∨ <mark class="chg">(¬p∧q)</mark>', law:'Commutative Law', note:'Tidy q∧¬p as ¬p∧q.'},
+      {expr:'<mark class="chg">[(p∧¬q)∨¬p] ∧ [(p∧¬q)∨q]</mark>', law:'Distributive Law', note:'Distribute ∨ over the two disjuncts.'},
+      {expr:'<mark class="chg">[(p∨¬p)∧(¬q∨¬p)]</mark> ∧ <mark class="chg">[(p∨q)∧(¬q∨q)]</mark>', law:'Distributive Law', note:'Distribute again inside each bracket.'},
+      {expr:'[<mark class="chg">T</mark>∧(¬p∨¬q)] ∧ [(p∨q)∧<mark class="chg">T</mark>]', law:'Complement Law', note:'p∨¬p ≡ T and ¬q∨q ≡ T.'},
+      {expr:'<mark class="chg">(¬p∨¬q)</mark> ∧ <mark class="chg">(p∨q)</mark>', law:'Identity Law', note:'T∧X ≡ X and X∧T ≡ X.'},
+      {expr:'(p∨q) ∧ <mark class="chg">¬(p∧q)</mark>', law:"De Morgan's Law", note:'¬p∨¬q ≡ ¬(p∧q) — done.'}
+    ]
+  },
+  iiib: {
+    label:'(iii)–b',
+    title:'¬(p↔q) ≡ (p∧¬q) ∨ (¬p∧q)',
+    steps:[
+      {expr:'¬(p↔q)', law:'Given', given:true},
+      {expr:'¬<mark class="chg">[(p→q)∧(q→p)]</mark>', law:'Definition of ↔', note:'p↔q ≡ (p→q)∧(q→p)'},
+      {expr:'¬[<mark class="chg">(¬p∨q)∧(¬q∨p)</mark>]', law:'Conditional Law', note:'Rewrite both → as ¬∨.'},
+      {expr:'<mark class="chg">¬(¬p∨q) ∨ ¬(¬q∨p)</mark>', law:"De Morgan's Law", note:'¬(A∧B) ≡ ¬A∨¬B'},
+      {expr:'<mark class="chg">(p∧¬q) ∨ (q∧¬p)</mark>', law:"De Morgan's Law", note:'¬(¬X∨Y) ≡ X∧¬Y, applied to both terms.'},
+      {expr:'(p∧¬q) ∨ <mark class="chg">(¬p∧q)</mark>', law:'Commutative Law', note:'Tidy q∧¬p as ¬p∧q — done.'}
+    ],
+    synth:'(iii)–a and (iii)–b are two different-looking but equally correct forms of ¬(p↔q) — one built from ∨ and ¬∧, the other from two ∧ terms joined by ∨. Compare them: can you see why both deserve to be called "the negation of the biconditional"?'
+  }
+};
+
+let curKey='i', curIndex=0, predictMode=false;
+
+function buildPills(){
+  const wrap=document.getElementById('pills');
+  wrap.innerHTML='';
+  Object.keys(proofs).forEach(k=>{
+    const b=document.createElement('button');
+    b.className='pill'+(k===curKey?' active':'');
+    b.textContent=proofs[k].label;
+    b.onclick=()=>selectProof(k);
+    wrap.appendChild(b);
+  });
+}
+
+function selectProof(k){
+  curKey=k; curIndex=0;
+  document.querySelectorAll('.pill').forEach((p,i)=>{
+    p.classList.toggle('active', Object.keys(proofs)[i]===k);
+  });
+  document.getElementById('targetLine').innerHTML = 'Proving: <b>'+proofs[k].title+'</b>';
+  render();
+}
+
+function buildDots(){
+  const steps=proofs[curKey].steps;
+  const wrap=document.getElementById('dots');
+  wrap.innerHTML='';
+  steps.forEach((s,i)=>{
+    const d=document.createElement('button');
+    d.className='dot'+(i===curIndex?' on':(i<curIndex?' past':''));
+    d.onclick=()=>{curIndex=i; render();};
+    wrap.appendChild(d);
+  });
+}
+
+function render(){
+  const steps=proofs[curKey].steps;
+  const step=steps[curIndex];
+  buildDots();
+  document.getElementById('stepcount').textContent='Line '+(curIndex+1)+' of '+steps.length;
+  document.getElementById('exprBox').innerHTML=step.expr;
+
+  const badge=document.getElementById('lawBadge');
+  badge.textContent = step.given ? 'Given' : step.law;
+  badge.className='lawbadge'+(step.given?' given':'')+(predictMode && !step.given ? '' : ' revealed');
+  badge.dataset.revealed = (predictMode && !step.given) ? 'false' : 'true';
+
+  document.getElementById('noteBox').textContent = (!predictMode || badge.dataset.revealed==='true') ? (step.note||'') : '';
+
+  document.getElementById('btnPrev').disabled = curIndex===0;
+  document.getElementById('btnNext').disabled = curIndex===steps.length-1;
+
+  const synth=document.getElementById('synthBox');
+  if(proofs[curKey].synth && curIndex===steps.length-1){
+    synth.style.display='block';
+    synth.innerHTML=proofs[curKey].synth;
+  } else {
+    synth.style.display='none';
+  }
+
+  renderTranscript();
+}
+
+function revealLaw(){
+  const badge=document.getElementById('lawBadge');
+  if(badge.classList.contains('given')) return;
+  badge.classList.add('revealed');
+  badge.dataset.revealed='true';
+  const step=proofs[curKey].steps[curIndex];
+  document.getElementById('noteBox').textContent = step.note || '';
+}
+
+function renderTranscript(){
+  const steps=proofs[curKey].steps;
+  const wrap=document.getElementById('transRows');
+  wrap.innerHTML='';
+  for(let i=0;i<=curIndex;i++){
+    const s=steps[i];
+    const row=document.createElement('div');
+    row.className='trow'+(i===curIndex?' cur':'');
+    row.onclick=()=>{curIndex=i; render();};
+    row.innerHTML='<span class="tn">'+(i+1)+'</span><span class="te">'+s.expr.replace(/<mark class="chg">/g,'').replace(/<\/mark>/g,'')+'</span><span class="tl">'+(s.given?'Given':s.law)+'</span>';
+    wrap.appendChild(row);
+  }
+}
+
+function nextStep(){ const steps=proofs[curKey].steps; if(curIndex<steps.length-1){curIndex++; render();} }
+function prevStep(){ if(curIndex>0){curIndex--; render();} }
+
+function togglePredict(){
+  predictMode=!predictMode;
+  document.getElementById('predictSwitch').classList.toggle('on',predictMode);
+  document.body.classList.toggle('predict',predictMode);
+  render();
+}
+
+const GLOSSARY=[
+  ['Idempotent Law','p∧p ≡ p,  p∨p ≡ p'],
+  ['Commutative Law','p∧q ≡ q∧p,  p∨q ≡ q∨p'],
+  ['Associative Law','(p∧q)∧r ≡ p∧(q∧r),  similarly for ∨'],
+  ['Distributive Law','p∧(q∨r) ≡ (p∧q)∨(p∧r),  and the ∨-over-∧ version'],
+  ['Identity Law','p∧T ≡ p,  p∨F ≡ p'],
+  ['Domination Law','p∧F ≡ F,  p∨T ≡ T'],
+  ['Complement Law','p∧¬p ≡ F,  p∨¬p ≡ T'],
+  ["De Morgan's Law",'¬(p∧q) ≡ ¬p∨¬q,  ¬(p∨q) ≡ ¬p∧¬q'],
+  ['Conditional Law','p→q ≡ ¬p∨q'],
+  ['Definition of ↔','p↔q ≡ (p→q)∧(q→p)']
+];
+function buildGlossary(){
+  const wrap=document.getElementById('glossList');
+  GLOSSARY.forEach(([name,rule])=>{
+    const d=document.createElement('div');
+    d.className='gi';
+    d.innerHTML='<b>'+name+'</b><span>'+rule+'</span>';
+    wrap.appendChild(d);
+  });
+}
+
+buildPills();
+buildGlossary();
+selectProof('i');
+</script>
+</body>
+</html>

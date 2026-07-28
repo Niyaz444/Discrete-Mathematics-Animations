@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>13 Problems · Satisfiability, Equivalence &amp; Duality</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pcb:#0F1B15; --pcb-light:#17251D; --pcb-line:#25392C;
+    --copper:#C08552; --phosphor:#6FE3A6; --warn:#E0794F; --bonus:#D9A441;
+    --paper:#F3EEDF; --ink:#211C12; --ink-soft:#6B6250; --purple:#8B6FC9;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--pcb);color:var(--paper);font-family:'IBM Plex Sans',sans-serif;padding:0 0 100px;line-height:1.6;
+    background-image:radial-gradient(circle at 1px 1px, rgba(111,227,166,0.05) 1px, transparent 0); background-size:26px 26px;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  ::selection{background:var(--phosphor);color:var(--pcb);}
+  a:focus-visible, button:focus-visible, .toggle:focus-visible{outline:2px solid var(--phosphor); outline-offset:3px;}
+
+  .hero{position:relative;padding:48px 16px 34px;text-align:center;overflow:hidden;border-bottom:1px solid var(--pcb-line);background:linear-gradient(180deg,#0B1410 0%, var(--pcb) 100%);}
+  .hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;background-image:linear-gradient(var(--pcb-line) 1px, transparent 1px),linear-gradient(90deg, var(--pcb-line) 1px, transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse at center, black 0%, transparent 72%);}
+  .hero-inner{position:relative;z-index:1;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(22px,4.6vw,36px);margin:0 0 10px;color:var(--paper);text-shadow:0 0 30px rgba(111,227,166,.2);}
+  .sub{text-align:center;color:#B9C4B9;font-size:14.5px;margin:0 auto;max-width:640px;line-height:1.6;}
+
+  .panel-nav{position:sticky;top:0;z-index:40;background:rgba(15,27,21,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--pcb-line);padding:10px 16px;}
+  .panel-nav-inner{max-width:980px;margin:0 auto;display:flex;gap:5px;flex-wrap:wrap;justify-content:center;}
+  .nav-led{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8FA093;text-decoration:none;padding:5px 9px;border-radius:20px;border:1px solid transparent;transition:.2s ease;}
+  .nav-led:hover{color:var(--paper);border-color:var(--pcb-line);}
+
+  .toolbar{position:sticky;top:39px;z-index:35;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;background:rgba(15,27,21,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--pcb-line);padding:10px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+  .toolbar-inner{max-width:980px;width:100%;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;}
+  .toolbar .score span{color:var(--bonus);font-weight:700;font-size:15px;}
+  .toolbar .btns{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .wrap{max-width:980px;margin:0 auto;padding:0 16px;}
+  .howto{margin:22px auto 0;background:var(--pcb-light);border:1px dashed var(--pcb-line);border-radius:12px;padding:14px 18px;font-size:13px;line-height:1.6;color:#B9C4B9;}
+  .howto strong{color:var(--paper);}
+
+  .problem{max-width:980px;margin:0 auto;padding:52px 16px 0;scroll-margin-top:96px;}
+  .p-head{margin-bottom:16px;}
+  .p-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
+  .p-title{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(18px,3.4vw,23px);margin:0 0 12px;color:var(--paper);}
+  .p-statement{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:12px;padding:14px 18px;font-size:14px;color:#DDE6DF;line-height:1.6;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:rgba(0,0,0,.25);color:var(--copper);padding:1px 6px;border-radius:4px;overflow-wrap:break-word;word-break:break-word;}
+  .p-statement{overflow-wrap:break-word;}
+  .goal-banner{text-align:center;background:var(--pcb-light);color:var(--paper);border:1px solid var(--pcb-line);border-radius:14px;padding:12px 16px;margin:14px 0;font-family:'IBM Plex Mono',monospace;font-size:clamp(12px,2.2vw,15px);}
+
+  /* ============ TRUTH TABLE ============ */
+  .tt-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin:14px 0;}
+  .tt-score{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8FA093;}
+  .tt-score strong{color:var(--phosphor);}
+  .tt-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .tbtn{background:transparent;border:1.5px solid var(--pcb-line);color:#B9C4B9;border-radius:20px;padding:5px 12px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;transition:.15s ease;}
+  .tbtn:hover{background:var(--pcb-light);color:var(--paper);border-color:var(--copper);}
+  .tbtn.primary{background:rgba(111,227,166,.12);border-color:var(--phosphor);color:var(--phosphor);}
+  .tbtn.primary:hover{background:rgba(111,227,166,.22);}
+
+  .table-scroll{overflow-x:auto;border-radius:14px;box-shadow:0 14px 30px -18px rgba(0,0,0,.5);background:var(--pcb-light);border:1px solid var(--pcb-line);padding:10px 8px;margin-bottom:12px;}
+  table.ttable{border-collapse:separate;border-spacing:6px 4px;width:100%;}
+  table.ttable th{background:#1C2B21;padding:7px 6px 8px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;color:#8FA093;border-radius:7px;white-space:nowrap;}
+  table.ttable th.given{background:#20301F;color:var(--copper);font-size:12.5px;}
+  table.ttable th.final{background:#123024;color:var(--phosphor);}
+  table.ttable td{text-align:center;padding:5px;background:#132018;border-radius:7px;}
+  table.ttable tr:nth-child(even) td{background:#0F1911;}
+  table.ttable td.given{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12px;background:#20301F;color:var(--copper);}
+  table.ttable tr:nth-child(even) td.given{background:#1A2818;}
+  table.ttable td.final-col{background:#0E2019;}
+
+  .cell-wrap{position:relative;display:inline-block;}
+  .toggle{position:relative;width:36px;height:19px;border-radius:20px;cursor:pointer;background:rgba(0,0,0,.3);border:1.5px solid var(--warn);display:inline-flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:7px;font-weight:700;user-select:none;transition:border-color .2s ease, box-shadow .2s ease;}
+  .toggle .lab{position:absolute;width:50%;text-align:center;transition:opacity .2s ease;}
+  .toggle .lab.t{left:0;color:var(--phosphor);opacity:.35;} .toggle .lab.f{right:0;color:var(--warn);opacity:1;}
+  .toggle.on .lab.t{opacity:1;} .toggle.on .lab.f{opacity:.35;}
+  .toggle .knob{position:absolute;top:2px;left:19px;width:13px;height:13px;border-radius:50%;background:linear-gradient(180deg,#E0794F,#B5493D);box-shadow:0 1px 3px rgba(0,0,0,.5);transition:left .2s ease, background .2s ease;}
+  .toggle.on{border-color:var(--phosphor);box-shadow:0 0 8px rgba(111,227,166,.35);}
+  .toggle.on .knob{left:2px;background:linear-gradient(180deg,#BFFFE0,#6FE3A6);}
+  .cell-wrap.ok .toggle{box-shadow:0 0 0 2.5px rgba(111,227,166,.35);}
+  .cell-wrap.bad .toggle{box-shadow:0 0 0 2.5px rgba(224,121,79,.35);}
+  .vmark{position:absolute;top:-7px;right:-7px;width:13px;height:13px;border-radius:50%;font-size:7.5px;line-height:13px;text-align:center;font-weight:700;color:#0B140F;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .cell-wrap.ok .vmark{opacity:1;transform:scale(1);background:var(--phosphor);}
+  .cell-wrap.bad .vmark{opacity:1;transform:scale(1);background:var(--warn);color:#fff;}
+
+  .verdict-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:12px;padding:14px 16px;margin-bottom:8px;}
+  .verdict-label{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#8FA093;}
+  .seg{display:inline-flex;border:1.5px solid var(--pcb-line);border-radius:20px;overflow:hidden;background:rgba(0,0,0,.25);}
+  .seg button{border:none;background:transparent;padding:7px 13px;font-family:'IBM Plex Sans',sans-serif;font-size:11.5px;font-weight:600;cursor:pointer;color:#8FA093;transition:.15s ease;}
+  .seg button.sel{background:rgba(111,227,166,.16);color:var(--phosphor);}
+  .seg button.sel.bad-sel{background:rgba(224,121,79,.16);color:var(--warn);}
+  .verdict-icon{width:18px;height:18px;border-radius:50%;font-size:11px;line-height:18px;text-align:center;font-weight:700;color:#0B140F;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .verdict-icon.show{opacity:1;transform:scale(1);}
+  .verdict-icon.ok{background:var(--phosphor);} .verdict-icon.bad{background:var(--warn);color:#fff;}
+
+  .explain-box{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .explain-box.show{max-height:260px;opacity:1;margin-top:4px;}
+  .explain-inner{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:10px;padding:12px 16px;font-size:12.5px;line-height:1.6;color:#B9C4B9;}
+  .explain-inner strong{color:var(--paper);}
+
+  /* ============ construction reveal cards ============ */
+  .construct-card{background:var(--paper);color:var(--ink);border-radius:8px;padding:16px 20px;margin-bottom:14px;box-shadow:0 12px 24px -16px rgba(0,0,0,.5);}
+  .construct-tag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:10px;padding:3px 11px;border-radius:20px;margin-bottom:10px;color:#fff;background:var(--copper);text-transform:uppercase;letter-spacing:.04em;}
+  .construct-card .qtext{font-size:14px;margin:0 0 8px;}
+  .construct-scratch{width:100%;border:1.5px dashed rgba(33,28,18,.25);border-radius:8px;background:rgba(255,255,255,.5);padding:8px 11px;font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;color:var(--ink);resize:vertical;min-height:36px;margin:6px 0;}
+  .c-reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:5px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .c-reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .c-reveal-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .c-reveal-panel.show{max-height:260px;opacity:1;margin-top:8px;}
+  .c-reveal-inner{border-top:1.5px dashed rgba(33,28,18,.2);padding-top:8px;font-size:13.5px;}
+  .c-reveal-inner .mono2{font-family:'IBM Plex Mono',monospace;background:#fff;border:1px solid rgba(33,28,18,.15);padding:1px 6px;border-radius:4px;}
+
+  .concept-box{background:var(--pcb-light);border:1.5px solid var(--bonus);border-radius:14px;padding:16px 20px;margin-bottom:18px;}
+  .concept-tag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--bonus);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+  .concept-box p{font-size:13px;color:#DDE6DF;margin:0 0 8px;line-height:1.6;}
+  .concept-box p:last-child{margin-bottom:0;}
+
+  .sub-label{font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--copper);margin:16px 0 8px;}
+
+  footer{text-align:center;font-size:11.5px;color:#5C6B60;margin-top:60px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;}
+  footer .ok{color:var(--phosphor);}
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+      <h1 class="page-title">13 Problems, Nothing Given Away</h1>
+      <p class="sub">Satisfiability, equivalence, associativity, plain-English simplification, duality, and functional completeness — build every table and construct every answer before you peek.</p>
+    </div>
+  </div>
+
+  <div class="panel-nav">
+    <div class="panel-nav-inner" id="navRow"></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-inner">
+      <div class="score">Truth-Table Score: <span id="scoreDisplay">0 / 0</span> correct</div>
+      <div class="btns">
+        <button class="tbtn primary" onclick="checkAll()">Check All Tables</button>
+        <button class="tbtn" onclick="revealAll()">Reveal All Tables</button>
+        <button class="tbtn" onclick="resetAll()">Reset All Tables</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap"><div class="howto"><strong>How this page works:</strong> truth-table problems give you fixed variable columns and blank toggle columns for everything else — fill them in, then check or reveal. Construction problems (English statements, duals) give you a scratch box — write your own answer first, then reveal.</div></div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q1">
+    <div class="p-head"><div class="p-tag">Problem 1</div><h2 class="p-title">Is It Satisfiable?</h2>
+      <div class="p-statement">Determine whether <span class="mono">(p∨¬q)∧(¬p∨q)∧(¬p∨¬q)</span> is satisfiable.</div></div>
+    <div id="tt-1"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q2">
+    <div class="p-head"><div class="p-tag">Problem 2</div><h2 class="p-title">How Many Can Be True at Once?</h2>
+      <div class="p-statement">How many of <span class="mono">p∨¬q</span>, <span class="mono">¬p∨q</span>, <span class="mono">q∨r</span>, <span class="mono">q∨¬r</span>, and <span class="mono">¬q∨¬r</span> can be made simultaneously true?</div></div>
+    <div id="tt-2"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q3">
+    <div class="p-head"><div class="p-tag">Problem 3</div><h2 class="p-title">Is It Satisfiable? (Four Variables)</h2>
+      <div class="p-statement">Determine whether <span class="mono">(p∨q∨¬r)∧(p∨¬q∨¬s)∧(p∨¬r∨¬s)∧(¬p∨¬q∨¬s)∧(p∨q∨¬s)</span> is satisfiable. Sixteen rows.</div></div>
+    <div id="tt-3"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q4">
+    <div class="p-head"><div class="p-tag">Problem 4</div><h2 class="p-title">Prove the Equivalence</h2>
+      <div class="p-statement">Show that <span class="mono">p↔q</span> and <span class="mono">(p→q)∧(q→p)</span> are logically equivalent.</div></div>
+    <div id="tt-4"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q5">
+    <div class="p-head"><div class="p-tag">Problem 5</div><h2 class="p-title">Prove the Equivalence</h2>
+      <div class="p-statement">Show that <span class="mono">p↔q</span> and <span class="mono">(p∧q)∨(¬p∧¬q)</span> are logically equivalent.</div></div>
+    <div id="tt-5"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q6">
+    <div class="p-head"><div class="p-tag">Problem 6</div><h2 class="p-title">Is the Sheffer Stroke Associative?</h2>
+      <div class="p-statement">Show that the logical operator <span class="mono">|</span> (Sheffer stroke / NAND, where <span class="mono">p|q ≡ ¬(p∧q)</span>) is <strong>not</strong> associative.</div></div>
+    <div id="tt-6"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q7">
+    <div class="p-head"><div class="p-tag">Problem 7</div><h2 class="p-title">Simplify the Specification</h2>
+      <div class="p-statement">Find an easier-to-understand specification for: <em>"If the directory database is opened, then the monitor is put in a closed state, if the system is not in its initial state."</em></div></div>
+    <div class="goal-banner">d: directory database is opened &nbsp;·&nbsp; m: monitor is put in a closed state &nbsp;·&nbsp; s: system is in its initial state<br>Given: ¬s → (d → m)</div>
+    <div id="construct-7"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q8">
+    <div class="p-head"><div class="p-tag">Problem 8</div><h2 class="p-title">Negate It With De Morgan's Law</h2>
+      <div class="p-statement">Find the negation of: <em>"Carlos will bicycle or run tomorrow."</em></div></div>
+    <div id="construct-8"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q9">
+    <div class="p-head"><div class="p-tag">Problem 9</div><h2 class="p-title">Find the Dual</h2>
+      <div class="p-statement">Find the dual of <span class="mono">(p∧¬q)∨(q∧F)</span>.</div></div>
+    <div id="construct-9"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q10">
+    <div class="p-head"><div class="p-tag">Problem 10</div><h2 class="p-title">Duals of Equivalent Propositions Are Equivalent</h2>
+      <div class="p-statement">Show that the duals of two equivalent compound propositions are also equivalent.</div></div>
+    <div class="concept-box">
+      <div class="concept-tag">Why this is true</div>
+      <p>The dual of a formula is computed by swapping <span class="mono">∧↔∨</span> and <span class="mono">T↔F</span> everywhere. That swap is exactly the same operation, applied consistently, no matter which formula you start with. So if two formulas agree on every row (they're equivalent), performing the <em>identical</em> swap on both sides can't possibly make them disagree — whatever relationship held before the swap still holds after it.</p>
+      <p>Here's the idea made concrete, using the Absorption Law you already know:</p>
+    </div>
+    <div class="goal-banner">Original: p∨(p∧q) ≡ p</div>
+    <div id="tt-10a"></div>
+    <div class="goal-banner">Dual (swap ∧↔∨): p∧(p∨q) ≡ p</div>
+    <div id="tt-10b"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q11">
+    <div class="p-head"><div class="p-tag">Problem 11</div><h2 class="p-title">Find the Dual</h2>
+      <div class="p-statement">Find the dual of <span class="mono">(p∨F)∧(q∨T)</span>.</div></div>
+    <div id="construct-11"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q12">
+    <div class="p-head"><div class="p-tag">Problem 12</div><h2 class="p-title">NOR Is Functionally Complete</h2>
+      <div class="p-statement">Show that the NOR operator <span class="mono">↓</span> (where <span class="mono">p↓q ≡ ¬(p∨q)</span>) is a functionally complete collection of logical operators — meaning ¬, ∧, and ∨ can <em>all</em> be built using only ↓.</div></div>
+    <div class="concept-box"><div class="concept-tag">What "functionally complete" means</div><p>A set of operators is functionally complete if every possible logical connective (¬, ∧, ∨, →, ↔, …) can be constructed using <em>only</em> operators from that set. Since ¬, ∧, ∨ already generate everything else, it's enough to show all three can be built from ↓ alone.</p></div>
+    <div class="sub-label">¬p using only ↓</div>
+    <div id="tt-12a"></div>
+    <div class="sub-label">p∨q using only ↓</div>
+    <div id="tt-12b"></div>
+    <div class="sub-label">p∧q using only ↓</div>
+    <div id="tt-12c"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="problem" id="q13">
+    <div class="p-head"><div class="p-tag">Problem 13</div><h2 class="p-title">NAND Is Functionally Complete</h2>
+      <div class="p-statement">Show that the NAND operator <span class="mono">|</span> (where <span class="mono">p|q ≡ ¬(p∧q)</span>) is a functionally complete collection of logical operators.</div></div>
+    <div class="sub-label">¬p using only |</div>
+    <div id="tt-13a"></div>
+    <div class="sub-label">p∧q using only |</div>
+    <div id="tt-13b"></div>
+    <div class="sub-label">p∨q using only |</div>
+    <div id="tt-13c"></div>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · 13 Problems &nbsp;—&nbsp; <span class="ok">CIRCUIT COMPLETE ✓</span></footer>
+
+<script>
+/* ===================== nav ===================== */
+const navItems = [
+  {id:'q1',label:'1'},{id:'q2',label:'2'},{id:'q3',label:'3'},{id:'q4',label:'4'},{id:'q5',label:'5'},
+  {id:'q6',label:'6'},{id:'q7',label:'7'},{id:'q8',label:'8'},{id:'q9',label:'9'},{id:'q10',label:'10'},
+  {id:'q11',label:'11'},{id:'q12',label:'12'},{id:'q13',label:'13'}
+];
+const navRow = document.getElementById('navRow');
+navItems.forEach(n=>{ const a=document.createElement('a'); a.href='#'+n.id; a.className='nav-led'; a.textContent='Q'+n.label; navRow.appendChild(a); });
+
+/* ===================== helpers ===================== */
+function rowsFor(n){
+  const out=[]; const gen=(a)=>{ if(a.length===n){out.push(a.slice());return;} gen(a.concat(true)); gen(a.concat(false)); };
+  gen([]); return out;
+}
+const VNAMES = ['p','q','r','s'];
+
+/* ===================== truth table builder ===================== */
+function buildTruthTable(config){
+  const container = document.getElementById(config.containerId);
+  const rows = rowsFor(config.nvars);
+  const vnames = (config.vnames || VNAMES.slice(0, config.nvars));
+  const totalCells = rows.length * config.cols.length + (config.verdict ? 1 : 0);
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'tt-toolbar';
+  toolbar.innerHTML = `<span class="tt-score">This table: <strong data-local>0</strong> / ${totalCells}</span>
+    <span class="tt-btns"><button class="tbtn primary" data-act="check">Check</button><button class="tbtn" data-act="reveal">Reveal</button><button class="tbtn" data-act="reset">Reset</button></span>`;
+  container.appendChild(toolbar);
+
+  const scrollWrap = document.createElement('div'); scrollWrap.className = 'table-scroll';
+  const table = document.createElement('table'); table.className = 'ttable';
+  const headTr = document.createElement('tr');
+  vnames.forEach(v=>{ const th=document.createElement('th'); th.className='given'; th.textContent=v; headTr.appendChild(th); });
+  config.cols.forEach(c=>{ const th=document.createElement('th'); if(c.final) th.className='final'; th.textContent=c.sym; headTr.appendChild(th); });
+  table.appendChild(headTr);
+
+  rows.forEach(row=>{
+    const tr = document.createElement('tr');
+    row.forEach(v=>{ const td=document.createElement('td'); td.className='given'; td.textContent=v?'T':'F'; tr.appendChild(td); });
+    config.cols.forEach(c=>{
+      const td = document.createElement('td'); if(c.final) td.className='final-col';
+      const correct = c.fn(...row);
+      const wrap = document.createElement('div');
+      wrap.className='cell-wrap'; wrap.dataset.correct=correct?'1':'0'; wrap.dataset.value='0';
+      wrap.innerHTML = `<div class="toggle" role="button" tabindex="0"><span class="lab t">T</span><span class="lab f">F</span><span class="knob"></span></div><span class="vmark"></span>`;
+      const tgl = wrap.querySelector('.toggle');
+      const flip = ()=>{
+        const on = wrap.dataset.value==='1';
+        wrap.dataset.value = on?'0':'1';
+        tgl.classList.toggle('on', !on);
+        wrap.classList.remove('ok','bad'); wrap.querySelector('.vmark').textContent='';
+        updateTTLocal(container);
+      };
+      tgl.addEventListener('click', flip);
+      tgl.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){flip(); e.preventDefault();} });
+      td.appendChild(wrap); tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
+  scrollWrap.appendChild(table); container.appendChild(scrollWrap);
+
+  let vSeg=null, vIcon=null, explainBox=null;
+  if(config.verdict){
+    const vrow = document.createElement('div'); vrow.className = 'verdict-row';
+    const segHtml = config.verdict.options.map(o=>`<button data-val="${o}" type="button">${o}</button>`).join('');
+    vrow.innerHTML = `<span class="verdict-label">${config.verdict.question}</span><div class="seg" data-role="verdict">${segHtml}</div><span class="verdict-icon"></span>`;
+    container.appendChild(vrow);
+    vSeg = vrow.querySelector('.seg'); vIcon = vrow.querySelector('.verdict-icon');
+    vSeg.querySelectorAll('button').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        vSeg.querySelectorAll('button').forEach(x=>x.classList.remove('sel','bad-sel'));
+        b.classList.add('sel'); vSeg.dataset.value=b.dataset.val;
+        vIcon.classList.remove('show','ok','bad'); if(explainBox) explainBox.classList.remove('show');
+        updateTTLocal(container);
+      });
+    });
+    explainBox = document.createElement('div'); explainBox.className='explain-box';
+    explainBox.innerHTML = `<div class="explain-inner">${config.verdict.note}</div>`;
+    container.appendChild(explainBox);
+  }
+
+  toolbar.querySelectorAll('[data-act]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const act = btn.dataset.act;
+      if(act==='check') checkTT(container, config, vSeg, vIcon, explainBox);
+      if(act==='reveal') revealTT(container, config, vSeg, vIcon, explainBox);
+      if(act==='reset') resetTT(container, vSeg, vIcon, explainBox);
+    });
+  });
+}
+function updateTTLocal(container){
+  let correct = 0;
+  container.querySelectorAll('.cell-wrap').forEach(w=>{ if(w.dataset.value===w.dataset.correct) correct++; });
+  const seg = container.querySelector('[data-role="verdict"]');
+  if(seg && seg.dataset.value !== undefined && seg.dataset.value === seg.dataset.correct) correct++;
+  const el = container.querySelector('[data-local]');
+  if(el) el.textContent = correct;
+  updateGrandScore();
+}
+function checkTT(container, config, vSeg, vIcon, explainBox){
+  container.querySelectorAll('.cell-wrap').forEach(w=>{
+    const ok = w.dataset.value===w.dataset.correct;
+    w.classList.remove('ok','bad'); w.classList.add(ok?'ok':'bad');
+    w.querySelector('.vmark').textContent = ok?'✓':'✗';
+  });
+  if(vSeg){
+    vSeg.dataset.correct = config.verdict.correct;
+    if(vSeg.dataset.value !== undefined){
+      const ok = vSeg.dataset.value === config.verdict.correct;
+      vIcon.classList.add('show', ok?'ok':'bad'); vIcon.textContent = ok?'✓':'✗';
+      if(!ok){ const sel=vSeg.querySelector('button.sel'); if(sel) sel.classList.add('bad-sel'); }
+    }
+    explainBox.classList.add('show');
+  }
+  updateTTLocal(container);
+}
+function revealTT(container, config, vSeg, vIcon, explainBox){
+  container.querySelectorAll('.cell-wrap').forEach(w=>{
+    w.dataset.value = w.dataset.correct;
+    w.querySelector('.toggle').classList.toggle('on', w.dataset.correct==='1');
+    w.classList.remove('ok','bad'); w.classList.add('ok');
+    w.querySelector('.vmark').textContent = '✓';
+  });
+  if(vSeg){
+    vSeg.dataset.correct = config.verdict.correct;
+    vSeg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','bad-sel'));
+    const btn = vSeg.querySelector(`button[data-val="${config.verdict.correct}"]`); if(btn) btn.classList.add('sel');
+    vSeg.dataset.value = config.verdict.correct;
+    vIcon.classList.add('show','ok'); vIcon.textContent='✓';
+    explainBox.classList.add('show');
+  }
+  updateTTLocal(container);
+}
+function resetTT(container, vSeg, vIcon, explainBox){
+  container.querySelectorAll('.cell-wrap').forEach(w=>{
+    w.dataset.value='0'; w.querySelector('.toggle').classList.remove('on');
+    w.classList.remove('ok','bad'); w.querySelector('.vmark').textContent='';
+  });
+  if(vSeg){ delete vSeg.dataset.value; vSeg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','bad-sel')); vIcon.classList.remove('show','ok','bad'); explainBox.classList.remove('show'); }
+  updateTTLocal(container);
+}
+function checkAll(){ document.querySelectorAll('.table-scroll').forEach(t=>{}); document.querySelectorAll('[data-act="check"]').forEach(b=>b.click()); }
+function revealAll(){ document.querySelectorAll('[data-act="reveal"]').forEach(b=>b.click()); }
+function resetAll(){ document.querySelectorAll('[data-act="reset"]').forEach(b=>b.click()); }
+function updateGrandScore(){
+  let correct=0, total=0;
+  document.querySelectorAll('.table-scroll').forEach(()=>{});
+  document.querySelectorAll('[id^="tt-"] .cell-wrap, [id^="q10"] .cell-wrap').forEach(w=>{ total++; if(w.dataset.value===w.dataset.correct) correct++; });
+  document.querySelectorAll('[id^="tt-"] [data-role="verdict"]').forEach(seg=>{ total++; if(seg.dataset.value!==undefined && seg.dataset.value===seg.dataset.correct) correct++; });
+  document.getElementById('scoreDisplay').textContent = correct + ' / ' + total;
+}
+
+/* ===================== construction reveal cards ===================== */
+let ccounter = 0;
+function buildConstructCard(containerId, tag, question, answer){
+  ccounter++;
+  const id = 'cc-'+ccounter;
+  const container = document.getElementById(containerId);
+  const card = document.createElement('div'); card.className='construct-card';
+  card.innerHTML = `<span class="construct-tag">${tag}</span><p class="qtext">${question}</p>
+    <textarea class="construct-scratch" placeholder="Write your own answer here first..."></textarea>
+    <button class="c-reveal-btn">Reveal Answer</button>
+    <div class="c-reveal-panel" id="${id}"><div class="c-reveal-inner">${answer}</div></div>`;
+  card.querySelector('.c-reveal-btn').addEventListener('click', ()=>{ document.getElementById(id).classList.toggle('show'); });
+  container.appendChild(card);
+}
+
+/* ===================== PROBLEM 1 ===================== */
+buildTruthTable({
+  containerId:'tt-1', nvars:2,
+  cols:[
+    {sym:'p∨¬q', fn:(p,q)=>p||(!q)},
+    {sym:'¬p∨q', fn:(p,q)=>(!p)||q},
+    {sym:'¬p∨¬q', fn:(p,q)=>(!p)||(!q)},
+    {sym:'final: AND all three', fn:(p,q)=>(p||(!q))&&((!p)||q)&&((!p)||(!q)), final:true}
+  ],
+  verdict:{question:'Satisfiable?', options:['Satisfiable','Unsatisfiable'], correct:'Satisfiable',
+    note:'<strong>Satisfiable.</strong> At p=F, q=F, every clause is True (only row that works) — one satisfying assignment is all it takes.'}
+});
+
+/* ===================== PROBLEM 2 ===================== */
+buildTruthTable({
+  containerId:'tt-2', nvars:3,
+  cols:[
+    {sym:'p∨¬q', fn:(p,q,r)=>p||(!q)},
+    {sym:'¬p∨q', fn:(p,q,r)=>(!p)||q},
+    {sym:'q∨r', fn:(p,q,r)=>q||r},
+    {sym:'q∨¬r', fn:(p,q,r)=>q||(!r)},
+    {sym:'¬q∨¬r', fn:(p,q,r)=>(!q)||(!r)}
+  ],
+  verdict:{question:'Maximum number simultaneously True?', options:['3','4','5'], correct:'5',
+    note:'<strong>5 — all of them at once.</strong> Set p=T, q=T, r=F: p∨¬q=T, ¬p∨q=T, q∨r=T, q∨¬r=T, ¬q∨¬r=T. Every disjunction is satisfiable together — go back and check that row.'}
+});
+
+/* ===================== PROBLEM 3 ===================== */
+buildTruthTable({
+  containerId:'tt-3', nvars:4,
+  cols:[
+    {sym:'p∨q∨¬r', fn:(p,q,r,s)=>p||q||(!r)},
+    {sym:'p∨¬q∨¬s', fn:(p,q,r,s)=>p||(!q)||(!s)},
+    {sym:'p∨¬r∨¬s', fn:(p,q,r,s)=>p||(!r)||(!s)},
+    {sym:'¬p∨¬q∨¬s', fn:(p,q,r,s)=>(!p)||(!q)||(!s)},
+    {sym:'p∨q∨¬s', fn:(p,q,r,s)=>p||q||(!s)},
+    {sym:'final: AND all five', fn:(p,q,r,s)=>(p||q||(!r))&&(p||(!q)||(!s))&&(p||(!r)||(!s))&&((!p)||(!q)||(!s))&&(p||q||(!s)), final:true}
+  ],
+  verdict:{question:'Satisfiable?', options:['Satisfiable','Unsatisfiable'], correct:'Satisfiable',
+    note:'<strong>Satisfiable.</strong> Nine of the sixteen rows work — for example p=T, q=T, r=T, s=F makes every clause True. You only need to find one.'}
+});
+
+/* ===================== PROBLEM 4 ===================== */
+buildTruthTable({
+  containerId:'tt-4', nvars:2,
+  cols:[
+    {sym:'p↔q', fn:(p,q)=>p===q},
+    {sym:'p→q', fn:(p,q)=>(!p)||q},
+    {sym:'q→p', fn:(p,q)=>(!q)||p},
+    {sym:'final: (p→q)∧(q→p)', fn:(p,q)=>((!p)||q)&&((!q)||p), final:true}
+  ],
+  verdict:{question:'Are p↔q and (p→q)∧(q→p) equivalent?', options:['Yes','No'], correct:'Yes',
+    note:'<strong>Yes.</strong> The first and last columns match in all 4 rows — biconditional really is "two promises in both directions" made precise.'}
+});
+
+/* ===================== PROBLEM 5 ===================== */
+buildTruthTable({
+  containerId:'tt-5', nvars:2,
+  cols:[
+    {sym:'p↔q', fn:(p,q)=>p===q},
+    {sym:'p∧q', fn:(p,q)=>p&&q},
+    {sym:'¬p∧¬q', fn:(p,q)=>(!p)&&(!q)},
+    {sym:'final: (p∧q)∨(¬p∧¬q)', fn:(p,q)=>(p&&q)||((!p)&&(!q)), final:true}
+  ],
+  verdict:{question:'Are p↔q and (p∧q)∨(¬p∧¬q) equivalent?', options:['Yes','No'], correct:'Yes',
+    note:'<strong>Yes.</strong> "p and q match" is exactly "both true, or both false" — the first and last columns agree in every row.'}
+});
+
+/* ===================== PROBLEM 6 ===================== */
+buildTruthTable({
+  containerId:'tt-6', nvars:3,
+  cols:[
+    {sym:'p|q', fn:(p,q,r)=>!(p&&q)},
+    {sym:'(p|q)|r', fn:(p,q,r)=>{const pq=!(p&&q); return !(pq&&r);}},
+    {sym:'q|r', fn:(p,q,r)=>!(q&&r)},
+    {sym:'p|(q|r)', fn:(p,q,r)=>{const qr=!(q&&r); return !(p&&qr);}}
+  ],
+  verdict:{question:'Do (p|q)|r and p|(q|r) always match?', options:['Yes — associative','No — not associative'], correct:'No — not associative',
+    note:'<strong>No.</strong> At p=T,q=T,r=F: (p|q)|r comes out True, but p|(q|r) comes out False. One mismatched row is all it takes to break associativity.'}
+});
+
+/* ===================== PROBLEM 7 — construction ===================== */
+(function(){
+  buildConstructCard('construct-7', 'Simplify the nested conditional',
+    'The statement is ¬s → (d → m). Using the equivalence p→(q→r) ≡ (p∧q)→r, rewrite this as a single, flatter conditional — then put it back into plain English.',
+    '<span class="mono2">(¬s ∧ d) → m</span><br><br>In plain English: <em>"If the system is not in its initial state and the directory database is opened, then the monitor is put in a closed state."</em> Same meaning, one "if" instead of two nested ones.');
+})();
+
+/* ===================== PROBLEM 8 — construction ===================== */
+(function(){
+  buildConstructCard('construct-8', "De Morgan's negation",
+    'Let b: "Carlos will bicycle tomorrow", r: "Carlos will run tomorrow." The statement is b∨r. Negate it using De Morgan\'s Law.',
+    '<span class="mono2">¬b ∧ ¬r</span><br><br>In plain English: <em>"Carlos will not bicycle tomorrow, and he will not run tomorrow."</em>');
+})();
+
+/* ===================== PROBLEM 9 — construction ===================== */
+(function(){
+  buildConstructCard('construct-9', 'Find the dual', 'Swap ∧↔∨ and T↔F throughout (p, q, ¬ stay untouched). What\'s the dual of (p∧¬q)∨(q∧F)?',
+    '<span class="mono2">(p∨¬q)∧(q∨T)</span><br><br><strong>Bonus:</strong> simplify each side with the laws you already know — the original collapses to just <span class="mono2">p∧¬q</span> (Domination then Identity), and the dual collapses to <span class="mono2">p∨¬q</span> (same two laws). Notice the dual of the simplified form matches too — duality is consistent all the way through.');
+})();
+
+/* ===================== PROBLEM 10 — verify panels ===================== */
+buildTruthTable({
+  containerId:'tt-10a', nvars:2,
+  cols:[{sym:'p∨(p∧q)', fn:(p,q)=>p||(p&&q)}, {sym:'final: equals p?', fn:(p,q)=>(p||(p&&q))===p, final:true}],
+  verdict:{question:'Does p∨(p∧q) always equal p?', options:['Yes','No'], correct:'Yes', note:'<strong>Yes</strong> — the Absorption Law holds, confirmed in all 4 rows.'}
+});
+buildTruthTable({
+  containerId:'tt-10b', nvars:2,
+  cols:[{sym:'p∧(p∨q)', fn:(p,q)=>p&&(p||q)}, {sym:'final: equals p?', fn:(p,q)=>(p&&(p||q))===p, final:true}],
+  verdict:{question:'Does the dual p∧(p∨q) also always equal p?', options:['Yes','No'], correct:'Yes',
+    note:'<strong>Yes</strong> — the dual holds too, exactly as the Principle of Duality guarantees. Original equivalent ⟹ dual equivalent, every time, for any pair of formulas.'}
+});
+
+/* ===================== PROBLEM 11 — construction ===================== */
+(function(){
+  buildConstructCard('construct-11', 'Find the dual', 'What\'s the dual of (p∨F)∧(q∨T)?',
+    '<span class="mono2">(p∧T)∨(q∧F)</span><br><br><strong>Bonus:</strong> simplify both. The original: p∨F≡p (Identity), q∨T≡T (Domination), so (p∨F)∧(q∨T) ≡ p∧T ≡ p. The dual: p∧T≡p (Identity), q∧F≡F (Domination), so (p∧T)∨(q∧F) ≡ p∨F ≡ p. Both sides simplify to exactly <span class="mono2">p</span> — a clean illustration of duality holding all the way down.');
+})();
+
+/* ===================== PROBLEM 12 — NOR completeness ===================== */
+buildTruthTable({
+  containerId:'tt-12a', nvars:1, vnames:['p'],
+  cols:[{sym:'p↓p', fn:(p)=>!(p||p)}, {sym:'final: equals ¬p?', fn:(p)=>(!(p||p))===(!p), final:true}],
+  verdict:{question:'Does p↓p always equal ¬p?', options:['Yes','No'], correct:'Yes', note:'<strong>Yes.</strong> ¬(p∨p) ≡ ¬p — NOR-ing p with itself is exactly negation.'}
+});
+buildTruthTable({
+  containerId:'tt-12b', nvars:2,
+  cols:[{sym:'p↓q', fn:(p,q)=>!(p||q)}, {sym:'(p↓q)↓(p↓q)', fn:(p,q)=>{const x=!(p||q); return !(x||x);}}, {sym:'final: equals p∨q?', fn:(p,q)=>{const x=!(p||q); return (!(x||x))===(p||q);}, final:true}],
+  verdict:{question:'Does (p↓q)↓(p↓q) always equal p∨q?', options:['Yes','No'], correct:'Yes', note:'<strong>Yes.</strong> NOR-ing (p↓q) with itself just negates it — ¬(¬(p∨q)) ≡ p∨q.'}
+});
+buildTruthTable({
+  containerId:'tt-12c', nvars:2,
+  cols:[{sym:'p↓p', fn:(p,q)=>!(p||p)}, {sym:'q↓q', fn:(p,q)=>!(q||q)}, {sym:'(p↓p)↓(q↓q)', fn:(p,q)=>{const a=!(p||p), b=!(q||q); return !(a||b);}}, {sym:'final: equals p∧q?', fn:(p,q)=>{const a=!(p||p), b=!(q||q); return (!(a||b))===(p&&q);}, final:true}],
+  verdict:{question:'Does (p↓p)↓(q↓q) always equal p∧q?', options:['Yes','No'], correct:'Yes', note:'<strong>Yes.</strong> This builds ¬p and ¬q first, then NORs them: ¬(¬p∨¬q) ≡ p∧q by De Morgan\'s Law. All three connectives (¬, ∨, ∧) are now built from ↓ alone — NOR is functionally complete.'}
+});
+
+/* ===================== PROBLEM 13 — NAND completeness ===================== */
+buildTruthTable({
+  containerId:'tt-13a', nvars:1, vnames:['p'],
+  cols:[{sym:'p|p', fn:(p)=>!(p&&p)}, {sym:'final: equals ¬p?', fn:(p)=>(!(p&&p))===(!p), final:true}],
+  verdict:{question:'Does p|p always equal ¬p?', options:['Yes','No'], correct:'Yes', note:'<strong>Yes.</strong> ¬(p∧p) ≡ ¬p — NAND-ing p with itself is negation.'}
+});
+buildTruthTable({
+  containerId:'tt-13b', nvars:2,
+  cols:[{sym:'p|q', fn:(p,q)=>!(p&&q)}, {sym:'(p|q)|(p|q)', fn:(p,q)=>{const x=!(p&&q); return !(x&&x);}}, {sym:'final: equals p∧q?', fn:(p,q)=>{const x=!(p&&q); return (!(x&&x))===(p&&q);}, final:true}],
+  verdict:{question:'Does (p|q)|(p|q) always equal p∧q?', options:['Yes','No'], correct:'Yes', note:'<strong>Yes.</strong> NAND-ing (p|q) with itself negates it — ¬(¬(p∧q)) ≡ p∧q.'}
+});
+buildTruthTable({
+  containerId:'tt-13c', nvars:2,
+  cols:[{sym:'p|p', fn:(p,q)=>!(p&&p)}, {sym:'q|q', fn:(p,q)=>!(q&&q)}, {sym:'(p|p)|(q|q)', fn:(p,q)=>{const a=!(p&&p), b=!(q&&q); return !(a&&b);}}, {sym:'final: equals p∨q?', fn:(p,q)=>{const a=!(p&&p), b=!(q&&q); return (!(a&&b))===(p||q);}, final:true}],
+  verdict:{question:'Does (p|p)|(q|q) always equal p∨q?', options:['Yes','No'], correct:'Yes', note:'<strong>Yes.</strong> This builds ¬p and ¬q first, then NANDs them: ¬(¬p∧¬q) ≡ p∨q by De Morgan\'s Law. NAND is functionally complete too.'}
+});
+
+updateGrandScore();
+</script>
+</body>
+</html>

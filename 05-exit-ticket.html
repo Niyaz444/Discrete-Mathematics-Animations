@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exit Ticket · Statements &amp; Notation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+    --lv1:#7FA79A; --lv2:#4F8A73; --lv3:#C79A3E; --lv4:#C17A3A; --lv5:#B5493D;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);background-image:radial-gradient(circle at 1px 1px, rgba(28,43,51,0.06) 1px, transparent 0);background-size:22px 22px;font-family:'IBM Plex Sans',sans-serif;color:var(--ink);padding:36px 16px 60px;}
+  .wrap{max-width:640px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(26px,5vw,34px);margin:0 0 4px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14px;margin-bottom:28px;}
+
+  .ticket{position:relative;background:var(--card);border-radius:14px;box-shadow:0 18px 40px -18px rgba(28,43,51,.35), 0 1px 0 rgba(28,43,51,.05);transform:rotate(0.6deg);padding:24px 26px;margin-bottom:30px;border:1px solid rgba(28,43,51,.08);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .ticket h2{font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin:0 0 6px;}
+  .ticket p{margin:0;color:var(--ink-soft);font-size:13.5px;line-height:1.5;}
+  .badge{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:var(--gold);color:var(--ink);padding:6px 10px;border-radius:20px;white-space:nowrap;}
+
+  .q-card{background:var(--card);border-radius:12px;padding:18px 20px;margin-bottom:14px;border:1px solid rgba(28,43,51,.08);box-shadow:0 6px 16px -12px rgba(28,43,51,.4);}
+  .q-top{display:flex;gap:10px;align-items:center;margin-bottom:8px;}
+  .q-num{font-family:'Fraunces',serif;font-weight:600;font-size:15px;color:var(--ink-soft);min-width:26px;}
+  .lvl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#fff;padding:3px 8px;border-radius:20px;}
+  .lv1{background:var(--lv1);} .lv2{background:var(--lv2);} .lv3{background:var(--lv3);}
+  .lv4{background:var(--lv4);} .lv5{background:var(--lv5);}
+  .q-text{font-size:15px;line-height:1.55;margin:0 0 10px;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;}
+
+  .reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:6px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .reveal-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
+
+  .answer{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .q-card.revealed .answer{max-height:420px;opacity:1;margin-top:12px;}
+  .answer-inner{border-top:1px dashed var(--line);padding-top:12px;font-size:14px;line-height:1.6;display:flex;gap:12px;align-items:flex-start;}
+  .stamp{flex-shrink:0;display:inline-block;border:2.5px solid var(--teal);color:var(--teal);padding:5px 10px;border-radius:7px;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px;letter-spacing:.06em;transform:rotate(-8deg) scale(.7);opacity:0;mix-blend-mode:multiply;transition:all .4s cubic-bezier(.2,1.7,.4,1);white-space:nowrap;margin-top:2px;}
+  .q-card.revealed .stamp{opacity:1;transform:rotate(-8deg) scale(1);}
+  .stamp.brick{border-color:var(--brick);color:var(--brick);}
+  .stamp.gold{border-color:var(--gold);color:#8a6a24;}
+
+  .reflect{background:#fff;border:1.5px solid var(--gold);border-radius:12px;padding:16px 18px;margin-top:6px;font-size:13.5px;color:var(--ink-soft);}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:30px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Exit Ticket</h1>
+  <p class="sub">Topic 1 — Introduction: Statements &amp; Notation</p>
+
+  <div class="ticket">
+    <div>
+      <h2>Leaving Logic</h2>
+      <p>Before you go — show me what stuck. Compare your Entry Ticket instincts to what you know now.</p>
+    </div>
+    <div class="badge">5 min</div>
+  </div>
+
+  <div class="q-card" id="q1"><div class="q-top"><span class="q-num">1</span><span class="lvl lv2">Lv2</span></div>
+    <p class="q-text">In your own words: what two conditions must a sentence satisfy to be a statement?</p>
+    <button class="reveal-btn" onclick="toggle('q1')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">DEF</span><span>It must be <strong>declarative</strong> (an assertion, not a question/command), and it must have exactly <strong>one</strong> truth value, True or False.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q2"><div class="q-top"><span class="q-num">2</span><span class="lvl lv2">Lv2</span></div>
+    <p class="q-text">Classify: <em>"Prove that √2 is irrational."</em></p>
+    <button class="reveal-btn" onclick="toggle('q2')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp brick">✗ NOT A STATEMENT</span><span>It's a command/instruction ("Prove that…") — not a declarative claim with a truth value.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q3"><div class="q-top"><span class="q-num">3</span><span class="lvl lv3">Lv3</span></div>
+    <p class="q-text">Let <span class="mono">p</span>: "Two is a prime number." State the truth value of <span class="mono">p</span>.</p>
+    <button class="reveal-btn" onclick="toggle('q3')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">✓ TRUE</span><span>2 is prime (only divisible by 1 and itself), so <span class="mono">p</span> is <strong>True</strong>.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q4"><div class="q-top"><span class="q-num">4</span><span class="lvl lv3">Lv3</span></div>
+    <p class="q-text">Is <em>"y − 4 = 0"</em> a statement? If not, what is it called?</p>
+    <button class="reveal-btn" onclick="toggle('q4')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp brick">✗ NO</span><span>Not a statement — <span class="mono">y</span> is a free variable. It's an <strong>open sentence</strong>.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q5"><div class="q-top"><span class="q-num">5</span><span class="lvl lv4">Lv4</span></div>
+    <p class="q-text">Go back to your Entry Ticket Q5 (the self-referential sentence). Now, formally, why does it fail to be a statement?</p>
+    <button class="reveal-btn" onclick="toggle('q5')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp brick">✗ REJECTED</span><span>Self-reference forces its truth value to flip endlessly — no stable assignment of True or False satisfies it, which violates the "exactly one truth value" requirement.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q6"><div class="q-top"><span class="q-num">6</span><span class="lvl lv4">Lv4</span></div>
+    <p class="q-text">A friend argues: <em>"If nobody knows whether it's true, it can't be a statement."</em> What's the flaw in this reasoning?</p>
+    <button class="reveal-btn" onclick="toggle('q6')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp brick">✗ FLAWED</span><span>It confuses <em>our knowledge</em> of the truth value with the truth value <em>existing</em>. A statement only needs a determinate truth value in principle — "unknown to us" is not the same as "undefined."</span></div></div>
+  </div>
+
+  <div class="q-card" id="q7"><div class="q-top"><span class="q-num">7</span><span class="lvl lv5">Lv5</span></div>
+    <p class="q-text">Write one sentence from your own life (not math) that IS a statement, and one that looks similar but ISN'T. Explain the difference.</p>
+    <button class="reveal-btn" onclick="toggle('q7')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">🧩 OPEN</span><span>Sample: <em>"My college starts at 9 AM"</em> (statement — checkable) vs. <em>"My college should start later"</em> (not a statement — a value judgement with no objective test). Many valid answers — check yours has a genuine checkable-vs-opinion contrast.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q8"><div class="q-top"><span class="q-num">8</span><span class="lvl lv3">Lv3</span></div>
+    <p class="q-text">Rewrite <em>"Are you attending the seminar?"</em> as a genuine statement.</p>
+    <button class="reveal-btn" onclick="toggle('q8')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">✓ APPLY</span><span>"You are attending the seminar." — now declarative and checkable.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q9"><div class="q-top"><span class="q-num">9</span><span class="lvl lv5">Lv5</span></div>
+    <p class="q-text"><strong>Predict:</strong> next class we join simple statements together — e.g. <span class="mono">p</span>: "It rains" and <span class="mono">q</span>: "I carry an umbrella" — into "If it rains, then I carry an umbrella." What do you think we'll need to invent to write that combination in symbols?</p>
+    <button class="reveal-btn" onclick="toggle('q9')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp gold">🔮 NEXT</span><span>Symbols for joining words like "and," "or," "if…then" — these are called <strong>connectives</strong> (e.g. <span class="mono">∧, ∨, →</span>). That's exactly Topic 2. Hold onto your guess and see how close it was!</span></div></div>
+  </div>
+
+  <div class="q-card" id="q10"><div class="q-top"><span class="q-num">10</span><span class="lvl lv2">Lv2</span></div>
+    <p class="q-text">Muddiest point: what's the one idea from today you're still unsure about?</p>
+    <div class="reflect">Write freely — there's no "reveal" here. I'll address the most common muddy points at the start of next class.</div>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Topic 1 Exit Ticket — see you at Topic 2: Connectives</footer>
+</div>
+
+<script>function toggle(id){ document.getElementById(id).classList.toggle('revealed'); }</script>
+</body>
+</html>

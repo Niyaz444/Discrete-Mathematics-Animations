@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Truth Table Explorer · All Connectives</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pcb:#0F1B15; --pcb-light:#17251D; --pcb-line:#25392C;
+    --copper:#C08552; --phosphor:#6FE3A6; --warn:#E0794F; --bonus:#D9A441;
+    --paper:#F3EEDF; --ink:#211C12; --ink-soft:#6B6250;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--pcb);font-family:'IBM Plex Sans',sans-serif;color:var(--paper);padding:0 0 80px;
+    background-image:radial-gradient(circle at 1px 1px, rgba(111,227,166,0.05) 1px, transparent 0);
+    background-size:26px 26px;
+  }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  ::selection{background:var(--phosphor);color:var(--pcb);}
+  a:focus-visible, button:focus-visible, .toggle:focus-visible{outline:2px solid var(--phosphor); outline-offset:3px;}
+
+  .hero{
+    position:relative; padding:48px 16px 34px; text-align:center; overflow:hidden;
+    border-bottom:1px solid var(--pcb-line); background:linear-gradient(180deg,#0B1410 0%, var(--pcb) 100%);
+  }
+  .hero::before{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+    background-image:linear-gradient(var(--pcb-line) 1px, transparent 1px), linear-gradient(90deg, var(--pcb-line) 1px, transparent 1px);
+    background-size:44px 44px; mask-image:radial-gradient(ellipse at center, black 0%, transparent 72%);
+  }
+  .hero-inner{position:relative;z-index:1;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:700;text-align:center;font-size:clamp(26px,5vw,42px);margin:0 0 10px;color:var(--paper);text-shadow:0 0 30px rgba(111,227,166,.2);}
+  .sub{text-align:center;color:#B9C4B9;font-size:14.5px;margin:0 auto;max-width:600px;line-height:1.6;}
+
+  .wrap{max-width:1150px;margin:0 auto;padding:36px 16px 0;}
+
+  .howto{
+    background:var(--pcb-light); border:1px dashed var(--pcb-line); border-radius:12px;
+    padding:14px 18px; margin-bottom:22px; font-size:13.5px; line-height:1.65; color:#B9C4B9;
+  }
+  .howto strong{color:var(--paper);}
+  .howto .chip{display:inline-flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:1px 8px;border-radius:20px;background:rgba(0,0,0,.25);border:1px solid var(--pcb-line);color:var(--phosphor);}
+
+  .toolbar{
+    position:sticky; top:0; z-index:20;
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+    background:rgba(15,27,21,.92); backdrop-filter:blur(6px); border:1px solid var(--pcb-line); border-radius:14px;
+    padding:12px 18px; margin-bottom:22px; box-shadow:0 12px 28px -16px rgba(0,0,0,.6);
+    font-family:'IBM Plex Mono',monospace; font-size:13px;
+  }
+  .toolbar .score span{color:var(--bonus);font-weight:700;font-size:16px;text-shadow:0 0 10px rgba(217,164,65,.4);}
+  .toolbar .btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .tbtn{
+    background:transparent;border:1.5px solid var(--pcb-line);color:#B9C4B9;border-radius:20px;
+    padding:6px 13px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.03em;
+    text-transform:uppercase;cursor:pointer;transition:.15s ease;
+  }
+  .tbtn:hover{background:var(--pcb-light);color:var(--paper);border-color:var(--copper);}
+  .tbtn.primary{background:rgba(111,227,166,.12);border-color:var(--phosphor);color:var(--phosphor);}
+  .tbtn.primary:hover{background:rgba(111,227,166,.22);}
+
+  .table-scroll{
+    overflow-x:auto; border-radius:14px; box-shadow:0 14px 34px -18px rgba(0,0,0,.55);
+    background:var(--pcb-light); border:1px solid var(--pcb-line); padding:4px;
+  }
+  table{border-collapse:separate;border-spacing:0;width:100%;min-width:1020px;}
+  thead th{
+    background:var(--pcb-light); padding:10px 6px 12px; text-align:center; vertical-align:bottom;
+    border-bottom:2px solid var(--pcb-line); position:sticky; top:0; z-index:5;
+  }
+  thead th .gate-icon-wrap{width:36px;height:26px;margin:0 auto 4px;color:var(--copper);}
+  thead th .gate-icon-wrap svg{width:100%;height:100%;}
+  thead th .sym{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:var(--paper);display:block;}
+  thead th .name{font-size:10px;color:#8FA093;text-transform:uppercase;letter-spacing:.03em;display:block;margin-top:3px;}
+  thead th.given .sym{color:var(--copper); font-size:18px;}
+  thead th.given .name{color:var(--copper);}
+  thead th.bonus .name{color:var(--bonus);}
+
+  th.pcol, td.pcol{position:sticky;left:0;z-index:4;}
+  th.qcol, td.qcol{position:sticky;left:56px;z-index:4;}
+  @media (min-width:600px){ th.pcol, td.pcol{left:0;} th.qcol, td.qcol{left:64px;} }
+
+  tbody td{ text-align:center; padding:10px 6px; border-bottom:1px solid var(--pcb-line); background:var(--pcb-light); }
+  tbody tr:nth-child(even) td{background:#132018;}
+  tbody tr:nth-child(even) td.given{background:#1C2B21;}
+
+  td.given{
+    font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:15px;
+    background:#1C2B21; color:var(--copper);
+  }
+
+  /* ================= transparent glass toggle, T left · F right ================= */
+  .cell-wrap{position:relative; display:inline-block;}
+  .toggle{
+    position:relative; width:52px; height:26px; border-radius:20px; cursor:pointer;
+    background:rgba(0,0,0,.28); backdrop-filter:blur(2px);
+    border:1.5px solid var(--warn); display:inline-flex; align-items:center;
+    font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; user-select:none;
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  .toggle .lab{position:absolute; width:50%; text-align:center; transition:opacity .2s ease, color .2s ease;}
+  .toggle .lab.t{left:0; color:var(--phosphor); opacity:.35;}
+  .toggle .lab.f{right:0; color:var(--warn); opacity:1;}
+  .toggle.on .lab.t{opacity:1;}
+  .toggle.on .lab.f{opacity:.35;}
+  .toggle .knob{
+    position:absolute; top:2px; left:28px; width:20px; height:20px; border-radius:50%;
+    background:linear-gradient(180deg,#E0794F,#B5493D); box-shadow:0 1px 4px rgba(0,0,0,.5);
+    transition:left .2s ease, background .2s ease;
+  }
+  .toggle.on{border-color:var(--phosphor); box-shadow:0 0 10px rgba(111,227,166,.35);}
+  .toggle.on .knob{left:2px; background:linear-gradient(180deg,#BFFFE0,#6FE3A6);}
+
+  .cell-wrap.correct .toggle{box-shadow:0 0 0 3px rgba(111,227,166,.3);}
+  .cell-wrap.incorrect .toggle{box-shadow:0 0 0 3px rgba(224,121,79,.3);}
+  .mark{
+    position:absolute; top:-9px; right:-9px; width:18px; height:18px; border-radius:50%;
+    font-size:11px; line-height:18px; text-align:center; font-weight:700; color:#0B140F;
+    opacity:0; transform:scale(.5); transition:all .25s cubic-bezier(.2,1.6,.4,1);
+  }
+  .cell-wrap.correct .mark{opacity:1; transform:scale(1); background:var(--phosphor);}
+  .cell-wrap.incorrect .mark{opacity:1; transform:scale(1); background:var(--warn); color:#fff;}
+
+  .legend{
+    margin-top:26px; background:var(--pcb-light); border:1px solid var(--pcb-line); border-radius:12px;
+    padding:18px 20px;
+  }
+  .legend h3{font-family:'Fraunces',serif; font-weight:600; font-size:16px; margin:0 0 12px; color:var(--phosphor);}
+  .legend-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px 18px; font-size:13px; line-height:1.55; color:#B9C4B9;}
+  .legend-grid .mono{font-family:'IBM Plex Mono',monospace; background:rgba(0,0,0,.3); color:var(--copper); padding:1px 6px; border-radius:4px; margin-right:4px;}
+  .legend-grid strong{color:var(--paper);}
+
+  footer{text-align:center;font-size:11.5px;color:#5C6B60;margin-top:36px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;}
+  footer .ok{color:var(--phosphor);}
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+      <h1 class="page-title">Truth Table Explorer</h1>
+      <p class="sub">Topic 2 — Connectives, all in one table. Nine gates, one board, instant feedback.</p>
+    </div>
+  </div>
+
+<div class="wrap">
+  <div class="howto">
+    <strong>How this works:</strong> the first two columns, <span class="chip">p</span> and <span class="chip">q</span>, are already fixed for you — every possible combination of True and False. Every other column is a switch you set yourself: click a toggle to flip it between <span class="chip">T</span> and <span class="chip">F</span>. Set what <em>you</em> think each connective's result should be for that row, then use the toolbar to check your work.
+  </div>
+
+  <div class="toolbar">
+    <div class="score">Score: <span id="scoreDisplay">0 / 36</span> correct</div>
+    <div class="btns">
+      <button class="tbtn primary" onclick="checkAll()">Check My Answers</button>
+      <button class="tbtn" onclick="revealAll()">Reveal Answers</button>
+      <button class="tbtn" onclick="resetAll()">Reset All</button>
+    </div>
+  </div>
+
+  <div class="table-scroll">
+    <table id="ttable">
+      <thead><tr id="headRow"></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="legend">
+    <h3>Reference — what each connective means</h3>
+    <div class="legend-grid" id="legendGrid"></div>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Topic 2 &nbsp;—&nbsp; <span class="ok">CIRCUIT COMPLETE ✓</span></footer>
+</div>
+
+<script>
+/* ---------- Gate icon library ---------- */
+const GATES = {
+  not: `<svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="6,6 6,42 46,24" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><circle cx="53" cy="24" r="6" stroke="currentColor" stroke-width="4"/></svg>`,
+  and: `<svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8,6 H30 A18,18 0 0 1 30,42 H8 Z" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></svg>`,
+  or: `<svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8,5 Q20,24 8,43 Q40,42 56,24 Q40,6 8,5 Z" stroke="currentColor" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/></svg>`,
+  xor: `<svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8,5 Q20,24 8,43 Q40,42 56,24 Q40,6 8,5 Z" stroke="currentColor" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M2,5 Q14,24 2,43" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>`,
+  imp: `<svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8,5 Q20,24 8,43 Q40,42 56,24 Q40,6 8,5 Z" stroke="currentColor" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="2" cy="13" r="4.5" stroke="currentColor" stroke-width="4"/></svg>`,
+  bicond: `<svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8,5 Q20,24 8,43 Q40,42 56,24 Q40,6 8,5 Z" stroke="currentColor" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M2,5 Q14,24 2,43" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><circle cx="61" cy="24" r="4.5" stroke="currentColor" stroke-width="4"/></svg>`,
+  nand: `<svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8,6 H30 A18,18 0 0 1 30,42 H8 Z" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><circle cx="55" cy="24" r="5.5" stroke="currentColor" stroke-width="4"/></svg>`,
+  nor: `<svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8,5 Q20,24 8,43 Q40,42 56,24 Q40,6 8,5 Z" stroke="currentColor" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="60" cy="24" r="4.5" stroke="currentColor" stroke-width="4"/></svg>`
+};
+
+const rows = [
+  {p:true,  q:true },
+  {p:true,  q:false},
+  {p:false, q:true },
+  {p:false, q:false}
+];
+
+const connectives = [
+  {key:'notp',   gate:'not',    sym:'¬p',   name:'Negation of p',  def:'True exactly when p is False.',                         fn:(p,q)=>!p},
+  {key:'notq',   gate:'not',    sym:'¬q',   name:'Negation of q',  def:'True exactly when q is False.',                         fn:(p,q)=>!q},
+  {key:'and',    gate:'and',    sym:'p∧q',  name:'Conjunction',    def:'True only when both p and q are True.',                 fn:(p,q)=>p&&q},
+  {key:'or',     gate:'or',     sym:'p∨q',  name:'Disjunction',    def:'True when at least one of p, q is True.',               fn:(p,q)=>p||q},
+  {key:'xor',    gate:'xor',    sym:'p⊕q',  name:'Exclusive OR',   def:'True when exactly one of p, q is True.',                fn:(p,q)=>p!==q},
+  {key:'cond',   gate:'imp',    sym:'p→q',  name:'Conditional',    def:'False only when p is True and q is False.',             fn:(p,q)=>(!p)||q},
+  {key:'bicond', gate:'bicond', sym:'p↔q',  name:'Biconditional',  def:'True when p and q share the same truth value.',         fn:(p,q)=>p===q},
+  {key:'nand',   gate:'nand',   sym:'p↑q',  name:'NAND',           def:'True unless both p and q are True. (Opposite of ∧.)',   fn:(p,q)=>!(p&&q), bonus:true},
+  {key:'nor',    gate:'nor',    sym:'p↓q',  name:'NOR',            def:'True only when both p and q are False. (Opposite of ∨.)', fn:(p,q)=>!(p||q), bonus:true}
+];
+
+const TOTAL = rows.length * connectives.length;
+
+// ---------- Build header ----------
+const headRow = document.getElementById('headRow');
+['p','q'].forEach(v=>{
+  const th = document.createElement('th');
+  th.className = 'given ' + (v==='p'?'pcol':'qcol');
+  th.innerHTML = `<span class="sym">${v}</span><span class="name">given</span>`;
+  headRow.appendChild(th);
+});
+connectives.forEach(c=>{
+  const th = document.createElement('th');
+  th.className = c.bonus ? 'bonus' : '';
+  th.title = c.def;
+  th.innerHTML = `<div class="gate-icon-wrap">${GATES[c.gate]}</div><span class="sym">${c.sym}</span><span class="name">${c.name}${c.bonus?' · bonus':''}</span>`;
+  headRow.appendChild(th);
+});
+
+// ---------- Build body ----------
+const tbody = document.getElementById('tbody');
+rows.forEach((r, ri)=>{
+  const tr = document.createElement('tr');
+
+  const tdP = document.createElement('td');
+  tdP.className = 'given pcol';
+  tdP.textContent = r.p ? 'T' : 'F';
+  tr.appendChild(tdP);
+
+  const tdQ = document.createElement('td');
+  tdQ.className = 'given qcol';
+  tdQ.textContent = r.q ? 'T' : 'F';
+  tr.appendChild(tdQ);
+
+  connectives.forEach(c=>{
+    const td = document.createElement('td');
+    const correct = c.fn(r.p, r.q);
+    const wrap = document.createElement('div');
+    wrap.className = 'cell-wrap';
+    wrap.dataset.correct = correct ? '1':'0';
+    wrap.dataset.value = '0';
+    wrap.dataset.row = ri;
+    wrap.dataset.key = c.key;
+    wrap.innerHTML = `
+      <div class="toggle" role="button" tabindex="0" aria-label="Toggle ${c.sym} for row ${ri+1}">
+        <span class="lab t">T</span><span class="lab f">F</span>
+        <span class="knob"></span>
+      </div>
+      <span class="mark"></span>
+    `;
+    const toggleEl = wrap.querySelector('.toggle');
+    const flip = ()=>{
+      const on = wrap.dataset.value === '1';
+      wrap.dataset.value = on ? '0' : '1';
+      toggleEl.classList.toggle('on', !on);
+      wrap.classList.remove('correct','incorrect');
+      wrap.querySelector('.mark').textContent = '';
+      updateScoreLive();
+    };
+    toggleEl.addEventListener('click', flip);
+    toggleEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ flip(); e.preventDefault(); } });
+    td.appendChild(wrap);
+    tr.appendChild(td);
+  });
+
+  tbody.appendChild(tr);
+});
+
+// ---------- Legend ----------
+const legendGrid = document.getElementById('legendGrid');
+connectives.forEach(c=>{
+  const div = document.createElement('div');
+  div.innerHTML = `<span class="mono">${c.sym}</span><strong>${c.name}:</strong> ${c.def}`;
+  legendGrid.appendChild(div);
+});
+
+// ---------- Scoring ----------
+function allWraps(){ return document.querySelectorAll('.cell-wrap'); }
+
+function updateScoreLive(){
+  let correctCount = 0;
+  allWraps().forEach(w=>{ if(w.dataset.value === w.dataset.correct) correctCount++; });
+  document.getElementById('scoreDisplay').textContent = correctCount + ' / ' + TOTAL;
+}
+
+function checkAll(){
+  let correctCount = 0;
+  allWraps().forEach(w=>{
+    const isCorrect = w.dataset.value === w.dataset.correct;
+    w.classList.remove('correct','incorrect');
+    w.classList.add(isCorrect ? 'correct' : 'incorrect');
+    w.querySelector('.mark').textContent = isCorrect ? '✓' : '✗';
+    if(isCorrect) correctCount++;
+  });
+  document.getElementById('scoreDisplay').textContent = correctCount + ' / ' + TOTAL;
+}
+
+function revealAll(){
+  allWraps().forEach(w=>{
+    w.dataset.value = w.dataset.correct;
+    const on = w.dataset.correct === '1';
+    w.querySelector('.toggle').classList.toggle('on', on);
+    w.classList.remove('correct','incorrect');
+    w.classList.add('correct');
+    w.querySelector('.mark').textContent = '✓';
+  });
+  document.getElementById('scoreDisplay').textContent = TOTAL + ' / ' + TOTAL;
+}
+
+function resetAll(){
+  allWraps().forEach(w=>{
+    w.dataset.value = '0';
+    w.querySelector('.toggle').classList.remove('on');
+    w.classList.remove('correct','incorrect');
+    w.querySelector('.mark').textContent = '';
+  });
+  document.getElementById('scoreDisplay').textContent = '0 / ' + TOTAL;
+}
+</script>
+</body>
+</html>

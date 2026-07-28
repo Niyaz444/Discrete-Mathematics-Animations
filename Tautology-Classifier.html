@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tautology, Contradiction, or Contingency? · Tautologies, Logic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+    --given:#EAE7DA;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);font-family:'IBM Plex Sans',sans-serif;color:var(--ink);padding:32px 16px 70px;}
+  .wrap{max-width:840px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(23px,4.5vw,33px);margin:0 0 6px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14.5px;margin:0 auto 26px;max-width:620px;line-height:1.6;}
+
+  .howto{
+    background:#fff;border:1px dashed var(--line);border-radius:12px;
+    padding:14px 18px;margin-bottom:22px;font-size:13.5px;line-height:1.65;color:var(--ink-soft);
+    box-shadow:0 6px 16px -12px rgba(28,43,51,.35);
+  }
+  .howto strong{color:var(--ink);}
+
+  .toolbar{
+    position:sticky; top:10px; z-index:20;
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+    background:var(--ink); color:#F4F2EA; border-radius:14px; padding:12px 18px; margin-bottom:24px;
+    box-shadow:0 12px 28px -16px rgba(28,43,51,.6);
+    font-family:'IBM Plex Mono',monospace; font-size:13px;
+  }
+  .toolbar .score span{color:var(--gold);font-weight:700;font-size:16px;}
+  .toolbar .btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .tbtn{
+    background:transparent;border:1.5px solid #F4F2EA;color:#F4F2EA;border-radius:20px;
+    padding:6px 13px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.03em;
+    text-transform:uppercase;cursor:pointer;transition:.15s ease;
+  }
+  .tbtn:hover{background:#F4F2EA;color:var(--ink);}
+  .tbtn.primary{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .tbtn.primary:hover{background:#256150;}
+
+  .f-card{
+    background:var(--card); border-radius:14px; padding:18px 20px; margin-bottom:16px;
+    border:1.5px solid rgba(28,43,51,.08); box-shadow:0 8px 20px -14px rgba(28,43,51,.4);
+    transition:border-color .25s ease, background .25s ease;
+  }
+  .f-card.correct{border-color:var(--teal); background:#F3FAF7;}
+  .f-card.incorrect{border-color:var(--brick); background:#FCF3F2;}
+
+  .f-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+  .f-num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);}
+  .f-name{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:700;color:var(--ink);}
+
+  table.mini{border-collapse:separate;border-spacing:0;margin-bottom:14px;}
+  table.mini th, table.mini td{padding:6px 12px;text-align:center;border-bottom:1px solid var(--line);}
+  table.mini th{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.04em;
+    color:var(--ink-soft);border-bottom:2px solid var(--ink);
+  }
+  table.mini th.res, table.mini td.res{border-left:1.5px solid var(--line);}
+  table.mini td.given{font-family:'IBM Plex Mono',monospace;font-weight:700;background:var(--given);}
+  table.mini tr:nth-child(even) td.given{background:#DEDACB;}
+
+  .toggle{
+    position:relative; width:50px; height:26px; border-radius:20px; cursor:pointer;
+    background:#E4E0D2; border:1.5px solid var(--line); display:inline-flex; align-items:center;
+    font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; user-select:none;
+    transition:background .2s ease, border-color .2s ease;
+  }
+  .toggle .lab{position:absolute; width:50%; text-align:center; transition:opacity .2s ease, color .2s ease;}
+  .toggle .lab.f{left:0; color:var(--brick);}
+  .toggle .lab.t{right:0; color:var(--teal); opacity:.35;}
+  .toggle.on .lab.t{opacity:1;}
+  .toggle.on .lab.f{opacity:.35;}
+  .toggle .knob{
+    position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%;
+    background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.35); transition:left .2s ease;
+  }
+  .toggle.on{background:#DCEFE9; border-color:var(--teal);}
+  .toggle.on .knob{left:26px;}
+  .toggle:not(.on){background:#F6E4E0; border-color:var(--brick);}
+  .cell-wrap{position:relative; display:inline-block;}
+  .cell-wrap.ok .toggle{box-shadow:0 0 0 3px rgba(47,122,102,.35);}
+  .cell-wrap.bad .toggle{box-shadow:0 0 0 3px rgba(181,73,61,.35);}
+  .mark{
+    position:absolute; top:-9px; right:-9px; width:17px; height:17px; border-radius:50%;
+    font-size:10px; line-height:17px; text-align:center; font-weight:700; color:#fff;
+    opacity:0; transform:scale(.5); transition:all .25s cubic-bezier(.2,1.6,.4,1);
+  }
+  .cell-wrap.ok .mark{opacity:1; transform:scale(1); background:var(--teal);}
+  .cell-wrap.bad .mark{opacity:1; transform:scale(1); background:var(--brick);}
+
+  .classify-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .control-label{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);}
+  .seg{display:inline-flex;border:1.5px solid var(--line);border-radius:20px;overflow:hidden;background:#F6F4EC;}
+  .seg button{
+    border:none;background:transparent;padding:7px 13px;font-family:'IBM Plex Sans',sans-serif;
+    font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ink-soft);transition:.15s ease;
+  }
+  .seg button.sel{background:var(--ink);color:#fff;}
+  .seg button.sel.taut-sel{background:var(--teal);}
+  .seg button.sel.contra-sel{background:var(--brick);}
+  .seg button.sel.conting-sel{background:var(--gold);}
+  .result-icon{width:20px;height:20px;border-radius:50%;font-size:12px;line-height:20px;text-align:center;font-weight:700;color:#fff;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .result-icon.show{opacity:1;transform:scale(1);}
+  .result-icon.ok{background:var(--teal);}
+  .result-icon.bad{background:var(--brick);}
+
+  .explain{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .explain.show{max-height:200px;opacity:1;margin-top:12px;}
+  .explain-inner{border-top:1px dashed var(--line);padding-top:10px;font-size:13.5px;line-height:1.6;color:var(--ink-soft);}
+  .explain-inner strong{color:var(--ink);}
+
+  .legend{
+    margin-top:28px; background:#fff; border-left:4px solid var(--teal); border-radius:0 10px 10px 0;
+    padding:16px 18px; box-shadow:0 6px 16px -12px rgba(28,43,51,.4); font-size:13.5px; line-height:1.7;
+  }
+  .legend h3{font-family:'Fraunces',serif; font-weight:600; font-size:16px; margin:0 0 8px; color:var(--teal);}
+  .legend ul{margin:0;padding-left:20px;}
+  .legend li{margin-bottom:4px;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:36px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Tautology, Contradiction, or Contingency?</h1>
+  <p class="sub">Topic 3 — Tautologies, Logic</p>
+
+  <div class="howto">
+    <strong>How this works:</strong> for each formula, the variable columns are fixed (all combinations of True/False). Your job: fill in the <strong>Result</strong> column yourself, row by row, by clicking each toggle. Once every row is filled in, use the classification switch below the table to decide — is the whole formula a <strong>Tautology</strong>, a <strong>Contradiction</strong>, or a <strong>Contingency</strong>? Then check your work.
+  </div>
+
+  <div class="toolbar">
+    <div class="score">Score: <span id="scoreDisplay">0 / 0</span> correct</div>
+    <div class="btns">
+      <button class="tbtn primary" onclick="checkAll()">Check My Answers</button>
+      <button class="tbtn" onclick="revealAll()">Reveal Answers</button>
+      <button class="tbtn" onclick="resetAll()">Reset All</button>
+    </div>
+  </div>
+
+  <div id="list"></div>
+
+  <div class="legend">
+    <h3>Reference — the three classifications</h3>
+    <ul>
+      <li><strong>Tautology</strong> — True in every row of the truth table, no matter the inputs.</li>
+      <li><strong>Contradiction</strong> (fallacy) — False in every row, no matter the inputs.</li>
+      <li><strong>Contingency</strong> — True in some rows, False in others; genuinely depends on the inputs.</li>
+      <li>A formula is <strong>satisfiable</strong> if it's True in at least one row — every tautology and every contingency qualifies. Only contradictions are unsatisfiable.</li>
+    </ul>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Topic 3 — Tautology, Contradiction, or Contingency?</footer>
+</div>
+
+<script>
+const formulas = [
+  {name:'p ∨ ¬p', vars:2, fn:(p,q,r)=> p || !p, cls:'Tautology',
+    why:'The Law of Excluded Middle. One of p, ¬p is always True, so the "or" is always satisfied.'},
+  {name:'p ∧ ¬p', vars:2, fn:(p,q,r)=> p && !p, cls:'Contradiction',
+    why:'The Law of Non-Contradiction. p and ¬p never agree, so the "and" always fails.'},
+  {name:'p → p', vars:2, fn:(p,q,r)=> (!p) || p, cls:'Tautology',
+    why:'Antecedent and consequent are identical — the conditional can never be broken.'},
+  {name:'p ∧ q', vars:2, fn:(p,q,r)=> p && q, cls:'Contingency',
+    why:'True only in the TT row, False in the other three — genuinely depends on the inputs.'},
+  {name:'p ↔ ¬p', vars:2, fn:(p,q,r)=> p === !p, cls:'Contradiction',
+    why:'p and ¬p never share a truth value, so the biconditional fails in every row.'},
+  {name:'(p ∧ q) → p', vars:2, fn:(p,q,r)=> (!(p&&q)) || p, cls:'Tautology',
+    why:'Whenever p∧q is True, p is certainly True too — the implication can never fail.'},
+  {name:'p ∨ q', vars:2, fn:(p,q,r)=> p || q, cls:'Contingency',
+    why:'False only when both are False, True in the other three rows — depends on the inputs.'},
+  {name:'((p → q) ∧ p) → q', vars:2, fn:(p,q,r)=> (!(( (!p)||q ) && p)) || q, cls:'Tautology',
+    why:'The Modus Ponens pattern — whenever p→q and p both hold, q must hold. Never fails.'},
+  {name:'(p ∧ q ∧ r) → p', vars:3, fn:(p,q,r)=> (!(p&&q&&r)) || p, cls:'Tautology',
+    why:'Whenever all three are True, p is certainly True — the implication can never be broken, even with three variables.'},
+  {name:'(p ∨ q ∨ r) ∧ ¬p ∧ ¬q ∧ ¬r', vars:3, fn:(p,q,r)=> (p||q||r) && !p && !q && !r, cls:'Contradiction',
+    why:'¬p ∧ ¬q ∧ ¬r forces all three False, which directly contradicts p∨q∨r needing at least one True. No row can satisfy both halves at once.'}
+];
+
+function rowsFor(vars){
+  const rows = [];
+  if(vars===2){
+    [true,false].forEach(p=>{ [true,false].forEach(q=>{ rows.push({p,q,r:null}); }); });
+  } else {
+    [true,false].forEach(p=>{ [true,false].forEach(q=>{ [true,false].forEach(r=>{ rows.push({p,q,r}); }); }); });
+  }
+  return rows;
+}
+
+const listEl = document.getElementById('list');
+let TOTAL = 0;
+
+formulas.forEach((f, fi)=>{
+  const rows = rowsFor(f.vars);
+  const card = document.createElement('div');
+  card.className = 'f-card';
+  card.dataset.idx = fi;
+
+  let tableHtml = `<table class="mini"><thead><tr>`;
+  tableHtml += `<th>p</th><th>q</th>`;
+  if(f.vars===3) tableHtml += `<th>r</th>`;
+  tableHtml += `<th class="res">Result</th></tr></thead><tbody>`;
+
+  rows.forEach((row, ri)=>{
+    const correct = f.fn(row.p, row.q, row.r);
+    tableHtml += `<tr>`;
+    tableHtml += `<td class="given">${row.p?'T':'F'}</td><td class="given">${row.q?'T':'F'}</td>`;
+    if(f.vars===3) tableHtml += `<td class="given">${row.r?'T':'F'}</td>`;
+    tableHtml += `<td class="res"><div class="cell-wrap" data-correct="${correct?'1':'0'}" data-row="${ri}">
+        <div class="toggle" role="button" aria-label="row ${ri+1} result">
+          <span class="lab f">F</span><span class="lab t">T</span><span class="knob"></span>
+        </div>
+        <span class="mark"></span>
+      </div></td>`;
+    tableHtml += `</tr>`;
+    TOTAL++;
+  });
+  tableHtml += `</tbody></table>`;
+
+  card.innerHTML = `
+    <div class="f-head">
+      <span class="f-num">Formula ${fi+1} — ${f.vars} variables</span>
+      <span class="f-name">${f.name}</span>
+    </div>
+    ${tableHtml}
+    <div class="classify-row">
+      <span class="control-label">Classification?</span>
+      <div class="seg" data-role="classify">
+        <button data-val="Tautology" type="button">Tautology</button>
+        <button data-val="Contradiction" type="button">Contradiction</button>
+        <button data-val="Contingency" type="button">Contingency</button>
+      </div>
+      <span class="result-icon" data-icon="classify"></span>
+    </div>
+    <div class="explain"><div class="explain-inner"><strong>Why:</strong> ${f.why}</div></div>
+  `;
+  listEl.appendChild(card);
+  TOTAL++; // classification adjuster
+
+  // wire row toggles
+  card.querySelectorAll('.cell-wrap').forEach(wrap=>{
+    wrap.dataset.value = '0';
+    wrap.querySelector('.toggle').addEventListener('click', ()=>{
+      const on = wrap.dataset.value === '1';
+      wrap.dataset.value = on ? '0' : '1';
+      wrap.querySelector('.toggle').classList.toggle('on', !on);
+      wrap.classList.remove('ok','bad');
+      wrap.querySelector('.mark').textContent = '';
+      card.classList.remove('correct','incorrect');
+      updateScoreLive();
+    });
+  });
+
+  // wire classification segment
+  const seg = card.querySelector('[data-role="classify"]');
+  seg.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','taut-sel','contra-sel','conting-sel'));
+      btn.classList.add('sel');
+      if(btn.dataset.val==='Tautology') btn.classList.add('taut-sel');
+      if(btn.dataset.val==='Contradiction') btn.classList.add('contra-sel');
+      if(btn.dataset.val==='Contingency') btn.classList.add('conting-sel');
+      seg.dataset.value = btn.dataset.val;
+      card.classList.remove('correct','incorrect');
+      card.querySelector('[data-icon="classify"]').classList.remove('show','ok','bad');
+      card.querySelector('[data-icon="classify"]').textContent = '';
+      card.querySelector('.explain').classList.remove('show');
+      updateScoreLive();
+    });
+  });
+});
+
+document.getElementById('scoreDisplay').textContent = '0 / ' + TOTAL;
+
+function countScore(){
+  let correct = 0;
+  document.querySelectorAll('.cell-wrap').forEach(w=>{
+    if(w.dataset.value === w.dataset.correct) correct++;
+  });
+  formulas.forEach((f, fi)=>{
+    const card = listEl.children[fi];
+    const seg = card.querySelector('[data-role="classify"]');
+    if(seg.dataset.value === f.cls) correct++;
+  });
+  return correct;
+}
+
+function updateScoreLive(){
+  document.getElementById('scoreDisplay').textContent = countScore() + ' / ' + TOTAL;
+}
+
+function checkAll(){
+  document.querySelectorAll('.cell-wrap').forEach(w=>{
+    const isCorrect = w.dataset.value === w.dataset.correct;
+    w.classList.remove('ok','bad');
+    w.classList.add(isCorrect?'ok':'bad');
+    w.querySelector('.mark').textContent = isCorrect ? '✓':'✗';
+  });
+  formulas.forEach((f, fi)=>{
+    const card = listEl.children[fi];
+    const seg = card.querySelector('[data-role="classify"]');
+    const icon = card.querySelector('[data-icon="classify"]');
+    const isCorrect = seg.dataset.value === f.cls;
+    let anyRowWrong = false;
+    card.querySelectorAll('.cell-wrap').forEach(w=>{ if(w.dataset.value !== w.dataset.correct) anyRowWrong = true; });
+    if(seg.dataset.value !== undefined){
+      icon.classList.add('show', isCorrect?'ok':'bad');
+      icon.textContent = isCorrect ? '✓':'✗';
+    }
+    card.classList.remove('correct','incorrect');
+    card.classList.add((isCorrect && !anyRowWrong) ? 'correct':'incorrect');
+    card.querySelector('.explain').classList.add('show');
+  });
+  updateScoreLive();
+}
+
+function revealAll(){
+  formulas.forEach((f, fi)=>{
+    const card = listEl.children[fi];
+    card.querySelectorAll('.cell-wrap').forEach(w=>{
+      w.dataset.value = w.dataset.correct;
+      w.querySelector('.toggle').classList.toggle('on', w.dataset.correct==='1');
+      w.classList.remove('ok','bad');
+      w.classList.add('ok');
+      w.querySelector('.mark').textContent = '✓';
+    });
+    const seg = card.querySelector('[data-role="classify"]');
+    seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','taut-sel','contra-sel','conting-sel'));
+    const btn = seg.querySelector(`button[data-val="${f.cls}"]`);
+    btn.classList.add('sel');
+    if(f.cls==='Tautology') btn.classList.add('taut-sel');
+    if(f.cls==='Contradiction') btn.classList.add('contra-sel');
+    if(f.cls==='Contingency') btn.classList.add('conting-sel');
+    seg.dataset.value = f.cls;
+    const icon = card.querySelector('[data-icon="classify"]');
+    icon.classList.add('show','ok');
+    icon.textContent = '✓';
+    card.classList.remove('incorrect');
+    card.classList.add('correct');
+    card.querySelector('.explain').classList.add('show');
+  });
+  document.getElementById('scoreDisplay').textContent = TOTAL + ' / ' + TOTAL;
+}
+
+function resetAll(){
+  document.querySelectorAll('.cell-wrap').forEach(w=>{
+    w.dataset.value = '0';
+    w.querySelector('.toggle').classList.remove('on');
+    w.classList.remove('ok','bad');
+    w.querySelector('.mark').textContent = '';
+  });
+  formulas.forEach((f, fi)=>{
+    const card = listEl.children[fi];
+    card.classList.remove('correct','incorrect');
+    const seg = card.querySelector('[data-role="classify"]');
+    delete seg.dataset.value;
+    seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','taut-sel','contra-sel','conting-sel'));
+    const icon = card.querySelector('[data-icon="classify"]');
+    icon.classList.remove('show','ok','bad');
+    icon.textContent = '';
+    card.querySelector('.explain').classList.remove('show');
+  });
+  document.getElementById('scoreDisplay').textContent = '0 / ' + TOTAL;
+}
+</script>
+</body>
+</html>

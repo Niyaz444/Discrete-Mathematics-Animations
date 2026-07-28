@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statement or Not? · Statements &amp; Notation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);font-family:'IBM Plex Sans',sans-serif;color:var(--ink);padding:32px 16px 70px;}
+  .wrap{max-width:760px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(24px,4.5vw,34px);margin:0 0 6px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14.5px;margin:0 auto 26px;max-width:600px;line-height:1.6;}
+
+  .howto{
+    background:#fff;border:1px dashed var(--line);border-radius:12px;
+    padding:14px 18px;margin-bottom:22px;font-size:13.5px;line-height:1.65;color:var(--ink-soft);
+    box-shadow:0 6px 16px -12px rgba(28,43,51,.35);
+  }
+  .howto strong{color:var(--ink);}
+
+  .toolbar{
+    position:sticky; top:10px; z-index:20;
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+    background:var(--ink); color:#F4F2EA; border-radius:14px; padding:12px 18px; margin-bottom:24px;
+    box-shadow:0 12px 28px -16px rgba(28,43,51,.6);
+    font-family:'IBM Plex Mono',monospace; font-size:13px;
+  }
+  .toolbar .score span{color:var(--gold);font-weight:700;font-size:16px;}
+  .toolbar .btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .tbtn{
+    background:transparent;border:1.5px solid #F4F2EA;color:#F4F2EA;border-radius:20px;
+    padding:6px 13px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.03em;
+    text-transform:uppercase;cursor:pointer;transition:.15s ease;
+  }
+  .tbtn:hover{background:#F4F2EA;color:var(--ink);}
+  .tbtn.primary{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .tbtn.primary:hover{background:#256150;}
+
+  .s-card{
+    background:var(--card); border-radius:14px; padding:18px 20px; margin-bottom:14px;
+    border:1.5px solid rgba(28,43,51,.08); box-shadow:0 8px 20px -14px rgba(28,43,51,.4);
+    transition:border-color .25s ease, background .25s ease;
+  }
+  .s-card.correct{border-color:var(--teal); background:#F3FAF7;}
+  .s-card.incorrect{border-color:var(--brick); background:#FCF3F2;}
+
+  .s-num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);margin-bottom:4px;}
+  .s-text{font-size:16px;line-height:1.5;margin:0 0 14px;font-family:'Fraunces',serif;font-weight:500;color:var(--ink);}
+  .s-text .mono{font-family:'IBM Plex Mono',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;font-size:14px;}
+
+  .control-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
+  .control-label{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);min-width:98px;}
+
+  .seg{display:inline-flex;border:1.5px solid var(--line);border-radius:20px;overflow:hidden;background:#F6F4EC;}
+  .seg button{
+    border:none;background:transparent;padding:7px 14px;font-family:'IBM Plex Sans',sans-serif;
+    font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ink-soft);transition:.15s ease;
+  }
+  .seg button.sel{background:var(--ink);color:#fff;}
+  .seg button.sel.true-sel{background:var(--teal);}
+  .seg button.sel.false-sel{background:var(--brick);}
+
+  .na-note{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);font-style:italic;}
+  .unknown-tag{font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;background:var(--gold);color:#fff;padding:2px 7px;border-radius:20px;margin-left:6px;}
+
+  .result-icon{width:20px;height:20px;border-radius:50%;font-size:12px;line-height:20px;text-align:center;font-weight:700;color:#fff;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .result-icon.show{opacity:1;transform:scale(1);}
+  .result-icon.ok{background:var(--teal);}
+  .result-icon.bad{background:var(--brick);}
+  .result-icon.neutral{background:var(--gold);}
+
+  .explain{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .explain.show{max-height:200px;opacity:1;margin-top:10px;}
+  .explain-inner{border-top:1px dashed var(--line);padding-top:10px;font-size:13.5px;line-height:1.6;color:var(--ink-soft);}
+  .explain-inner strong{color:var(--ink);}
+
+  .legend{
+    margin-top:30px; background:#fff; border-left:4px solid var(--teal); border-radius:0 10px 10px 0;
+    padding:16px 18px; box-shadow:0 6px 16px -12px rgba(28,43,51,.4); font-size:13.5px; line-height:1.7;
+  }
+  .legend h3{font-family:'Fraunces',serif; font-weight:600; font-size:16px; margin:0 0 8px; color:var(--teal);}
+  .legend ul{margin:0;padding-left:20px;}
+  .legend li{margin-bottom:4px;}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:36px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Statement or Not?</h1>
+  <p class="sub">Topic 1 — Introduction: Statements &amp; Notation</p>
+
+  <div class="howto">
+    <strong>How this works:</strong> read each sentence and set the adjusters yourself. First decide: is it a <strong>Statement</strong> or <strong>Not a Statement</strong>? If it is a statement, a second adjuster appears — decide whether it's <strong>True</strong> or <strong>False</strong>. Some sentences don't need a truth value at all; a couple of tricky ones are statements whose truth value nobody actually knows — those are marked and don't count toward your score, but think about them anyway.
+  </div>
+
+  <div class="toolbar">
+    <div class="score">Score: <span id="scoreDisplay">0 / 0</span> correct</div>
+    <div class="btns">
+      <button class="tbtn primary" onclick="checkAll()">Check My Answers</button>
+      <button class="tbtn" onclick="revealAll()">Reveal Answers</button>
+      <button class="tbtn" onclick="resetAll()">Reset All</button>
+    </div>
+  </div>
+
+  <div id="list"></div>
+
+  <div class="legend">
+    <h3>Reference — is it a statement?</h3>
+    <ul>
+      <li>A <strong>statement</strong> is a declarative sentence with exactly one truth value — True or False, never both, never neither.</li>
+      <li>Questions, commands, and exclamations are <strong>never</strong> statements — nothing to check.</li>
+      <li>Sentences with a free variable (like <span class="mono" style="font-family:'IBM Plex Mono',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;">x + 5 = 12</span>) are <strong>open sentences</strong>, not statements, until the variable is fixed.</li>
+      <li>Opinions are <strong>not</strong> statements — no shared, objective test decides them.</li>
+      <li>A self-referential sentence that flips its own truth value (a paradox) is <strong>not</strong> a statement.</li>
+      <li>A statement only needs a truth value <strong>in principle</strong> — "currently unknown to us" is still a statement, just one we can't yet score.</li>
+    </ul>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Topic 1 — Statement or Not?</footer>
+</div>
+
+<script>
+const items = [
+  {text:'"New Delhi is the capital of India."', isStatement:true, truth:true,
+    why:'A checkable, declarative claim — and it happens to be True.'},
+  {text:'"2 + 2 = 5"', isStatement:true, truth:false,
+    why:'Declarative and checkable — just False. A false claim is still a statement.'},
+  {text:'"Close the door."', isStatement:false,
+    why:'A command. There is nothing here to check — no truth value applies.'},
+  {text:'"What time is it?"', isStatement:false,
+    why:'A question asks rather than asserts, so it has no truth value.'},
+  {text:'"x + 5 = 12"', isStatement:false,
+    why:'A free variable <span class="mono" style="font-family:\'IBM Plex Mono\',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;">x</span> with no fixed value — an open sentence, not yet a statement.'},
+  {text:'"This statement is false."', isStatement:false,
+    why:'The Liar Paradox. Assuming True forces False, assuming False forces True — no consistent truth value exists.'},
+  {text:'"The sun rises in the east."', isStatement:true, truth:true,
+    why:'Declarative, checkable, and True.'},
+  {text:'"All prime numbers are odd numbers."', isStatement:true, truth:false,
+    why:'Declarative and checkable — but False, since 2 is prime and even. One counterexample is enough.'},
+  {text:'"Please submit your assignment by Friday."', isStatement:false,
+    why:'A request/command — it directs an action rather than asserting a fact.'},
+  {text:'"Wow, what a beautiful sunset!"', isStatement:false,
+    why:'An exclamation expressing feeling, not a checkable claim.'},
+  {text:'"There is life on other planets."', isStatement:true, unknown:true,
+    why:'This is a statement — it has a definite truth value in principle — but nobody currently knows whether it\'s True or False. "Unknown to us" is not the same as "not a statement."'},
+  {text:'"9 is a prime number."', isStatement:true, truth:false,
+    why:'Declarative and checkable — False, since 9 = 3 × 3.'},
+  {text:'"Mathematics is the most beautiful subject."', isStatement:false,
+    why:'An opinion. No shared, objective test decides it, so it never enters the statement calculus.'},
+  {text:'"Every even number greater than 2 is the sum of two primes."', isStatement:true, unknown:true,
+    why:'This is the Goldbach Conjecture — a genuine statement with a fixed truth value, but one mathematicians still haven\'t proven True or False after centuries of trying.'},
+  {text:'"Water boils at 100°C at sea level."', isStatement:true, truth:true,
+    why:'Declarative, checkable, and True under standard conditions.'},
+  {text:'"y − 3 = 10"', isStatement:false,
+    why:'Another open sentence — <span class="mono" style="font-family:\'IBM Plex Mono\',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;">y</span> is unfixed, so no truth value exists yet.'},
+  {text:'"How far is the Moon from Earth?"', isStatement:false,
+    why:'A question — it requests information rather than asserting a fact.'},
+  {text:'"The square root of 4 is 5."', isStatement:true, truth:false,
+    why:'Declarative and checkable — False, since the square root of 4 is 2.'},
+  {text:'"All squares are rectangles."', isStatement:true, truth:true,
+    why:'Declarative, checkable, and True — every square satisfies a rectangle\'s definition.'},
+  {text:'"n² ≥ 0 for every integer n."', isStatement:true, truth:true,
+    why:'Declarative and checkable — True for every integer, since a square can never be negative. (This kind of "for every..." sentence is exactly what quantifiers will let us write formally, later in this module.)'}
+];
+
+const listEl = document.getElementById('list');
+let TOTAL = 0;
+
+items.forEach((item, idx)=>{
+  const card = document.createElement('div');
+  card.className = 's-card';
+  card.dataset.idx = idx;
+
+  let html = `
+    <div class="s-num">Sentence ${idx+1}</div>
+    <p class="s-text">${item.text}</p>
+    <div class="control-row">
+      <span class="control-label">Statement?</span>
+      <div class="seg" data-role="isstatement">
+        <button data-val="1" type="button">Statement</button>
+        <button data-val="0" type="button">Not a Statement</button>
+      </div>
+      <span class="result-icon" data-icon="isstatement"></span>
+    </div>
+  `;
+  TOTAL++;
+
+  if(item.isStatement){
+    if(item.unknown){
+      html += `
+      <div class="control-row">
+        <span class="control-label">Truth value?<span class="unknown-tag">unscored</span></span>
+        <div class="seg" data-role="truth">
+          <button data-val="1" type="button">True</button>
+          <button data-val="0" type="button">False</button>
+        </div>
+        <span class="result-icon" data-icon="truth"></span>
+      </div>`;
+    } else {
+      html += `
+      <div class="control-row">
+        <span class="control-label">Truth value?</span>
+        <div class="seg" data-role="truth">
+          <button data-val="1" type="button">True</button>
+          <button data-val="0" type="button">False</button>
+        </div>
+        <span class="result-icon" data-icon="truth"></span>
+      </div>`;
+      TOTAL++;
+    }
+  } else {
+    html += `
+      <div class="control-row">
+        <span class="control-label">Truth value?</span>
+        <span class="na-note">N/A — doesn't apply to non-statements</span>
+      </div>`;
+  }
+
+  html += `<div class="explain"><div class="explain-inner"><strong>Why:</strong> ${item.why}</div></div>`;
+
+  card.innerHTML = html;
+  listEl.appendChild(card);
+
+  // wire up segmented controls
+  card.querySelectorAll('.seg').forEach(seg=>{
+    seg.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','true-sel','false-sel'));
+        btn.classList.add('sel');
+        if(seg.dataset.role==='truth'){
+          btn.classList.add(btn.dataset.val==='1' ? 'true-sel':'false-sel');
+        }
+        seg.dataset.value = btn.dataset.val;
+        card.classList.remove('correct','incorrect');
+        card.querySelectorAll('.result-icon').forEach(ic=>{ic.classList.remove('show','ok','bad','neutral'); ic.textContent='';});
+        card.querySelector('.explain').classList.remove('show');
+        updateScoreLive();
+      });
+    });
+  });
+});
+
+document.getElementById('scoreDisplay').textContent = '0 / ' + TOTAL;
+
+function evaluateCard(card, reveal){
+  const item = items[card.dataset.idx];
+  let allGradedCorrect = true;
+  let anyGraded = false;
+  let anyWrong = false;
+
+  const isSeg = card.querySelector('[data-role="isstatement"]');
+  const isIcon = card.querySelector('[data-icon="isstatement"]');
+  if(isSeg.dataset.value !== undefined || reveal){
+    anyGraded = true;
+    const chosen = reveal ? (item.isStatement?'1':'0') : isSeg.dataset.value;
+    if(reveal){
+      isSeg.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
+      isSeg.querySelector(`button[data-val="${chosen}"]`).classList.add('sel');
+      isSeg.dataset.value = chosen;
+    }
+    const correct = chosen === (item.isStatement?'1':'0');
+    isIcon.classList.add('show', correct?'ok':'bad');
+    isIcon.textContent = correct ? '✓':'✗';
+    if(!correct){ anyWrong = true; }
+  }
+
+  const truthSeg = card.querySelector('[data-role="truth"]');
+  if(truthSeg){
+    const truthIcon = card.querySelector('[data-icon="truth"]');
+    if(item.unknown){
+      if(truthSeg.dataset.value !== undefined || reveal){
+        if(reveal){ /* leave as-is, no single correct answer */ }
+        truthIcon.classList.add('show','neutral');
+        truthIcon.textContent = '?';
+      }
+    } else {
+      if(truthSeg.dataset.value !== undefined || reveal){
+        anyGraded = true;
+        const chosen = reveal ? (item.truth?'1':'0') : truthSeg.dataset.value;
+        if(reveal){
+          truthSeg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','true-sel','false-sel'));
+          const btn = truthSeg.querySelector(`button[data-val="${chosen}"]`);
+          btn.classList.add('sel', chosen==='1'?'true-sel':'false-sel');
+          truthSeg.dataset.value = chosen;
+        }
+        const correct = chosen === (item.truth?'1':'0');
+        truthIcon.classList.add('show', correct?'ok':'bad');
+        truthIcon.textContent = correct ? '✓':'✗';
+        if(!correct){ anyWrong = true; }
+      }
+    }
+  }
+
+  if(anyGraded){
+    card.classList.remove('correct','incorrect');
+    card.classList.add(anyWrong ? 'incorrect':'correct');
+  }
+  card.querySelector('.explain').classList.add('show');
+}
+
+function countScore(){
+  let correct = 0;
+  items.forEach((item, idx)=>{
+    const card = listEl.children[idx];
+    const isSeg = card.querySelector('[data-role="isstatement"]');
+    if(isSeg.dataset.value !== undefined && isSeg.dataset.value === (item.isStatement?'1':'0')) correct++;
+    if(item.isStatement && !item.unknown){
+      const truthSeg = card.querySelector('[data-role="truth"]');
+      if(truthSeg && truthSeg.dataset.value !== undefined && truthSeg.dataset.value === (item.truth?'1':'0')) correct++;
+    }
+  });
+  return correct;
+}
+
+function updateScoreLive(){
+  document.getElementById('scoreDisplay').textContent = countScore() + ' / ' + TOTAL;
+}
+
+function checkAll(){
+  Array.from(listEl.children).forEach(card=>evaluateCard(card, false));
+  updateScoreLive();
+}
+
+function revealAll(){
+  Array.from(listEl.children).forEach(card=>evaluateCard(card, true));
+  document.getElementById('scoreDisplay').textContent = TOTAL + ' / ' + TOTAL;
+}
+
+function resetAll(){
+  Array.from(listEl.children).forEach(card=>{
+    card.classList.remove('correct','incorrect');
+    card.querySelectorAll('.seg').forEach(seg=>{
+      delete seg.dataset.value;
+      seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','true-sel','false-sel'));
+    });
+    card.querySelectorAll('.result-icon').forEach(ic=>{ic.classList.remove('show','ok','bad','neutral'); ic.textContent='';});
+    card.querySelector('.explain').classList.remove('show');
+  });
+  document.getElementById('scoreDisplay').textContent = '0 / ' + TOTAL;
+}
+</script>
+</body>
+</html>

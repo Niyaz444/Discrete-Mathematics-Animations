@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Laws of Statement Calculus — A Story</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pcb:#0F1B15; --pcb-light:#17251D; --pcb-line:#25392C;
+    --copper:#C08552; --phosphor:#6FE3A6; --warn:#E0794F; --bonus:#D9A441;
+    --paper:#F3EEDF; --ink:#211C12; --ink-soft:#6B6250;
+    --purple:#8B6FC9; --mistake:#C1608A;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;background:var(--pcb);color:var(--paper);font-family:'IBM Plex Sans',sans-serif;
+    padding:0 0 100px;line-height:1.6;
+    background-image:radial-gradient(circle at 1px 1px, rgba(111,227,166,0.05) 1px, transparent 0);
+    background-size:26px 26px;
+  }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  ::selection{background:var(--phosphor);color:var(--pcb);}
+  a:focus-visible, button:focus-visible, .toggle:focus-visible{outline:2px solid var(--phosphor); outline-offset:3px;}
+
+  .wrap{max-width:800px;margin:0 auto;padding:0 16px;}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative; padding:52px 16px 38px; text-align:center; overflow:hidden; border-bottom:1px solid var(--pcb-line); background:linear-gradient(180deg,#0B1410 0%, var(--pcb) 100%);}
+  .hero::before{content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+    background-image:linear-gradient(var(--pcb-line) 1px, transparent 1px), linear-gradient(90deg, var(--pcb-line) 1px, transparent 1px);
+    background-size:44px 44px; mask-image:radial-gradient(ellipse at center, black 0%, transparent 72%);}
+  .hero-inner{position:relative;z-index:1;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:14px;}
+  .hero-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(28px,6.5vw,48px);margin:0 0 12px;color:var(--paper);text-shadow:0 0 30px rgba(111,227,166,.22);letter-spacing:-.01em;}
+  .hero-sub{font-size:15px;color:#B9C4B9;max-width:560px;margin:0 auto;}
+
+  /* ---------- nav ---------- */
+  .panel-nav{position:sticky; top:0; z-index:40; background:rgba(15,27,21,.94); backdrop-filter:blur(6px); border-bottom:1px solid var(--pcb-line); padding:10px 16px;}
+  .panel-nav-inner{max-width:800px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+  .nav-led{display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8FA093;text-decoration:none;padding:5px 10px;border-radius:20px;border:1px solid transparent;transition:.2s ease;white-space:nowrap;}
+  .nav-led .dot{width:5px;height:5px;border-radius:50%;background:#3E4F44;transition:.2s ease;flex-shrink:0;}
+  .nav-led:hover{color:var(--paper);border-color:var(--pcb-line);}
+  .nav-led.active{color:var(--phosphor);border-color:rgba(111,227,166,.35);background:rgba(111,227,166,.06);}
+  .nav-led.active .dot{background:var(--phosphor); box-shadow:0 0 8px var(--phosphor);}
+
+  /* ---------- global toolbar ---------- */
+  .toolbar{
+    position:sticky; top:39px; z-index:35;
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+    background:rgba(15,27,21,.96); backdrop-filter:blur(6px); border-bottom:1px solid var(--pcb-line);
+    padding:10px 16px; font-family:'IBM Plex Mono',monospace; font-size:12.5px;
+  }
+  .toolbar-inner{max-width:800px;margin:0 auto;width:100%;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;}
+  .toolbar .score span{color:var(--bonus);font-weight:700;font-size:15px;text-shadow:0 0 10px rgba(217,164,65,.4);}
+  .toolbar .btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .tbtn{background:transparent;border:1.5px solid var(--pcb-line);color:#B9C4B9;border-radius:20px;padding:5px 12px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;transition:.15s ease;}
+  .tbtn:hover{background:var(--pcb-light);color:var(--paper);border-color:var(--copper);}
+  .tbtn.primary{background:rgba(111,227,166,.12);border-color:var(--phosphor);color:var(--phosphor);}
+  .tbtn.primary:hover{background:rgba(111,227,166,.22);}
+  .tbtn.small{padding:4px 10px;font-size:9.5px;}
+
+  .howto{max-width:800px;margin:22px auto 0;padding:0 16px;}
+  .howto-inner{background:var(--pcb-light); border:1px dashed var(--pcb-line); border-radius:12px; padding:14px 18px; font-size:13px; line-height:1.6; color:#B9C4B9;}
+  .howto-inner strong{color:var(--paper);}
+
+  /* ---------- section shell ---------- */
+  .law-section{max-width:800px;margin:0 auto;padding:60px 16px 0;scroll-margin-top:110px;}
+  .section-head{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:22px;}
+  .figure{width:76px;height:76px;color:var(--copper);margin-bottom:14px;transition:color .5s ease, filter .5s ease; filter:drop-shadow(0 0 0 transparent);}
+  .law-section.in-view .figure{color:var(--phosphor); filter:drop-shadow(0 0 14px rgba(111,227,166,.5));}
+  .figure svg{width:100%;height:100%;}
+  .conn-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
+  .law-title{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(23px,4.3vw,30px);margin:0 0 10px;color:var(--paper);}
+  .formula-pill{font-family:'IBM Plex Mono',monospace;font-size:16px;background:rgba(111,227,166,.1);border:1.5px solid var(--phosphor);color:var(--phosphor);padding:8px 20px;border-radius:10px;display:inline-block;}
+
+  .connector{height:44px;max-width:800px;margin:0 auto;display:flex;justify-content:center;}
+  .connector .wire{width:2px;height:100%;background:repeating-linear-gradient(var(--copper) 0 6px, transparent 6px 12px);opacity:.4;}
+
+  /* ---------- story cards (paper index-card look) ---------- */
+  .story-box{position:relative; background:var(--paper); color:var(--ink); border-radius:6px; padding:20px 22px 18px; margin-bottom:18px; box-shadow:0 16px 30px -18px rgba(0,0,0,.55), 0 2px 0 rgba(0,0,0,.06);}
+  .story-box:nth-of-type(odd){transform:rotate(-.35deg);}
+  .story-box:nth-of-type(even){transform:rotate(.35deg);}
+  .story-box::before{content:""; position:absolute; top:-9px; left:26px; width:24px; height:16px; border-radius:3px; background:linear-gradient(180deg,#D8CFAE,#B7AB82); box-shadow:0 2px 4px rgba(0,0,0,.35);}
+  .story-tag{display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:10.5px;padding:4px 12px;border-radius:20px;margin-bottom:12px;color:#fff;letter-spacing:.03em;text-transform:uppercase;transform:rotate(-1deg);}
+  .story-box p{margin:0 0 9px;font-size:14.5px;}
+  .story-box p:last-child{margin-bottom:0;}
+  .story-box .center-line{text-align:center;font-style:italic;margin:8px 0;font-size:15px;}
+  .story-box .boxed{font-family:'IBM Plex Mono',monospace;background:#fff;border:1.5px solid rgba(33,28,18,.18);border-radius:6px;padding:8px 14px;display:inline-block;margin:6px 0;color:var(--ink);}
+  .story-box .boxed-wrap{text-align:center;}
+  .story-box ul,.story-box ol{margin:8px 0;padding-left:20px;}
+
+  .tag-hook{background:var(--copper);}
+  .tag-think{background:var(--purple);}
+  .tag-key{background:#2F7A5F;}
+  .tag-counter{background:#B5493D;}
+  .tag-mnemonic{background:var(--mistake);}
+
+  .reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:6px 13px;border-radius:20px;cursor:pointer;transition:.2s ease;margin-top:4px;}
+  .reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .reveal-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .reveal-panel.show{max-height:400px;opacity:1;margin-top:12px;}
+  .reveal-panel-inner{border-top:1.5px dashed rgba(33,28,18,.2);padding-top:10px;font-size:14px;line-height:1.6;}
+  .reveal-panel-inner strong{color:var(--ink);}
+
+  /* ---------- law reference plate ---------- */
+  .plate{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:14px;padding:18px 20px;margin-bottom:18px;}
+  .plate-title{font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#8FA093;margin-bottom:10px;}
+  table.plate-table{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:14px;}
+  table.plate-table td,table.plate-table th{padding:8px 10px;text-align:left;border-bottom:1px solid var(--pcb-line);}
+  table.plate-table th{color:#8FA093;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;}
+  table.plate-table tr:last-child td{border-bottom:none;}
+  table.plate-table td.op{color:var(--copper);}
+  table.plate-table td.res{color:var(--phosphor);font-weight:600;}
+
+  /* three-card grid for implication family */
+  .trio-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:20px;}
+  .trio-card{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:12px;padding:16px;text-align:center;}
+  .trio-card .tname{font-family:'Fraunces',serif;font-weight:600;font-size:15px;color:var(--paper);margin-bottom:6px;}
+  .trio-card .top{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--copper);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
+  .trio-card .tformula{font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--phosphor);background:rgba(111,227,166,.08);border-radius:8px;padding:7px 10px;}
+
+  .mono{font-family:'IBM Plex Mono',monospace;background:rgba(0,0,0,.25);color:var(--copper);padding:1px 6px;border-radius:4px;}
+
+  /* ---------- verify (prove-it-yourself) panels ---------- */
+  .verify-panel{background:var(--pcb-light);border:1.5px solid var(--pcb-line);border-radius:14px;padding:18px 20px;margin-bottom:20px;}
+  .verify-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+  .verify-title{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--bonus);display:flex;align-items:center;gap:7px;}
+  .verify-title::before{content:"⚡";}
+  .verify-score{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8FA093;}
+  .verify-score strong{color:var(--phosphor);}
+  .verify-btns{display:flex;gap:6px;flex-wrap:wrap;}
+
+  table.vtable{border-collapse:separate;border-spacing:6px 4px;width:100%;margin-bottom:4px;}
+  table.vtable th{background:#1C2B21;padding:6px 8px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;color:#8FA093;border-radius:6px;white-space:nowrap;}
+  table.vtable th.given{color:var(--copper);}
+  table.vtable td{text-align:center;padding:5px 6px;background:#132018;border-radius:6px;}
+  table.vtable tr:nth-child(even) td{background:#0F1911;}
+  table.vtable td.given{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;background:#20301F;color:var(--copper);}
+  table.vtable tr:nth-child(even) td.given{background:#1A2818;}
+
+  .cell-wrap{position:relative;display:inline-block;}
+  .toggle{position:relative;width:40px;height:21px;border-radius:20px;cursor:pointer;background:rgba(0,0,0,.3);border:1.5px solid var(--warn);display:inline-flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:700;user-select:none;transition:border-color .2s ease, box-shadow .2s ease;}
+  .toggle .lab{position:absolute;width:50%;text-align:center;transition:opacity .2s ease;}
+  .toggle .lab.t{left:0;color:var(--phosphor);opacity:.35;}
+  .toggle .lab.f{right:0;color:var(--warn);opacity:1;}
+  .toggle.on .lab.t{opacity:1;} .toggle.on .lab.f{opacity:.35;}
+  .toggle .knob{position:absolute;top:2px;left:21px;width:15px;height:15px;border-radius:50%;background:linear-gradient(180deg,#E0794F,#B5493D);box-shadow:0 1px 3px rgba(0,0,0,.5);transition:left .2s ease, background .2s ease;}
+  .toggle.on{border-color:var(--phosphor);box-shadow:0 0 8px rgba(111,227,166,.35);}
+  .toggle.on .knob{left:2px;background:linear-gradient(180deg,#BFFFE0,#6FE3A6);}
+  .cell-wrap.ok .toggle{box-shadow:0 0 0 2.5px rgba(111,227,166,.35);}
+  .cell-wrap.bad .toggle{box-shadow:0 0 0 2.5px rgba(224,121,79,.35);}
+  .vmark{position:absolute;top:-7px;right:-7px;width:14px;height:14px;border-radius:50%;font-size:8.5px;line-height:14px;text-align:center;font-weight:700;color:#0B140F;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .cell-wrap.ok .vmark{opacity:1;transform:scale(1);background:var(--phosphor);}
+  .cell-wrap.bad .vmark{opacity:1;transform:scale(1);background:var(--warn);color:#fff;}
+
+  .verify-note{font-size:12px;color:#8FA093;margin-top:8px;line-height:1.5;}
+  .verify-note strong{color:var(--paper);}
+
+  /* ---------- cheat sheet ---------- */
+  .cheat-sheet{max-width:800px;margin:70px auto 0;padding:0 16px;}
+  .cheat-title{text-align:center;font-family:'Fraunces',serif;font-weight:700;font-size:clamp(22px,4vw,28px);margin-bottom:6px;color:var(--paper);}
+  .cheat-sub{text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);margin-bottom:24px;text-transform:uppercase;letter-spacing:.08em;}
+  .cheat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+  .cheat-card{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:12px;padding:16px;text-align:left;}
+  .cheat-card .cname{font-family:'Fraunces',serif;font-weight:600;font-size:14.5px;color:var(--paper);margin-bottom:6px;}
+  .cheat-card .cform{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--phosphor);margin-bottom:6px;}
+  .cheat-card .chint{font-size:11.5px;color:#8FA093;}
+
+  footer{text-align:center;font-size:11.5px;color:#5C6B60;margin-top:60px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;}
+  footer .ok{color:var(--phosphor);}
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+      <h1 class="hero-title">The Laws of<br>Statement Calculus</h1>
+      <p class="hero-sub">Implications, their three cousins, and nine laws of equivalence — each one hiding inside a story you already know. Read the story, then prove it yourself.</p>
+    </div>
+  </div>
+
+  <div class="panel-nav">
+    <div class="panel-nav-inner" id="navRow"></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-inner">
+      <div class="score">Overall Score: <span id="scoreDisplay">0 / 0</span> correct</div>
+      <div class="btns">
+        <button class="tbtn primary" onclick="checkAll()">Check Everything</button>
+        <button class="tbtn" onclick="revealAll()">Reveal Everything</button>
+        <button class="tbtn" onclick="resetAll()">Reset Everything</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="howto">
+    <div class="howto-inner"><strong>How the "Prove It Yourself" panels work:</strong> the P, Q (and R) columns are fixed for you — every combination of True and False. Every other column is a toggle: click to set what <em>you</em> think that expression evaluates to on that row. Every law on this page is a genuine logical equivalence, so if you fill in both sides correctly, their columns will always match — row for row, no exceptions.</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- IMPLICATION FAMILY -->
+  <!-- ============================================================ -->
+  <div class="law-section" id="implication-family">
+    <div class="section-head">
+      <div class="figure" data-icon="fork"></div>
+      <div class="conn-tag">Where it all starts</div>
+      <h2 class="law-title">P → Q and its Three Cousins</h2>
+      <span class="formula-pill">P → Q &nbsp;(Conditional Statement)</span>
+    </div>
+
+    <div class="trio-grid">
+      <div class="trio-card"><div class="top">Swap</div><div class="tname">Converse</div><div class="tformula">Q → P</div></div>
+      <div class="trio-card"><div class="top">Negate</div><div class="tname">Inverse</div><div class="tformula">¬P → ¬Q</div></div>
+      <div class="trio-card"><div class="top">Swap + Negate</div><div class="tname">Contrapositive</div><div class="tformula">¬Q → ¬P</div></div>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-key">Quick Recap</span>
+      <p>Every conditional statement <span class="mono">P → Q</span> travels with three relatives, built by two simple moves — <strong>swap</strong> the two halves, or <strong>negate</strong> them. Do both, in that order, and you get the <strong>contrapositive</strong>.</p>
+    </div>
+
+    <div class="verify-panel" id="vp-implication"></div>
+  </div>
+
+  <div class="connector"><div class="wire"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- TAUTOLOGY / CONTRADICTION / CONTINGENCY RECAP -->
+  <!-- ============================================================ -->
+  <div class="law-section" id="tcc-recap">
+    <div class="section-head">
+      <div class="conn-tag">A one-line refresher</div>
+      <h2 class="law-title">Tautology · Contradiction · Contingency</h2>
+    </div>
+    <div class="plate">
+      <table class="plate-table">
+        <tr><th>Name</th><th>Truth value</th><th>Hint</th><th>Example</th></tr>
+        <tr><td>Tautology</td><td class="res">T</td><td class="op">Look for majority T</td><td class="mono">P ∨ ¬P</td></tr>
+        <tr><td>Contradiction</td><td class="res" style="color:var(--warn)">F</td><td class="op">The door is both open &amp; closed</td><td class="mono">P ∧ ¬P</td></tr>
+        <tr><td>Contingency</td><td class="res" style="color:var(--bonus)">T or F</td><td class="op">Neither always, nor never</td><td class="mono">P → Q</td></tr>
+      </table>
+    </div>
+    <div class="story-box">
+      <span class="story-tag tag-key">Everyday Version</span>
+      <p><span class="mono">P ∨ ¬P</span> is "Either it's raining, or it's not raining" — always true, no matter the weather. That's a tautology.</p>
+    </div>
+  </div>
+
+  <div class="connector"><div class="wire"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- LOGICAL EQUIVALENCE INTRO -->
+  <!-- ============================================================ -->
+  <div class="law-section" id="logical-equivalence">
+    <div class="section-head">
+      <div class="figure" data-icon="equiv"></div>
+      <div class="conn-tag">The idea behind every law below</div>
+      <h2 class="law-title">Logical Equivalence</h2>
+      <span class="formula-pill">Different Expressions &nbsp;→&nbsp; Same Meaning</span>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-think">Which Path Reaches the Library?</span>
+      <p>Two completely different routes — from the <strong>Classroom</strong>, or from the <strong>Hostel</strong> — both end up at the same place.</p>
+      <div class="boxed-wrap"><span class="boxed">Classroom &nbsp;→&nbsp; Library &nbsp;&nbsp;&nbsp;&nbsp; Hostel &nbsp;→&nbsp; Library</span></div>
+      <button class="reveal-btn" onclick="toggleReveal('leq1')">What does this have to do with logic?</button>
+      <div class="reveal-panel" id="leq1"><div class="reveal-panel-inner">
+        The two routes look nothing alike, yet they arrive at the exact same destination. That's precisely what <strong>logical equivalence</strong> means: two expressions can look completely different — <span class="mono">P ∧ Q</span> versus <span class="mono">¬(¬P ∨ ¬Q)</span> — and still always "arrive" at the same truth value, row for row. Same with plain arithmetic: <span class="mono">5 ← 5+0</span> and <span class="mono">5 ← 3+2</span> — different-looking routes, same number at the end.
+      </div></div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="wire"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- CONDITIONAL LAW -->
+  <!-- ============================================================ -->
+  <div class="law-section" id="conditional-law">
+    <div class="section-head">
+      <div class="figure" data-icon="arrow"></div>
+      <div class="conn-tag">The law that unlocks all the others</div>
+      <h2 class="law-title">The Conditional Law</h2>
+      <span class="formula-pill">P → Q &nbsp;≡&nbsp; ¬P ∨ Q</span>
+    </div>
+    <div class="story-box">
+      <span class="story-tag tag-key">Why This Matters</span>
+      <p>Every proof "without truth tables" you've stepped through leaned on this single rewrite — turning an arrow into a negation-and-or. Once <span class="mono">→</span> becomes <span class="mono">¬∨</span>, all the algebra laws below become available to simplify it.</p>
+    </div>
+    <div class="verify-panel" id="vp-conditional"></div>
+  </div>
+
+  <div class="connector"><div class="wire"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- IDENTITY LAWS -->
+  <!-- ============================================================ -->
+  <div class="law-section" id="identity">
+    <div class="section-head">
+      <div class="figure" data-icon="loop"></div>
+      <div class="conn-tag">Law 1</div>
+      <h2 class="law-title">Identity Laws</h2>
+      <span class="formula-pill">P ∧ T ≡ P &nbsp;&nbsp;·&nbsp;&nbsp; P ∨ F ≡ P</span>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-hook">Which Calculator Would You Choose?</span>
+      <p class="center-line">Old → Slow! &nbsp;&nbsp;vs&nbsp;&nbsp; Modern → Extremely fast!</p>
+      <p>Obviously the modern one. Math has its own version of a "fast calculator" — a shortcut for two very common expressions:</p>
+      <div class="boxed-wrap"><span class="boxed">P ∧ T &nbsp;&nbsp;and&nbsp;&nbsp; P ∨ F</span></div>
+      <p class="center-line">Both shortcut straight to just <strong>P</strong>. Any statement!</p>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-key">The Arithmetic Behind It</span>
+      <p>Recall from ordinary arithmetic — the <strong>Identity Property</strong>:</p>
+      <ul>
+        <li><span class="mono">∧</span> behaves like multiplication (<span class="mono">×</span>), <span class="mono">T</span> behaves like <span class="mono">1</span></li>
+        <li><span class="mono">∨</span> behaves like addition (<span class="mono">+</span>), <span class="mono">F</span> behaves like <span class="mono">0</span></li>
+      </ul>
+      <div class="boxed-wrap"><span class="boxed">P ∧ T := P × 1 = P &nbsp;&nbsp;&nbsp;&nbsp; P ∨ F := P + 0 = P</span></div>
+    </div>
+
+    <div class="verify-panel" id="vp-identity"></div>
+  </div>
+
+  <div class="connector"><div class="wire"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- DOMINATION LAWS -->
+  <!-- ============================================================ -->
+  <div class="law-section" id="domination">
+    <div class="section-head">
+      <div class="figure" data-icon="power"></div>
+      <div class="conn-tag">Law 2</div>
+      <h2 class="law-title">Domination Laws</h2>
+      <span class="formula-pill">P ∧ F ≡ F &nbsp;&nbsp;·&nbsp;&nbsp; P ∨ T ≡ T</span>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-hook">Attendance AND Principal's Approval</span>
+      <p>Students must satisfy <strong>Attendance</strong> <span class="mono">AND</span> the <strong>Principal's Approval</strong>.</p>
+      <p><span class="mono">p</span>: Attendance requirement satisfied &nbsp;·&nbsp; the Principal's Approval = <strong>False</strong>!</p>
+      <div class="boxed-wrap"><span class="boxed">p ∧ F &nbsp;≡&nbsp; F &nbsp;&nbsp;(p × 0 = 0 = F)</span></div>
+      <p class="center-line">It doesn't matter how good your attendance is — one guaranteed False <strong>dominates</strong> the whole conjunction.</p>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-hook">Free Wi-Fi for Everyone!</span>
+      <p>Every student receives free Wi-Fi — <span class="mono">= T</span>, no conditions attached.</p>
+      <button class="reveal-btn" onclick="toggleReveal('dom1')">Does your attendance matter now?</button>
+      <div class="reveal-panel" id="dom1"><div class="reveal-panel-inner">
+        <strong>"No!"</strong> Why? You'll receive it anyway, right! <div class="boxed-wrap" style="margin-top:8px;"><span class="boxed">p ∨ T &nbsp;≡&nbsp; T</span></div> One guaranteed True <strong>dominates</strong> the whole disjunction.
+      </div></div>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-key">Two Ways to Feel It</span>
+      <p><strong>P ∧ F ≡ F</strong> — switching off the main electricity to a building: it no longer matters whether the individual room switches are on. Every light stays off.</p>
+      <p><strong>P ∨ T ≡ T</strong> — every student automatically passes the course: individual marks become irrelevant, the result is always true.</p>
+    </div>
+
+    <div class="verify-panel" id="vp-domination"></div>
+  </div>
+
+  <div class="connector"><div class="wire"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- IDENTITY vs DOMINATION — ASK YOURSELF -->
+  <!-- ============================================================ -->
+  <div class="law-section" id="ask-yourself">
+    <div class="section-head">
+      <div class="conn-tag">Telling them apart</div>
+      <h2 class="law-title">Ask Yourself: "Does the Original Statement Survive?"</h2>
+    </div>
+    <div class="story-box">
+      <span class="story-tag tag-mnemonic">The Mnemonic</span>
+      <p><strong>If Yes</strong> — the letters sit <em>far apart</em> (<span class="mono">A</span>…<span class="mono">T</span>: <span class="mono">P ∧ T</span>) → <strong>Identity</strong>. P survives.</p>
+      <p><strong>If No</strong> — the letters sit <em>closer together</em> (<span class="mono">P ∧ F</span> / <span class="mono">P ∨ T</span>) → <strong>Domination</strong>. P gets overridden.</p>
+      <div class="plate" style="margin-top:12px;">
+        <table class="plate-table">
+          <tr><th>Rule</th><th>Formula</th></tr>
+          <tr><td>Identity</td><td class="mono">P ∧ T ≡ P &nbsp;·&nbsp; P ≡ P ∨ F</td></tr>
+          <tr><td>Domination</td><td class="mono">P ∧ F ≡ F &nbsp;·&nbsp; P ∨ T ≡ T</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="wire"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- IDEMPOTENT LAW -->
+  <!-- ============================================================ -->
+  <div class="law-section" id="idempotent">
+    <div class="section-head">
+      <div class="figure" data-icon="repeat"></div>
+      <div class="conn-tag">Law 3</div>
+      <h2 class="law-title">Idempotent Law</h2>
+      <span class="formula-pill">P ∧ P ≡ P ∨ P ≡ P</span>
+    </div>
+    <div class="story-box">
+      <span class="story-tag tag-hook">Saying "Present" Twice</span>
+      <button class="reveal-btn" onclick="toggleReveal('idem1')">Does saying "present" twice increase your attendance?</button>
+      <div class="reveal-panel" id="idem1"><div class="reveal-panel-inner"><strong>"No!"</strong> Does repeating the same fact create a new fact? <strong>"No!"</strong> Repeating the same statement — whether joined with AND or OR — adds absolutely no new information.</div></div>
+      <div class="boxed-wrap" style="margin-top:10px;"><span class="boxed">P ∧ P = P ∨ P ≡ P</span></div>
+      <p class="center-line">Like pressing an elevator button that's already lit up — nothing changes.</p>
+    </div>
+    <div class="verify-panel" id="vp-idempotent"></div>
+  </div>
+
+  <div class="connector"><div class="wire"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- DOUBLE NEGATION -->
+  <!-- ============================================================ -->
+  <div class="law-section" id="double-negation">
+    <div class="section-head">
+      <div class="figure" data-icon="flip"></div>
+      <div class="conn-tag">Law 4</div>
+      <h2 class="law-title">Double Negation</h2>
+      <span class="formula-pill">¬(¬P) ≡ P</span>
+    </div>
+    <div class="story-box">
+      <span class="story-tag tag-hook">"I'm Not Unhappy"</span>
+      <p class="center-line">"I'm not unhappy" &nbsp;→&nbsp; "I'm happy," right?</p>
+      <div class="boxed-wrap"><span class="boxed">¬(¬P) ≡ P</span></div>
+      <p>Two negations cancel each other out — just like flipping a light switch off, then on again.</p>
+    </div>
+    <div class="verify-panel" id="vp-doubleneg"></div>
+  </div>
+
+  <div class="connector"><div class="wire"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- COMMUTATIVE LAW -->
+  <!-- ============================================================ -->
+  <div class="law-section" id="commutative">
+    <div class="section-head">
+      <div class="figure" data-icon="swap"></div>
+      <div class="conn-tag">Law 5</div>
+      <h2 class="law-title">Commutative Law</h2>
+      <span class="formula-pill">P ∧ Q ≡ Q ∧ P &nbsp;&nbsp;·&nbsp;&nbsp; P ∨ Q ≡ Q ∨ P</span>
+    </div>
+    <div class="story-box">
+      <span class="story-tag tag-hook">The Shoe–Socks Puzzle</span>
+      <p class="center-line">Changing the order changes nothing.</p>
+      <div class="boxed-wrap"><span class="boxed">Team A: Rahul &amp; Priya &nbsp;&nbsp;vs&nbsp;&nbsp; Team A: Priya &amp; Rahul</span></div>
+      <button class="reveal-btn" onclick="toggleReveal('comm1')">Has the team changed?</button>
+      <div class="reveal-panel" id="comm1"><div class="reveal-panel-inner"><strong>No!</strong> Only the order changed — the team itself is identical.
+        <p style="margin-top:8px;">Just like ordinary arithmetic: <span class="mono">4 × 3 = 3 × 4</span> and <span class="mono">2 + 5 = 5 + 2</span>.</p>
+      </div></div>
+    </div>
+    <div class="verify-panel" id="vp-commutative"></div>
+  </div>
+
+  <div class="connector"><div class="wire"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- ASSOCIATIVE LAW -->
+  <!-- ============================================================ -->
+  <div class="law-section" id="associative">
+    <div class="section-head">
+      <div class="figure" data-icon="brackets"></div>
+      <div class="conn-tag">Law 6</div>
+      <h2 class="law-title">Associative Law</h2>
+      <span class="formula-pill">(P∧Q)∧R ≡ P∧(Q∧R) &nbsp;&nbsp;·&nbsp;&nbsp; (P∨Q)∨R ≡ P∨(Q∨R)</span>
+    </div>
+    <div class="story-box">
+      <span class="story-tag tag-hook">Inter-Class Math Relay Race</span>
+      <p>Team: A, B, C — grouped two different ways:</p>
+      <div class="boxed-wrap"><span class="boxed">1st: (A and B) and C &nbsp;&nbsp;&nbsp;&nbsp; 2nd: A and (B and C)</span></div>
+      <p><strong>Did we change the team? Or merely the grouping?</strong></p>
+      <button class="reveal-btn" onclick="toggleReveal('assoc1')">Reveal the Answer</button>
+      <div class="reveal-panel" id="assoc1"><div class="reveal-panel-inner">Grouping, right! Changing the grouping changes nothing.</div></div>
+    </div>
+    <div class="story-box">
+      <span class="story-tag tag-mnemonic">Don't Confuse These Two</span>
+      <p><strong>Commutative</strong> → the <em>order</em> changes. <strong>Associative</strong> → the <em>brackets</em> change. Nothing else about either one.</p>
+    </div>
+    <div class="verify-panel" id="vp-associative"></div>
+  </div>
+
+  <div class="connector"><div class="wire"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- DISTRIBUTIVE LAW -->
+  <!-- ============================================================ -->
+  <div class="law-section" id="distributive">
+    <div class="section-head">
+      <div class="figure" data-icon="share"></div>
+      <div class="conn-tag">Law 7</div>
+      <h2 class="law-title">Distributive Law</h2>
+      <span class="formula-pill">P∧(Q∨R) ≡ (P∧Q)∨(P∧R)</span>
+    </div>
+    <div class="story-box">
+      <span class="story-tag tag-hook">"Today Everyone Gets Chocolates!"</span>
+      <p class="center-line">Carry one box → to all.</p>
+      <div class="boxed-wrap"><span class="boxed">P∧(Q∨R) ≡ (P∧Q)∨(P∧R)<br>P∨(Q∧R) ≡ (P∨Q)∧(P∨R)</span></div>
+      <p>One proposition (<span class="mono">P</span>, "the chocolate") gets shared across every branch — exactly like carrying one box and giving a piece to everyone in the room.</p>
+    </div>
+    <div class="verify-panel" id="vp-distributive"></div>
+  </div>
+
+  <div class="connector"><div class="wire"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- ABSORPTION LAW -->
+  <!-- ============================================================ -->
+  <div class="law-section" id="absorption">
+    <div class="section-head">
+      <div class="figure" data-icon="absorb"></div>
+      <div class="conn-tag">Law 8</div>
+      <h2 class="law-title">Absorption Law</h2>
+      <span class="formula-pill">P∨(P∧Q) ≡ P ≡ P∧(P∨Q)</span>
+    </div>
+    <div class="story-box">
+      <span class="story-tag tag-hook">Every VIT Bhopal Student Has an ID Card</span>
+      <p>Statement: <strong>All VIT students</strong> &nbsp;OR&nbsp; <strong>all VIT students who wear spectacles</strong>.</p>
+      <p><em>Hint: the larger group "absorbs" the smaller one.</em></p>
+      <div class="boxed-wrap"><span class="boxed">∀ P, Q: &nbsp; P∨(P∧Q) ≡ P ≡ P∧(P∨Q)</span></div>
+    </div>
+    <div class="story-box">
+      <span class="story-tag tag-key">The Ocean and the Bucket</span>
+      <p>Throw one bucket of water into a large ocean. Does the ocean become a different ocean? No — the bucket is completely <strong>absorbed</strong>.</p>
+      <p><span class="mono">P</span> absorbs both <span class="mono">P∧Q</span> and <span class="mono">P∨Q</span> — the extra expression adds nothing new.</p>
+    </div>
+    <div class="verify-panel" id="vp-absorption"></div>
+  </div>
+
+  <div class="connector"><div class="wire"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- DE MORGAN'S LAW -->
+  <!-- ============================================================ -->
+  <div class="law-section" id="de-morgans">
+    <div class="section-head">
+      <div class="figure" data-icon="lock"></div>
+      <div class="conn-tag">Law 9 · The finale</div>
+      <h2 class="law-title">De Morgan's Law</h2>
+      <span class="formula-pill">¬(P∧Q) ≡ ¬P∨¬Q &nbsp;&nbsp;·&nbsp;&nbsp; ¬(P∨Q) ≡ ¬P∧¬Q</span>
+    </div>
+    <div class="story-box">
+      <span class="story-tag tag-hook">Welcome to the Logic Escape Room!</span>
+      <p><span class="mono">p</span>: fingerprint accepted &nbsp;·&nbsp; <span class="mono">q</span>: face recognition accepted</p>
+      <p><strong>Rule:</strong> the student must escape before the bell rings! The only exit door opens only if <strong>both</strong> electronic locks are unlocked.</p>
+      <div class="boxed-wrap"><span class="boxed">The door opens only when p∧q is true.</span></div>
+      <p><strong>What happens if the door doesn't open?</strong></p>
+      <button class="reveal-btn" onclick="toggleReveal('dm1')">Reveal the Answer</button>
+      <div class="reveal-panel" id="dm1"><div class="reveal-panel-inner">
+        <strong>At least one lock failed!</strong>
+        <div class="boxed-wrap" style="margin-top:8px;"><span class="boxed">∀ p, q: &nbsp; ¬(p∧q) ≡ ¬p∨¬q<br>similarly: &nbsp; ¬(p∨q) ≡ ¬p∧¬q</span></div>
+      </div></div>
+    </div>
+    <div class="story-box">
+      <span class="story-tag tag-mnemonic">Negation's Job, Once It Steps Inside</span>
+      <ol>
+        <li><strong>Break</strong> the brace (the outer negation splits open the brackets)</li>
+        <li><strong>Flip</strong> the connective (∧ becomes ∨, or ∨ becomes ∧)</li>
+        <li><strong>Negate</strong> each statement inside</li>
+      </ol>
+      <p class="center-line">That three-step job is the whole magic of negation.</p>
+    </div>
+    <div class="verify-panel" id="vp-demorgan"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- CHEAT SHEET -->
+  <!-- ============================================================ -->
+  <div class="cheat-sheet">
+    <div class="cheat-title">All Nine Laws, One Glance</div>
+    <div class="cheat-sub">Every formula from this page, in one place</div>
+    <div class="cheat-grid">
+      <div class="cheat-card"><div class="cname">Identity</div><div class="cform">P∧T≡P · P∨F≡P</div><div class="chint">The fast calculator — nothing changes.</div></div>
+      <div class="cheat-card"><div class="cname">Domination</div><div class="cform">P∧F≡F · P∨T≡T</div><div class="chint">One guaranteed value overrides everything.</div></div>
+      <div class="cheat-card"><div class="cname">Idempotent</div><div class="cform">P∧P≡P∨P≡P</div><div class="chint">Repeating a fact adds nothing new.</div></div>
+      <div class="cheat-card"><div class="cname">Double Negation</div><div class="cform">¬(¬P)≡P</div><div class="chint">"Not unhappy" = happy.</div></div>
+      <div class="cheat-card"><div class="cname">Commutative</div><div class="cform">P∧Q≡Q∧P · P∨Q≡Q∨P</div><div class="chint">Order changes — the team doesn't.</div></div>
+      <div class="cheat-card"><div class="cname">Associative</div><div class="cform">(P∧Q)∧R≡P∧(Q∧R)</div><div class="chint">Brackets change — the grouping doesn't matter.</div></div>
+      <div class="cheat-card"><div class="cname">Distributive</div><div class="cform">P∧(Q∨R)≡(P∧Q)∨(P∧R)</div><div class="chint">One box of chocolates, shared to all.</div></div>
+      <div class="cheat-card"><div class="cname">Absorption</div><div class="cform">P∨(P∧Q)≡P</div><div class="chint">The ocean absorbs the bucket.</div></div>
+      <div class="cheat-card"><div class="cname">De Morgan's</div><div class="cform">¬(P∧Q)≡¬P∨¬Q</div><div class="chint">Break, flip, negate.</div></div>
+    </div>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Topic 5 — The Laws of Statement Calculus &nbsp;—&nbsp; <span class="ok">CIRCUIT COMPLETE ✓</span></footer>
+
+<script>
+/* =====================================================================
+   Icon library
+   ===================================================================== */
+const ICONS = {
+  fork: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M32 56 V30"/><path d="M32 30 L14 12"/><path d="M32 30 L32 8"/><path d="M32 30 L50 12"/></svg>`,
+  equiv: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><line x1="10" y1="22" x2="54" y2="22"/><line x1="10" y1="32" x2="54" y2="32"/><line x1="10" y1="42" x2="54" y2="42"/></svg>`,
+  arrow: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="32" x2="46" y2="32"/><path d="M34 18 L48 32 L34 46"/></svg>`,
+  loop: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M46 22 A18 18 0 1 0 48 34"/><path d="M38 12 L48 20 L37 24"/></svg>`,
+  power: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><circle cx="32" cy="36" r="17"/><line x1="32" y1="8" x2="32" y2="30"/></svg>`,
+  repeat: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M46 24 A18 18 0 1 1 42 13"/><path d="M42 4 L42 13 L51 13"/></svg>`,
+  flip: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22 H44"/><path d="M36 14 L44 22 L36 30"/><path d="M56 42 H20"/><path d="M28 34 L20 42 L28 50"/></svg>`,
+  swap: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="32" r="6" fill="currentColor" stroke="none"/><circle cx="48" cy="32" r="6" fill="currentColor" stroke="none"/><path d="M22 24 Q32 10 44 22"/><path d="M44 22 L44 14 M44 22 L36 18"/><path d="M42 40 Q32 54 20 42"/><path d="M20 42 L20 50 M20 42 L28 46"/></svg>`,
+  brackets: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M22 8 Q10 32 22 56"/><path d="M42 8 Q54 32 42 56"/></svg>`,
+  share: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="25" width="16" height="14" rx="2"/><path d="M22 32 H32"/><path d="M32 32 L38 20 M32 32 L38 44"/><rect x="38" y="12" width="18" height="14" rx="2"/><rect x="38" y="38" width="18" height="14" rx="2"/></svg>`,
+  absorb: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5"><circle cx="28" cy="32" r="22"/><circle cx="42" cy="32" r="8" fill="currentColor" stroke="none" opacity=".45"/></svg>`,
+  lock: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><rect x="15" y="28" width="34" height="27" rx="4"/><path d="M22 28 V19 a10 10 0 0 1 20 0 V28"/><circle cx="32" cy="40" r="3.5" fill="currentColor" stroke="none"/></svg>`
+};
+document.querySelectorAll('.figure').forEach(el=>{
+  const key = el.dataset.icon;
+  if(key && ICONS[key]) el.innerHTML = ICONS[key];
+});
+
+/* =====================================================================
+   Nav strip + scroll-glow
+   ===================================================================== */
+const navSections = [
+  {id:'implication-family', label:'P→Q Family'},
+  {id:'tcc-recap', label:'Taut/Contra/Conting'},
+  {id:'logical-equivalence', label:'Equivalence'},
+  {id:'conditional-law', label:'Conditional'},
+  {id:'identity', label:'Identity'},
+  {id:'domination', label:'Domination'},
+  {id:'ask-yourself', label:'Identity vs Domination'},
+  {id:'idempotent', label:'Idempotent'},
+  {id:'double-negation', label:'Double Negation'},
+  {id:'commutative', label:'Commutative'},
+  {id:'associative', label:'Associative'},
+  {id:'distributive', label:'Distributive'},
+  {id:'absorption', label:'Absorption'},
+  {id:'de-morgans', label:"De Morgan's"}
+];
+const navRow = document.getElementById('navRow');
+navSections.forEach(s=>{
+  const a = document.createElement('a');
+  a.href = '#'+s.id;
+  a.className = 'nav-led';
+  a.dataset.target = s.id;
+  a.innerHTML = `<span class="dot"></span>${s.label}`;
+  navRow.appendChild(a);
+});
+
+const navLeds = document.querySelectorAll('.nav-led');
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    const id = entry.target.id;
+    if(entry.isIntersecting){
+      entry.target.classList.add('in-view');
+      navLeds.forEach(l=>l.classList.toggle('active', l.dataset.target===id));
+    } else {
+      entry.target.classList.remove('in-view');
+    }
+  });
+}, {threshold:0.3});
+document.querySelectorAll('.law-section').forEach(el=>observer.observe(el));
+
+function toggleReveal(id){
+  document.getElementById(id).classList.toggle('show');
+}
+
+/* =====================================================================
+   Prove-It-Yourself verify panels
+   ===================================================================== */
+function rowsFor(n){
+  const out = [];
+  const gen = (arr)=>{ if(arr.length===n){ out.push(arr.slice()); return; } gen(arr.concat(true)); gen(arr.concat(false)); };
+  gen([]);
+  return out;
+}
+
+const VERIFY_TOTAL = {count:0};
+
+function buildVerifyPanel(containerId, config){
+  // config: {vars:['P','Q'], cols:[{sym, fn}], title}
+  const container = document.getElementById(containerId);
+  const rows = rowsFor(config.vars.length);
+
+  const head = document.createElement('div');
+  head.className = 'verify-head';
+  head.innerHTML = `<span class="verify-title">Prove It Yourself</span><span class="verify-score">This law: <strong data-localscore>0</strong> / ${rows.length * config.cols.length} <span class="verify-btns"></span></span>`;
+  container.appendChild(head);
+
+  const btnWrap = head.querySelector('.verify-btns');
+  ['Check','Reveal','Reset'].forEach(label=>{
+    const b = document.createElement('button');
+    b.className = 'tbtn small' + (label==='Check' ? ' primary':'');
+    b.textContent = label;
+    b.style.marginLeft = '6px';
+    b.dataset.action = label.toLowerCase();
+    btnWrap.appendChild(b);
+  });
+
+  const tableScroll = document.createElement('div');
+  tableScroll.style.overflowX = 'auto';
+  const table = document.createElement('table');
+  table.className = 'vtable';
+  const thead = document.createElement('tr');
+  config.vars.forEach(v=>{
+    const th = document.createElement('th');
+    th.className = 'given';
+    th.textContent = v;
+    thead.appendChild(th);
+  });
+  config.cols.forEach(c=>{
+    const th = document.createElement('th');
+    th.textContent = c.sym;
+    thead.appendChild(th);
+  });
+  table.appendChild(thead);
+
+  rows.forEach(row=>{
+    const tr = document.createElement('tr');
+    row.forEach(v=>{
+      const td = document.createElement('td');
+      td.className = 'given';
+      td.textContent = v ? 'T':'F';
+      tr.appendChild(td);
+    });
+    config.cols.forEach(c=>{
+      const td = document.createElement('td');
+      const correct = c.fn(...row);
+      const wrap = document.createElement('div');
+      wrap.className = 'cell-wrap';
+      wrap.dataset.correct = correct ? '1':'0';
+      wrap.dataset.value = '0';
+      wrap.innerHTML = `<div class="toggle" role="button" tabindex="0"><span class="lab t">T</span><span class="lab f">F</span><span class="knob"></span></div><span class="vmark"></span>`;
+      const toggleEl = wrap.querySelector('.toggle');
+      const flip = ()=>{
+        const on = wrap.dataset.value === '1';
+        wrap.dataset.value = on ? '0':'1';
+        toggleEl.classList.toggle('on', !on);
+        wrap.classList.remove('ok','bad');
+        wrap.querySelector('.vmark').textContent = '';
+        updateLocalScore(container);
+        updateGrandScore();
+      };
+      toggleEl.addEventListener('click', flip);
+      toggleEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ flip(); e.preventDefault(); } });
+      td.appendChild(wrap);
+      tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
+  tableScroll.appendChild(table);
+  container.appendChild(tableScroll);
+
+  if(config.note){
+    const note = document.createElement('div');
+    note.className = 'verify-note';
+    note.innerHTML = config.note;
+    container.appendChild(note);
+  }
+
+  VERIFY_TOTAL.count += rows.length * config.cols.length;
+
+  btnWrap.querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const action = b.dataset.action;
+      if(action==='check') checkPanel(container);
+      if(action==='reveal') revealPanel(container);
+      if(action==='reset') resetPanel(container);
+    });
+  });
+}
+
+function updateLocalScore(container){
+  let correct = 0;
+  container.querySelectorAll('.cell-wrap').forEach(w=>{ if(w.dataset.value===w.dataset.correct) correct++; });
+  const el = container.querySelector('[data-localscore]');
+  if(el) el.textContent = correct;
+}
+
+function updateGrandScore(){
+  let correct = 0, total = 0;
+  document.querySelectorAll('.verify-panel .cell-wrap').forEach(w=>{
+    total++;
+    if(w.dataset.value===w.dataset.correct) correct++;
+  });
+  document.getElementById('scoreDisplay').textContent = correct + ' / ' + total;
+}
+
+function checkPanel(container){
+  container.querySelectorAll('.cell-wrap').forEach(w=>{
+    const ok = w.dataset.value===w.dataset.correct;
+    w.classList.remove('ok','bad');
+    w.classList.add(ok?'ok':'bad');
+    w.querySelector('.vmark').textContent = ok ? '✓':'✗';
+  });
+  updateLocalScore(container);
+  updateGrandScore();
+}
+function revealPanel(container){
+  container.querySelectorAll('.cell-wrap').forEach(w=>{
+    w.dataset.value = w.dataset.correct;
+    w.querySelector('.toggle').classList.toggle('on', w.dataset.correct==='1');
+    w.classList.remove('ok','bad'); w.classList.add('ok');
+    w.querySelector('.vmark').textContent = '✓';
+  });
+  updateLocalScore(container);
+  updateGrandScore();
+}
+function resetPanel(container){
+  container.querySelectorAll('.cell-wrap').forEach(w=>{
+    w.dataset.value = '0';
+    w.querySelector('.toggle').classList.remove('on');
+    w.classList.remove('ok','bad');
+    w.querySelector('.vmark').textContent = '';
+  });
+  updateLocalScore(container);
+  updateGrandScore();
+}
+
+function checkAll(){ document.querySelectorAll('.verify-panel').forEach(checkPanel); }
+function revealAll(){ document.querySelectorAll('.verify-panel').forEach(revealPanel); }
+function resetAll(){ document.querySelectorAll('.verify-panel').forEach(resetPanel); }
+
+/* =====================================================================
+   Build every verify panel
+   ===================================================================== */
+buildVerifyPanel('vp-implication', {
+  vars:['P','Q'],
+  cols:[
+    {sym:'P→Q', fn:(p,q)=>(!p)||q},
+    {sym:'Q→P (Converse)', fn:(p,q)=>(!q)||p},
+    {sym:'¬P→¬Q (Inverse)', fn:(p,q)=>p||(!q)},
+    {sym:'¬Q→¬P (Contrapositive)', fn:(p,q)=>q||(!p)}
+  ],
+  note:'Fill in all four columns, then compare them to the first. You\'ll find <strong>Contrapositive</strong> always matches <strong>P→Q</strong> exactly — but Converse and Inverse don\'t. That\'s why only the contrapositive is a genuine logical equivalence of the original.'
+});
+
+buildVerifyPanel('vp-conditional', {
+  vars:['P','Q'],
+  cols:[
+    {sym:'P→Q', fn:(p,q)=>(!p)||q},
+    {sym:'¬P∨Q', fn:(p,q)=>(!p)||q}
+  ],
+  note:'These two columns should end up identical in every row — that\'s exactly what "≡" promises.'
+});
+
+buildVerifyPanel('vp-identity', {
+  vars:['P'],
+  cols:[
+    {sym:'P∧T', fn:(p)=>p&&true},
+    {sym:'P∨F', fn:(p)=>p||false}
+  ],
+  note:'Both columns should just echo the P column back — nothing changes.'
+});
+
+buildVerifyPanel('vp-domination', {
+  vars:['P'],
+  cols:[
+    {sym:'P∧F', fn:(p)=>p&&false},
+    {sym:'P∨T', fn:(p)=>p||true}
+  ],
+  note:'Notice something surprising: these columns never even look at P — they\'re the same regardless of what P is!'
+});
+
+buildVerifyPanel('vp-idempotent', {
+  vars:['P'],
+  cols:[
+    {sym:'P∧P', fn:(p)=>p&&p},
+    {sym:'P∨P', fn:(p)=>p||p}
+  ],
+  note:'Both columns should just echo P — repeating it changed nothing.'
+});
+
+buildVerifyPanel('vp-doubleneg', {
+  vars:['P'],
+  cols:[
+    {sym:'¬(¬P)', fn:(p)=>!(!p)}
+  ],
+  note:'This single column should exactly match the P column.'
+});
+
+buildVerifyPanel('vp-commutative', {
+  vars:['P','Q'],
+  cols:[
+    {sym:'P∧Q', fn:(p,q)=>p&&q},
+    {sym:'Q∧P', fn:(p,q)=>q&&p}
+  ],
+  note:'Same idea holds for ∨ — P∨Q and Q∨P would match too, we just kept this table to one operator.'
+});
+
+buildVerifyPanel('vp-associative', {
+  vars:['P','Q','R'],
+  cols:[
+    {sym:'(P∧Q)∧R', fn:(p,q,r)=>(p&&q)&&r},
+    {sym:'P∧(Q∧R)', fn:(p,q,r)=>p&&(q&&r)}
+  ],
+  note:'Eight rows, one law: wherever you put the brackets, the answer never changes.'
+});
+
+buildVerifyPanel('vp-distributive', {
+  vars:['P','Q','R'],
+  cols:[
+    {sym:'P∧(Q∨R)', fn:(p,q,r)=>p&&(q||r)},
+    {sym:'(P∧Q)∨(P∧R)', fn:(p,q,r)=>(p&&q)||(p&&r)}
+  ],
+  note:'The chocolate box (P) reaches every branch either way you distribute it.'
+});
+
+buildVerifyPanel('vp-absorption', {
+  vars:['P','Q'],
+  cols:[
+    {sym:'P∨(P∧Q)', fn:(p,q)=>p||(p&&q)}
+  ],
+  note:'This column should exactly match the P column — Q never gets a vote.'
+});
+
+buildVerifyPanel('vp-demorgan', {
+  vars:['P','Q'],
+  cols:[
+    {sym:'¬(P∧Q)', fn:(p,q)=>!(p&&q)},
+    {sym:'¬P∨¬Q', fn:(p,q)=>(!p)||(!q)}
+  ],
+  note:'Break the brace, flip ∧ to ∨, negate both sides — and the columns match every time.'
+});
+
+document.getElementById('scoreDisplay').textContent = '0 / ' + VERIFY_TOTAL.count;
+</script>
+</body>
+</html>

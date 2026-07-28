@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Think Like Sherlock Holmes · The Missing Glasses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pcb:#0F1B15; --pcb-light:#17251D; --pcb-line:#25392C;
+    --copper:#C08552; --phosphor:#6FE3A6; --warn:#E0794F; --bonus:#D9A441;
+    --paper:#F3EEDF; --ink:#211C12; --ink-soft:#6B6250;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--pcb);color:var(--paper);font-family:'IBM Plex Sans',sans-serif;padding:0 0 100px;line-height:1.6;
+    background-image:radial-gradient(circle at 1px 1px, rgba(111,227,166,0.05) 1px, transparent 0); background-size:26px 26px;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  ::selection{background:var(--phosphor);color:var(--pcb);}
+  a:focus-visible, button:focus-visible{outline:2px solid var(--phosphor); outline-offset:3px;}
+
+  /* ============ hero with original detective illustration ============ */
+  .hero{position:relative;padding:0;text-align:center;overflow:hidden;border-bottom:1px solid var(--pcb-line);
+    background:radial-gradient(ellipse at 50% 30%, #1B2A22 0%, #0B1410 65%, #08100C 100%);}
+  .hero-fig{width:100%;max-width:420px;margin:0 auto;display:block;position:relative;z-index:1;}
+  .hero-text{position:relative;z-index:1;padding:8px 16px 34px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:10px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(24px,5.5vw,40px);margin:0 0 10px;color:var(--paper);text-shadow:0 0 30px rgba(111,227,166,.2);}
+  .sub{text-align:center;color:#B9C4B9;font-size:14.5px;margin:0 auto;max-width:560px;line-height:1.6;}
+
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px;}
+
+  /* ============ case file ============ */
+  .case-file{margin:36px auto 0;background:var(--paper);color:var(--ink);border-radius:10px;padding:24px 26px;box-shadow:0 20px 40px -20px rgba(0,0,0,.6);position:relative;}
+  .case-file::before{content:"CASE FILE";position:absolute;top:-11px;left:26px;background:var(--warn);color:#fff;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:10.5px;letter-spacing:.08em;padding:4px 12px;border-radius:4px;}
+  .case-file h2{font-family:'Fraunces',serif;font-weight:700;font-size:20px;margin:6px 0 12px;}
+  .case-file p{font-size:14.5px;margin:0 0 10px;}
+  .case-file p:last-child{margin-bottom:0;}
+
+  .clue-list{margin:22px auto 0;}
+  .clue{background:var(--paper);color:var(--ink);border-radius:8px;padding:14px 18px;margin-bottom:10px;box-shadow:0 10px 20px -14px rgba(0,0,0,.5);position:relative;padding-left:52px;}
+  .clue .letter{position:absolute;left:14px;top:14px;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--paper);font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;}
+  .clue .ctext{font-size:14px;}
+  .clue .cvar{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--warn);margin-top:4px;}
+  .cvar-btn{margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:5px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .cvar-btn:hover{background:var(--ink);color:var(--paper);}
+  .cvar-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .cvar-panel.show{max-height:60px;opacity:1;margin-top:8px;}
+
+  .var-key{margin:20px auto 0;background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:12px;padding:14px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#B9C4B9;line-height:1.8;}
+  .var-key b{color:var(--copper);}
+
+  .question-banner{text-align:center;background:var(--warn);color:#1B0E08;font-family:'Fraunces',serif;font-weight:700;font-size:clamp(18px,3.6vw,24px);border-radius:12px;padding:16px;margin:26px auto 0;}
+
+  /* ============ stepper ============ */
+  .stepper-wrap{margin:30px auto 0;}
+  .stepper-intro{text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8FA093;margin-bottom:14px;}
+  .stepper-box{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:16px;padding:22px 24px 20px;}
+  .stepper-count{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:#8FA093;text-align:center;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em;}
+  .stepper-dots{display:flex;gap:6px;justify-content:center;margin-bottom:18px;flex-wrap:wrap;}
+  .st-dot{width:10px;height:10px;border-radius:50%;background:var(--pcb-line);border:none;cursor:pointer;padding:0;transition:.2s ease;}
+  .st-dot.on{background:var(--phosphor);box-shadow:0 0 8px var(--phosphor);}
+  .st-dot.past{background:var(--copper);opacity:.6;}
+  .stepper-expr{font-family:'IBM Plex Mono',monospace;font-size:clamp(1rem,3vw,1.35rem);text-align:center;line-height:1.9;padding:18px 8px;min-height:2.4em;color:var(--paper);}
+  .st-mark{background:rgba(217,164,65,.16);color:var(--paper);border-bottom:2.5px solid var(--bonus);padding:1px 6px;border-radius:5px;}
+  .stepper-lawrow{display:flex;align-items:center;justify-content:center;gap:10px;margin:6px 0 4px;}
+  .stepper-lawbadge{font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:.86rem;background:rgba(111,227,166,.1);color:var(--phosphor);border:1.5px solid var(--phosphor);padding:7px 16px;border-radius:10px;cursor:default;}
+  .stepper-lawbadge.given{background:rgba(255,255,255,.04);color:#8FA093;border-color:var(--pcb-line);}
+  .stepper-note{font-family:'IBM Plex Sans',sans-serif;font-size:.82rem;color:#8FA093;text-align:center;margin:8px 0 2px;min-height:1.3em;}
+  .stepper-navrow{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:16px;}
+  .stepper-navbtn{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:.8rem;border:1.5px solid var(--pcb-line);background:transparent;color:#B9C4B9;padding:9px 18px;border-radius:10px;cursor:pointer;transition:.15s ease;text-transform:uppercase;}
+  .stepper-navbtn:hover{border-color:var(--copper);color:var(--paper);}
+  .stepper-navbtn:disabled{opacity:.3;cursor:not-allowed;}
+  .stepper-navbtn.primary{background:rgba(111,227,166,.12);color:var(--phosphor);border-color:var(--phosphor);}
+
+  .verdict-banner{text-align:center;background:rgba(111,227,166,.1);border:2px solid var(--phosphor);color:var(--phosphor);border-radius:14px;padding:18px;margin-top:16px;font-family:'Fraunces',serif;font-weight:700;font-size:clamp(16px,3.2vw,21px);opacity:0;max-height:0;overflow:hidden;transition:opacity .5s ease, max-height .5s ease, margin .5s ease, padding .5s ease;}
+  .verdict-banner.show{opacity:1;max-height:200px;margin-top:16px;padding:18px;}
+
+  footer{text-align:center;font-size:11.5px;color:#5C6B60;margin-top:60px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;}
+  footer .ok{color:var(--phosphor);}
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <svg class="hero-fig" viewBox="0 0 420 320" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="210" cy="300" rx="180" ry="16" fill="#000" opacity="0.35"/>
+      <g fill="#0C1512">
+        <!-- coat body -->
+        <path d="M210 130 C160 130 140 160 132 210 L120 300 L300 300 L288 210 C280 160 260 130 210 130 Z"/>
+        <!-- head -->
+        <circle cx="210" cy="95" r="42"/>
+        <!-- deerstalker cap -->
+        <path d="M164 90 Q166 48 210 44 Q254 48 256 90 Q256 78 210 76 Q164 78 164 90 Z"/>
+        <path d="M160 88 Q210 74 260 88 L260 96 Q210 82 160 96 Z"/>
+        <path d="M150 90 L172 84 L172 98 L150 104 Z"/>
+        <path d="M270 90 L248 84 L248 98 L270 104 Z"/>
+        <!-- pipe -->
+        <path d="M244 108 Q268 112 278 100 Q284 96 282 108 Q272 122 244 116 Z"/>
+      </g>
+      <!-- magnifying glass, held up, glowing phosphor ring -->
+      <g transform="translate(120,150) rotate(-18)">
+        <circle cx="0" cy="0" r="34" fill="none" stroke="#6FE3A6" stroke-width="6" opacity="0.9"/>
+        <line x1="24" y1="24" x2="60" y2="60" stroke="#6FE3A6" stroke-width="8" stroke-linecap="round" opacity="0.9"/>
+      </g>
+      <ellipse cx="210" cy="160" rx="150" ry="90" fill="url(#fog)" opacity="0.5"/>
+      <defs>
+        <radialGradient id="fog" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#6FE3A6" stop-opacity="0.12"/>
+          <stop offset="100%" stop-color="#6FE3A6" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+    </svg>
+    <div class="hero-text">
+      <div class="eyebrow">Discrete Mathematics · Module 1 · Theory of Inference</div>
+      <h1 class="page-title">Think Like Sherlock Holmes</h1>
+      <p class="sub">A case of missing glasses, five clues, and a chain of pure deduction. Work through it yourself — then tap to reveal each step of the proof.</p>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <div class="case-file">
+      <h2>The Case of the Missing Glasses</h2>
+      <p>You are about to leave for college in the morning and discover that you don't have your glasses. You know the following statements are true:</p>
+    </div>
+
+    <div class="clue-list">
+      <div class="clue"><span class="letter">a</span><div class="ctext">If I was reading the newspaper in the kitchen, then my glasses are on the kitchen table.</div>
+        <button class="cvar-btn" data-reveal="cv-a">Tap to reveal symbolic form</button>
+        <div class="cvar-panel" id="cv-a"><div class="cvar">P₁: p → q</div></div></div>
+      <div class="clue"><span class="letter">b</span><div class="ctext">If my glasses are on the kitchen table, then I saw them at breakfast.</div>
+        <button class="cvar-btn" data-reveal="cv-b">Tap to reveal symbolic form</button>
+        <div class="cvar-panel" id="cv-b"><div class="cvar">P₂: q → r</div></div></div>
+      <div class="clue"><span class="letter">c</span><div class="ctext">I did not see my glasses at breakfast.</div>
+        <button class="cvar-btn" data-reveal="cv-c">Tap to reveal symbolic form</button>
+        <div class="cvar-panel" id="cv-c"><div class="cvar">P₃: ¬r</div></div></div>
+      <div class="clue"><span class="letter">d</span><div class="ctext">I was reading the newspaper in the living room, or I was reading the newspaper in the kitchen.</div>
+        <button class="cvar-btn" data-reveal="cv-d">Tap to reveal symbolic form</button>
+        <div class="cvar-panel" id="cv-d"><div class="cvar">P₄: s ∨ p</div></div></div>
+      <div class="clue"><span class="letter">e</span><div class="ctext">If I was reading the newspaper in the living room, then my glasses are on the coffee table.</div>
+        <button class="cvar-btn" data-reveal="cv-e">Tap to reveal symbolic form</button>
+        <div class="cvar-panel" id="cv-e"><div class="cvar">P₅: s → t</div></div></div>
+    </div>
+
+    <div class="var-key">
+      <b>p</b>: reading the newspaper in the kitchen &nbsp;·&nbsp; <b>q</b>: glasses on the kitchen table &nbsp;·&nbsp; <b>r</b>: saw the glasses at breakfast<br>
+      <b>s</b>: reading the newspaper in the living room &nbsp;·&nbsp; <b>t</b>: glasses on the coffee table
+    </div>
+
+    <div class="question-banner">🔎 Where are the glasses?</div>
+
+    <div class="stepper-wrap">
+      <div class="stepper-intro">Tap Next to move through the deduction, one inference at a time.</div>
+      <div id="sherlockStepper"></div>
+      <div class="verdict-banner" id="verdictBanner">🕵️ Case closed — the glasses are on the coffee table.</div>
+    </div>
+
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Theory of Inference &nbsp;—&nbsp; <span class="ok">CIRCUIT COMPLETE ✓</span></footer>
+
+<script>
+const steps = [
+  {expr:'P₁: p → q &nbsp;&nbsp;&nbsp; P₂: q → r', law:'Given (clues a & b)', given:true,
+   note:'Two chained conditionals, ready to combine.'},
+  {expr:'<mark class="st-mark">P₆: p → r</mark>', law:'Hypothetical Syllogism (P₁, P₂)',
+   note:'p→q and q→r chain together: whatever p leads to eventually reaches r.'},
+  {expr:'P₆ rewritten: ¬p ∨ r &nbsp;&nbsp; with &nbsp;&nbsp; P₄: s ∨ p &nbsp;&nbsp; ⇒ <mark class="st-mark">r ∨ s</mark>', law:'Resolution (P₆, P₄ — cancel p / ¬p)',
+   note:'p and ¬p can\'t both be the reason things work — whichever is true, it resolves away, leaving r∨s.'},
+  {expr:'(r ∨ s) &nbsp;&nbsp; with &nbsp;&nbsp; P₅ rewritten: ¬s ∨ t &nbsp;&nbsp; ⇒ <mark class="st-mark">P₇: r ∨ t</mark>', law:'Resolution (r∨s, P₅ — cancel s / ¬s)',
+   note:'Same trick again: s and ¬s cancel, leaving r∨t.'},
+  {expr:'P₇: r ∨ t &nbsp;&nbsp; with &nbsp;&nbsp; P₃: ¬r &nbsp;&nbsp; ⇒ <mark class="st-mark">∴ C: t</mark>', law:'Disjunctive Syllogism (P₇, P₃)',
+   note:'We already know r is false (clue c) — so in "r or t," t is the only option left standing.'}
+];
+
+const container = document.getElementById('sherlockStepper');
+
+document.querySelectorAll('.cvar-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.getElementById(btn.dataset.reveal).classList.toggle('show');
+  });
+});
+
+const box = document.createElement('div');
+box.className = 'stepper-box';
+box.innerHTML = `
+  <div class="stepper-count"></div>
+  <div class="stepper-dots"></div>
+  <div class="stepper-expr"></div>
+  <div class="stepper-lawrow"><span class="stepper-lawbadge"></span></div>
+  <div class="stepper-note"></div>
+  <div class="stepper-navrow">
+    <button class="stepper-navbtn" data-role="prev">‹ Previous</button>
+    <button class="stepper-navbtn primary" data-role="next">Next ›</button>
+  </div>
+`;
+container.appendChild(box);
+
+let idx = 0;
+const countEl = box.querySelector('.stepper-count');
+const dotsEl = box.querySelector('.stepper-dots');
+const exprEl = box.querySelector('.stepper-expr');
+const lawEl = box.querySelector('.stepper-lawbadge');
+const noteEl = box.querySelector('.stepper-note');
+const prevBtn = box.querySelector('[data-role="prev"]');
+const nextBtn = box.querySelector('[data-role="next"]');
+const verdictBanner = document.getElementById('verdictBanner');
+
+steps.forEach((_, i)=>{
+  const d = document.createElement('button');
+  d.className = 'st-dot'; d.type='button';
+  d.addEventListener('click', ()=>{ idx=i; render(); });
+  dotsEl.appendChild(d);
+});
+
+function render(){
+  countEl.textContent = `DEDUCTION ${idx+1} OF ${steps.length}`;
+  Array.from(dotsEl.children).forEach((d,i)=>{ d.classList.toggle('on', i===idx); d.classList.toggle('past', i<idx); });
+  exprEl.innerHTML = steps[idx].expr;
+  lawEl.textContent = steps[idx].law;
+  lawEl.className = 'stepper-lawbadge' + (steps[idx].given ? ' given' : '');
+  noteEl.textContent = steps[idx].note;
+  prevBtn.disabled = idx===0;
+  nextBtn.disabled = idx===steps.length-1;
+  verdictBanner.classList.toggle('show', idx===steps.length-1);
+}
+prevBtn.addEventListener('click', ()=>{ if(idx>0){idx--; render();} });
+nextBtn.addEventListener('click', ()=>{ if(idx<steps.length-1){idx++; render();} });
+render();
+</script>
+</body>
+</html>

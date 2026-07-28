@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statements &amp; Notation — Full Class Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+    --purple:#6B4C9A; --amber:#C1752E; --slate:#3F5A6B;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);font-family:'IBM Plex Sans',sans-serif;color:var(--ink);padding:32px 16px 80px;}
+  .wrap{max-width:820px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(23px,4.5vw,33px);margin:0 0 6px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14.5px;margin:0 auto 26px;max-width:620px;line-height:1.6;}
+
+  .toolbar{
+    position:sticky; top:10px; z-index:30;
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+    background:var(--ink); color:#F4F2EA; border-radius:14px; padding:12px 18px; margin-bottom:8px;
+    box-shadow:0 12px 28px -16px rgba(28,43,51,.6);
+    font-family:'IBM Plex Mono',monospace; font-size:13px;
+  }
+  .toolbar .score span{color:var(--gold);font-weight:700;font-size:16px;}
+  .toolbar .btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .tbtn{
+    background:transparent;border:1.5px solid #F4F2EA;color:#F4F2EA;border-radius:20px;
+    padding:6px 13px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.03em;
+    text-transform:uppercase;cursor:pointer;transition:.15s ease;
+  }
+  .tbtn:hover{background:#F4F2EA;color:var(--ink);}
+  .tbtn.primary{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .tbtn.primary:hover{background:#256150;}
+  .toolbar-note{text-align:center;font-size:11px;color:var(--ink-soft);margin-bottom:30px;font-family:'IBM Plex Mono',monospace;}
+
+  /* ---------- Section header ---------- */
+  .sec-header{display:flex;align-items:center;gap:12px;margin:44px 0 6px;}
+  .sec-badge{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+    color:#fff; padding:5px 13px; border-radius:20px; white-space:nowrap;
+  }
+  .sec-title{font-family:'Fraunces',serif; font-weight:600; font-size:19px; color:var(--ink);}
+  .sec-line{flex:1;height:1px;background:var(--line);}
+  .sec-desc{color:var(--ink-soft); font-size:13.5px; line-height:1.6; margin:6px 0 16px;}
+  .sec-desc em{color:var(--ink);}
+
+  .badge-purple{background:var(--purple);} .badge-amber{background:var(--amber);}
+  .badge-slate{background:var(--slate);} .badge-teal{background:var(--teal);}
+
+  /* ---------- Generic question card ---------- */
+  .q-card{
+    background:var(--card); border-radius:14px; padding:18px 20px; margin-bottom:14px;
+    border:1.5px solid rgba(28,43,51,.08); box-shadow:0 8px 20px -14px rgba(28,43,51,.4);
+    transition:border-color .25s ease, background .25s ease;
+  }
+  .q-card.correct{border-color:var(--teal); background:#F3FAF7;}
+  .q-card.incorrect{border-color:var(--brick); background:#FCF3F2;}
+  .q-num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);margin-bottom:4px;}
+  .q-text{font-size:15.5px;line-height:1.6;margin:0 0 12px;}
+  .q-text em.center-quote{display:block;text-align:center;font-style:italic;margin:8px 0;font-size:16px;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;}
+
+  /* ---------- Segmented control (2/3-way) ---------- */
+  .seg{display:inline-flex;border:1.5px solid var(--line);border-radius:20px;overflow:hidden;background:#F6F4EC;flex-wrap:wrap;}
+  .seg button{
+    border:none;background:transparent;padding:8px 14px;font-family:'IBM Plex Sans',sans-serif;
+    font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ink-soft);transition:.15s ease;
+  }
+  .seg button.sel{background:var(--ink);color:#fff;}
+  .seg button.sel.pos{background:var(--teal);}
+  .seg button.sel.neg{background:var(--brick);}
+  .seg button.sel.mid{background:var(--gold);}
+  .control-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .control-label{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);min-width:90px;}
+  .result-icon{width:20px;height:20px;border-radius:50%;font-size:12px;line-height:20px;text-align:center;font-weight:700;color:#fff;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .result-icon.show{opacity:1;transform:scale(1);}
+  .result-icon.ok{background:var(--teal);}
+  .result-icon.bad{background:var(--brick);}
+
+  /* ---------- MCQ option list ---------- */
+  .mcq-opts{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+  .mcq-opt{
+    text-align:left; background:#fff; border:1.5px solid var(--line); border-radius:8px;
+    padding:9px 14px; font-size:14px; cursor:pointer; transition:.15s ease; font-family:'IBM Plex Sans',sans-serif;
+  }
+  .mcq-opt:hover{border-color:var(--ink);}
+  .mcq-opt.sel{border-color:var(--ink); background:#F1EFE6; font-weight:600;}
+  .mcq-opt.correct{border-color:var(--teal); background:#EAF4F0; color:var(--teal); font-weight:600;}
+  .mcq-opt.wrong{border-color:var(--brick); background:#F8ECEA; color:var(--brick); font-weight:600;}
+
+  /* ---------- Explain / reveal panel ---------- */
+  .explain{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .explain.show{max-height:400px;opacity:1;margin-top:12px;}
+  .explain-inner{border-top:1px dashed var(--line);padding-top:10px;font-size:13.5px;line-height:1.65;color:var(--ink-soft);}
+  .explain-inner strong{color:var(--ink);}
+  .explain-inner ul{margin:6px 0 0;padding-left:20px;}
+  .explain-inner li{margin-bottom:4px;}
+
+  .reveal-btn{
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.05em; text-transform:uppercase;
+    background:transparent; border:1.5px solid var(--ink); color:var(--ink); padding:6px 12px;
+    border-radius:20px; cursor:pointer; transition:.2s ease; margin-top:4px;
+  }
+  .reveal-btn:hover{background:var(--ink); color:var(--paper);}
+
+  /* ---------- Discussion / self-check cards (no scoring) ---------- */
+  .disc-card{
+    background:var(--card); border-radius:14px; padding:18px 20px; margin-bottom:14px;
+    border:1.5px solid rgba(28,43,51,.08); box-shadow:0 8px 20px -14px rgba(28,43,51,.4);
+  }
+  .disc-card ul{margin:8px 0 12px; padding-left:20px; font-size:14.5px; line-height:1.7;}
+  .disc-card .footnote{font-size:13px; color:var(--ink-soft); font-style:italic; margin-top:10px;}
+
+  /* ---------- Table (Think Before / Blackboard Activity) ---------- */
+  .table-scroll{overflow-x:auto; border-radius:14px; box-shadow:0 14px 30px -18px rgba(28,43,51,.4); background:#E3E0D2; border:1px solid rgba(28,43,51,.08); padding:12px 10px; margin-bottom:10px;}
+  table.class-table{border-collapse:separate; border-spacing:8px 6px; width:100%; min-width:560px;}
+  table.class-table th{
+    background:var(--card); padding:9px 10px; text-align:left; font-family:'IBM Plex Mono',monospace;
+    font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft); border-radius:8px;
+  }
+  table.class-table th.center, table.class-table td.center{text-align:center;}
+  table.class-table td{background:var(--card); padding:9px 10px; border-radius:8px; font-size:14px; vertical-align:middle;}
+  table.class-table tr:nth-child(even) td{background:#FAF9F4;}
+  table.class-table td.num{font-family:'IBM Plex Mono',monospace; color:var(--ink-soft); text-align:center; width:30px;}
+
+  .na-note{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);font-style:italic;white-space:nowrap;}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:44px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Statements &amp; Notation</h1>
+  <p class="sub">Full Class Companion — Entry Ticket, Discussion, Definition Check, Abstract Thinking, Pause–Review–Proceed &amp; Blackboard Activity, all in one place.</p>
+
+  <div class="toolbar">
+    <div class="score">Score: <span id="scoreDisplay">0 / 0</span> correct</div>
+    <div class="btns">
+      <button class="tbtn primary" onclick="checkAll()">Check My Answers</button>
+      <button class="tbtn" onclick="revealAll()">Reveal Answers</button>
+      <button class="tbtn" onclick="resetAll()">Reset All</button>
+    </div>
+  </div>
+  <p class="toolbar-note">Scoring covers the Entry Ticket, Definition Check, Abstract Thinking (Q1–Q3), and Blackboard Activity. Discussion and self-check prompts are reveal-only.</p>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1 — ENTRY TICKET -->
+  <!-- ============================================================ -->
+  <div class="sec-header"><span class="sec-badge badge-purple">Entry Ticket</span><span class="sec-title">Think Before We Begin</span><div class="sec-line"></div></div>
+  <p class="sec-desc">Without discussing with your neighbour, answer the following.</p>
+
+  <div class="q-card" id="et1">
+    <div class="q-num">Question 1</div>
+    <p class="q-text">Is the following sentence TRUE, FALSE, or CANNOT BE DECIDED?<br><em class="center-quote">"Every detective is smarter than Light Yagami."</em></p>
+    <div class="control-row">
+      <div class="seg" data-role="score" data-correct="cannot">
+        <button data-val="true" type="button">True</button>
+        <button data-val="false" type="button">False</button>
+        <button data-val="cannot" type="button">Cannot be decided</button>
+      </div>
+      <span class="result-icon"></span>
+    </div>
+    <div class="explain"><div class="explain-inner"><strong>Why:</strong> Light Yagami is a fictional character, and "smarter" has no single, shared, objective test that works across every real and fictional detective. There's no way to check this claim the way we check "7 is prime" — so it can't be assigned True or False. It fails to be a statement in the first place, which is why no truth value can be decided.</div></div>
+  </div>
+
+  <div class="q-card" id="et2">
+    <div class="q-num">Question 2</div>
+    <p class="q-text">Which of the following is <strong>NOT</strong> a mathematical statement?</p>
+    <div class="mcq-opts" data-role="score" data-correct="1">
+      <button class="mcq-opt" data-val="0" type="button">(a) 2 + 3 = 5</button>
+      <button class="mcq-opt" data-val="1" type="button">(b) Close the window.</button>
+      <button class="mcq-opt" data-val="2" type="button">(c) Earth revolves around the Sun.</button>
+      <button class="mcq-opt" data-val="3" type="button">(d) 7 is prime.</button>
+    </div>
+    <div class="explain"><div class="explain-inner"><strong>Why:</strong> (b) is a command — it directs an action rather than asserting a fact, so it has no truth value. The other three are all declarative and checkable (all happen to be True).</div></div>
+  </div>
+
+  <div class="q-card" id="et3">
+    <div class="q-num">Question 3</div>
+    <p class="q-text">Can a mathematical statement be FALSE and still be called a statement?</p>
+    <div class="control-row">
+      <div class="seg" data-role="score" data-correct="yes">
+        <button data-val="yes" type="button">Yes</button>
+        <button data-val="no" type="button">No</button>
+      </div>
+      <span class="result-icon"></span>
+    </div>
+    <div class="explain"><div class="explain-inner"><strong>Why:</strong> Yes. A statement only needs exactly one truth value — True or False. Being False doesn't disqualify a sentence from being a statement; "5 + 5 = 9" is false but still a perfectly good statement.</div></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2 — CLASS DISCUSSION -->
+  <!-- ============================================================ -->
+  <div class="sec-header"><span class="sec-badge badge-amber">Class Discussion</span><span class="sec-title">Groups of Four</span><div class="sec-line"></div></div>
+
+  <div class="disc-card" id="disc1">
+    <p class="q-text">In groups of four, discuss the following question:<br><em class="center-quote">"Can a genius always think logically?"</em></p>
+    <p>Use examples from:</p>
+    <ul>
+      <li>Mathematics</li>
+      <li>Daily life</li>
+      <li>Detective stories</li>
+      <li>Computer Science</li>
+      <li>Artificial Intelligence</li>
+    </ul>
+    <p class="footnote">Each group must defend its answer using reasoning, not opinions.</p>
+    <button class="reveal-btn" onclick="toggleReveal('disc1')">Show a Sample Framework</button>
+    <div class="explain"><div class="explain-inner">
+      <strong>There's no single correct answer here</strong> — it's a discussion prompt, and your reasoning matters more than your conclusion. A strong answer usually touches:
+      <ul>
+        <li><strong>Mathematics:</strong> even celebrated mathematicians have published "proofs" later found to contain logical gaps — raw brilliance doesn't guarantee error-free reasoning.</li>
+        <li><strong>Daily life:</strong> cognitive biases (like overconfidence) affect everyone, including highly intelligent people — intelligence and bias-resistance are different things.</li>
+        <li><strong>Detective stories:</strong> characters like L or Sherlock Holmes are written as flawless reasoners, but that's a fictional ideal — real cognition has blind spots fiction conveniently skips.</li>
+        <li><strong>Computer Science / AI:</strong> a program can execute its logic flawlessly and still produce a wrong answer if its starting assumptions or data were flawed — valid steps from a bad premise still fail.</li>
+      </ul>
+      Most strong answers conclude: raw intelligence and consistent logical discipline are related but not identical — one doesn't guarantee the other.
+    </div></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3 — THINK BEFORE READING THE DEFINITION -->
+  <!-- ============================================================ -->
+  <div class="sec-header"><span class="sec-badge badge-purple">Definition Check</span><span class="sec-title">Think Before Reading the Definition</span><div class="sec-line"></div></div>
+  <p class="sec-desc">Without discussing with anyone, classify each sentence. Don't worry if you're unsure — by the end of this section you should be able to justify every answer mathematically.</p>
+
+  <div class="table-scroll">
+    <table class="class-table" id="defTable">
+      <thead><tr><th>Sentence</th><th class="center">Statement?</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 — ABSTRACT THINKING -->
+  <!-- ============================================================ -->
+  <div class="sec-header"><span class="sec-badge badge-purple">Abstract Thinking</span><span class="sec-title">Justify Every Answer</span><div class="sec-line"></div></div>
+  <p class="sec-desc">Answer each question carefully. Do not guess.</p>
+
+  <div class="q-card" id="ab1">
+    <div class="q-num">Question 1</div>
+    <p class="q-text">Can a false sentence still be a statement?</p>
+    <div class="control-row">
+      <div class="seg" data-role="score" data-correct="yes">
+        <button data-val="yes" type="button">Yes</button>
+        <button data-val="no" type="button">No</button>
+      </div>
+      <span class="result-icon"></span>
+    </div>
+    <div class="explain"><div class="explain-inner"><strong>Why:</strong> Yes — truth and statement-hood are separate questions. A statement just needs exactly one fixed truth value; False qualifies just as well as True.</div></div>
+  </div>
+
+  <div class="q-card" id="ab2">
+    <div class="q-num">Question 2</div>
+    <p class="q-text">Can every true sentence be a statement?</p>
+    <div class="control-row">
+      <div class="seg" data-role="score" data-correct="no">
+        <button data-val="yes" type="button">Yes</button>
+        <button data-val="no" type="button">No</button>
+      </div>
+      <span class="result-icon"></span>
+    </div>
+    <div class="explain"><div class="explain-inner"><strong>Why:</strong> No — "feeling true" isn't enough. A sentence also has to be <em>declarative</em> and <em>objectively checkable</em>. "What a lovely day!" might genuinely be true on a lovely day, but it's an exclamation, not a statement — its grammatical form disqualifies it regardless of how true it feels.</div></div>
+  </div>
+
+  <div class="q-card" id="ab3">
+    <div class="q-num">Question 3</div>
+    <p class="q-text">Can nobody know whether a statement is true, yet it still be a statement?</p>
+    <div class="control-row">
+      <div class="seg" data-role="score" data-correct="yes">
+        <button data-val="yes" type="button">Yes</button>
+        <button data-val="no" type="button">No</button>
+      </div>
+      <span class="result-icon"></span>
+    </div>
+    <div class="explain"><div class="explain-inner"><strong>Why:</strong> Yes — a statement only needs a truth value <em>in principle</em>. The Goldbach Conjecture ("every even number greater than 2 is the sum of two primes") has a definite truth value, but no one has proven which one it is, even after centuries of trying. "Unknown to us" is not the same as "no truth value."</div></div>
+  </div>
+
+  <div class="q-card" id="ab4">
+    <div class="q-num">Question 4</div>
+    <p class="q-text">Can a statement become false in another universe? <span class="mono">(Hint: think about changing the domain.)</span></p>
+    <button class="reveal-btn" onclick="toggleReveal('ab4')">Show Model Reasoning</button>
+    <div class="explain"><div class="explain-inner">
+      It depends on <em>what kind</em> of statement it is:
+      <ul>
+        <li>Pure logical/mathematical truths, like <span class="mono">2 + 2 = 4</span>, don't depend on physical reality at all — they'd hold in any universe with the same underlying logical rules.</li>
+        <li>Statements about the physical world, like <span class="mono">"water boils at 100°C"</span>, depend on physical constants and laws — change the domain (a universe with different physics), and the statement could genuinely become False.</li>
+      </ul>
+      This is a preview of an idea we'll formalise soon: every statement (especially ones with variables) is implicitly evaluated over a <strong>domain of discourse</strong> — and changing that domain can change the truth value.
+    </div></div>
+  </div>
+
+  <div class="q-card" id="ab5">
+    <div class="q-num">Question 5</div>
+    <p class="q-text">Why does Mathematics prefer statements over opinions?</p>
+    <button class="reveal-btn" onclick="toggleReveal('ab5')">Show Model Reasoning</button>
+    <div class="explain"><div class="explain-inner">
+      Mathematics builds long chains of reasoning where each step depends on the one before it. That only works if every claim has a truth value everyone can check the <em>same way</em>. Opinions have no shared, objective test — two people can disagree forever with no way to settle it. If proofs were built on opinions, a single disagreement could collapse the entire chain. Statements give mathematics a stable foundation to build on.
+    </div></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 — PAUSE – REVIEW – PROCEED -->
+  <!-- ============================================================ -->
+  <div class="sec-header"><span class="sec-badge badge-amber">Pause – Review – Proceed</span><span class="sec-title">Self-Check Before Notation</span><div class="sec-line"></div></div>
+  <p class="sec-desc">Before moving to notation, verify that you can answer the following <em>without looking back</em>. If any answer is unclear, pause here — discuss with your partner. Only then proceed.</p>
+
+  <div class="disc-card">
+    <p class="q-text"><strong>1.</strong> State the mathematical definition of a statement.</p>
+    <button class="reveal-btn" onclick="toggleReveal('prp1')">Reveal Expected Answer</button>
+    <div class="explain" id="prp1"><div class="explain-inner">A statement (proposition) is a declarative sentence that is either True or False — never both, never neither.</div></div>
+  </div>
+
+  <div class="disc-card">
+    <p class="q-text"><strong>2.</strong> What are the two necessary conditions?</p>
+    <button class="reveal-btn" onclick="toggleReveal('prp2')">Reveal Expected Answer</button>
+    <div class="explain" id="prp2"><div class="explain-inner">(i) The sentence must be <em>declarative</em> — an assertion, not a question, command, or exclamation. (ii) It must have <em>exactly one</em> truth value, decided objectively.</div></div>
+  </div>
+
+  <div class="disc-card">
+    <p class="q-text"><strong>3.</strong> Can a false sentence be a statement?</p>
+    <button class="reveal-btn" onclick="toggleReveal('prp3')">Reveal Expected Answer</button>
+    <div class="explain" id="prp3"><div class="explain-inner">Yes — False is a valid truth value. A statement just needs one fixed truth value, not specifically True.</div></div>
+  </div>
+
+  <div class="disc-card">
+    <p class="q-text"><strong>4.</strong> Why is <span class="mono">x² = 9</span> not a statement?</p>
+    <button class="reveal-btn" onclick="toggleReveal('prp4')">Reveal Expected Answer</button>
+    <div class="explain" id="prp4"><div class="explain-inner">It contains a free variable <span class="mono">x</span> with no fixed value. Until <span class="mono">x</span> is specified, we can't decide True or False — this makes it an open sentence, not a statement.</div></div>
+  </div>
+
+  <div class="disc-card">
+    <p class="q-text"><strong>5.</strong> Give two examples and two non-examples of statements from daily life.</p>
+    <button class="reveal-btn" onclick="toggleReveal('prp5')">Reveal Sample Answer</button>
+    <div class="explain" id="prp5"><div class="explain-inner">
+      <strong>Examples (statements):</strong> "My school starts at 9 AM." · "It rained yesterday."<br>
+      <strong>Non-examples (not statements):</strong> "Please pass the salt." (command) · "Is the bus late?" (question)
+    </div></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6 — BLACKBOARD ACTIVITY -->
+  <!-- ============================================================ -->
+  <div class="sec-header"><span class="sec-badge badge-slate">Blackboard Activity</span><span class="sec-title">Classify All 20</span><div class="sec-line"></div></div>
+  <p class="sec-desc">For each sentence: is it a <strong>statement</strong>? If it is, what's its <strong>truth value</strong>? Non-statements show N/A automatically.</p>
+
+  <div class="table-scroll">
+    <table class="class-table" id="blackboardTable">
+      <thead><tr><th class="center" style="width:30px;">No.</th><th>Sentence</th><th class="center">Statement?</th><th class="center">Truth Value?</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Topic 1 — Statements &amp; Notation: Full Class Companion</footer>
+</div>
+
+<script>
+/* =====================================================================
+   Generic reveal-only toggler (Class Discussion, PRP) — not scored
+   ===================================================================== */
+function toggleReveal(id){
+  document.getElementById(id).querySelector('.explain') 
+    ? document.getElementById(id).querySelector('.explain').classList.toggle('show')
+    : document.getElementById(id).classList.toggle('show');
+}
+
+/* =====================================================================
+   Wire up all segmented controls (data-role="score") — Entry Ticket, Abstract Thinking
+   ===================================================================== */
+document.querySelectorAll('.seg[data-role="score"]').forEach(seg=>{
+  seg.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','pos','neg','mid'));
+      btn.classList.add('sel');
+      const isCorrectVal = btn.dataset.val === seg.dataset.correct;
+      // color hint only after check/reveal; for now just neutral selection
+      seg.dataset.value = btn.dataset.val;
+      const card = seg.closest('.q-card');
+      card.classList.remove('correct','incorrect');
+      const icon = card.querySelector('.result-icon');
+      icon.classList.remove('show','ok','bad');
+      card.querySelector('.explain').classList.remove('show');
+      updateScoreLive();
+    });
+  });
+});
+
+/* =====================================================================
+   Wire up MCQ option lists (data-role="score") — Entry Ticket Q2
+   ===================================================================== */
+document.querySelectorAll('.mcq-opts[data-role="score"]').forEach(group=>{
+  group.querySelectorAll('.mcq-opt').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      group.querySelectorAll('.mcq-opt').forEach(b=>b.classList.remove('sel','correct','wrong'));
+      btn.classList.add('sel');
+      group.dataset.value = btn.dataset.val;
+      const card = group.closest('.q-card');
+      card.classList.remove('correct','incorrect');
+      card.querySelector('.explain').classList.remove('show');
+      updateScoreLive();
+    });
+  });
+});
+
+/* =====================================================================
+   Build "Think Before Reading the Definition" table (6 rows)
+   ===================================================================== */
+const defItems = [
+  {text:'The Sun rises in the East.', isStatement:true, why:'Declarative and checkable — True.'},
+  {text:'Close the door.', isStatement:false, why:'A command — nothing to check.'},
+  {text:'How are you today?', isStatement:false, why:'A question — asks rather than asserts.'},
+  {text:'x + 5 = 9', isStatement:false, why:'A free variable x with no fixed value — an open sentence.'},
+  {text:'Water boils at 100°C.', isStatement:true, why:'Declarative and checkable — True under standard conditions.'},
+  {text:'What a beautiful painting!', isStatement:false, why:'An exclamation — expresses feeling, not a checkable claim.'}
+];
+buildStatementTable('defTable', defItems, false);
+
+/* =====================================================================
+   Build "Blackboard Activity" table (20 rows)
+   ===================================================================== */
+const boardItems = [
+  {text:'4 + 8 = 12', isStatement:true, truth:true, why:'Declarative, checkable, and True.'},
+  {text:'Open the door.', isStatement:false, why:'A command.'},
+  {text:'The Moon revolves around the Earth.', isStatement:true, truth:true, why:'Declarative, checkable, and True.'},
+  {text:'How old are you?', isStatement:false, why:'A question.'},
+  {text:'x > 5', isStatement:false, why:'A free variable x — an open sentence.'},
+  {text:'Every triangle has three sides.', isStatement:true, truth:true, why:'Declarative, checkable, and True by definition.'},
+  {text:'Chocolate is the best food.', isStatement:false, why:'An opinion — no shared objective test.'},
+  {text:'Please switch off the fan.', isStatement:false, why:'A command.'},
+  {text:'There are infinitely many prime numbers.', isStatement:true, truth:true, why:'A proven theorem (Euclid) — declarative, checkable, and True.'},
+  {text:'What a beautiful sunset!', isStatement:false, why:'An exclamation.'},
+  {text:'Tomorrow will be my lucky day.', isStatement:false, why:'"Lucky" has no shared objective test — this is a subjective prediction, not a statement.'},
+  {text:'5 is divisible by 2.', isStatement:true, truth:false, why:'Declarative and checkable — False, since 5 is odd.'},
+  {text:'She is intelligent.', isStatement:false, why:'"She" is undefined and "intelligent" is subjective — fails on both counts.'},
+  {text:'Every even number is divisible by 2.', isStatement:true, truth:true, why:'Declarative, checkable, and True by definition of "even."'},
+  {text:'Stop talking.', isStatement:false, why:'A command.'},
+  {text:'3⁴ = 81.', isStatement:true, truth:true, why:'Declarative and checkable — True (3⁴ = 81).'},
+  {text:'This sentence is false.', isStatement:false, why:'The Liar Paradox — no consistent truth value exists.'},
+  {text:'x + y = 8', isStatement:false, why:'Two free variables — an open sentence.'},
+  {text:'Earth has two moons.', isStatement:true, truth:false, why:'Declarative and checkable — False, Earth has one moon.'},
+  {text:'Thank you.', isStatement:false, why:'An expression of gratitude, not a declarative claim.'}
+];
+buildStatementTable('blackboardTable', boardItems, true);
+
+function buildStatementTable(tableId, items, numbered){
+  const tbody = document.querySelector('#'+tableId+' tbody');
+  items.forEach((item, idx)=>{
+    const tr = document.createElement('tr');
+    let rowHtml = '';
+    if(numbered) rowHtml += `<td class="num">${idx+1}</td>`;
+    rowHtml += `<td>${item.text}</td>`;
+    rowHtml += `<td class="center">
+      <div class="seg score-item" data-correct="${item.isStatement?'1':'0'}">
+        <button data-val="1" type="button">Statement</button>
+        <button data-val="0" type="button">Not</button>
+      </div>
+    </td>`;
+    if(numbered){
+      if(item.isStatement){
+        rowHtml += `<td class="center">
+          <div class="seg score-item" data-correct="${item.truth?'1':'0'}">
+            <button data-val="1" type="button">True</button>
+            <button data-val="0" type="button">False</button>
+          </div>
+        </td>`;
+      } else {
+        rowHtml += `<td class="center"><span class="na-note">N/A</span></td>`;
+      }
+    }
+    tr.innerHTML = rowHtml;
+    tbody.appendChild(tr);
+
+    // explanation row (hidden helper, shown via title attribute + data for check-time tooltip)
+    tr.dataset.why = item.why;
+  });
+
+  // wire up the segmented controls just created
+  tbody.querySelectorAll('.seg.score-item').forEach(seg=>{
+    seg.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','pos','neg'));
+        btn.classList.add('sel');
+        seg.dataset.value = btn.dataset.val;
+        seg.classList.remove('ok-ring','bad-ring');
+        updateScoreLive();
+      });
+    });
+  });
+}
+
+/* =====================================================================
+   Global scoring
+   ===================================================================== */
+function getAllScoreControls(){
+  return [
+    ...document.querySelectorAll('.seg[data-role="score"]'),
+    ...document.querySelectorAll('.mcq-opts[data-role="score"]'),
+    ...document.querySelectorAll('.seg.score-item')
+  ];
+}
+
+function computeTotal(){
+  return getAllScoreControls().length;
+}
+
+function countScore(){
+  let correct = 0;
+  getAllScoreControls().forEach(ctrl=>{
+    if(ctrl.dataset.value !== undefined && ctrl.dataset.value === ctrl.dataset.correct) correct++;
+  });
+  return correct;
+}
+
+function updateScoreLive(){
+  document.getElementById('scoreDisplay').textContent = countScore() + ' / ' + computeTotal();
+}
+updateScoreLive();
+
+function checkAll(){
+  // Entry Ticket & Abstract Thinking segmented controls
+  document.querySelectorAll('.seg[data-role="score"]').forEach(seg=>{
+    const card = seg.closest('.q-card');
+    const icon = card.querySelector('.result-icon');
+    if(seg.dataset.value !== undefined){
+      const ok = seg.dataset.value === seg.dataset.correct;
+      icon.classList.add('show', ok?'ok':'bad');
+      icon.textContent = ok ? '✓':'✗';
+      card.classList.remove('correct','incorrect');
+      card.classList.add(ok?'correct':'incorrect');
+    }
+    card.querySelector('.explain').classList.add('show');
+  });
+
+  // MCQ
+  document.querySelectorAll('.mcq-opts[data-role="score"]').forEach(group=>{
+    const card = group.closest('.q-card');
+    if(group.dataset.value !== undefined){
+      const ok = group.dataset.value === group.dataset.correct;
+      group.querySelectorAll('.mcq-opt').forEach(b=>{
+        if(b.dataset.val === group.dataset.correct) b.classList.add('correct');
+        else if(b.dataset.val === group.dataset.value) b.classList.add('wrong');
+      });
+      card.classList.remove('correct','incorrect');
+      card.classList.add(ok?'correct':'incorrect');
+    }
+    card.querySelector('.explain').classList.add('show');
+  });
+
+  // Table score-items
+  document.querySelectorAll('.seg.score-item').forEach(seg=>{
+    if(seg.dataset.value !== undefined){
+      const ok = seg.dataset.value === seg.dataset.correct;
+      seg.style.boxShadow = ok ? '0 0 0 2px rgba(47,122,102,.5)' : '0 0 0 2px rgba(181,73,61,.5)';
+    }
+  });
+
+  updateScoreLive();
+}
+
+function revealAll(){
+  // Entry Ticket & Abstract Thinking
+  document.querySelectorAll('.seg[data-role="score"]').forEach(seg=>{
+    seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
+    const btn = seg.querySelector(`button[data-val="${seg.dataset.correct}"]`);
+    btn.classList.add('sel');
+    seg.dataset.value = seg.dataset.correct;
+    const card = seg.closest('.q-card');
+    const icon = card.querySelector('.result-icon');
+    icon.classList.add('show','ok'); icon.textContent = '✓';
+    card.classList.remove('incorrect'); card.classList.add('correct');
+    card.querySelector('.explain').classList.add('show');
+  });
+
+  // MCQ
+  document.querySelectorAll('.mcq-opts[data-role="score"]').forEach(group=>{
+    group.querySelectorAll('.mcq-opt').forEach(b=>b.classList.remove('sel','wrong'));
+    group.querySelector(`.mcq-opt[data-val="${group.dataset.correct}"]`).classList.add('correct');
+    group.dataset.value = group.dataset.correct;
+    const card = group.closest('.q-card');
+    card.classList.remove('incorrect'); card.classList.add('correct');
+    card.querySelector('.explain').classList.add('show');
+  });
+
+  // Table score-items
+  document.querySelectorAll('.seg.score-item').forEach(seg=>{
+    seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
+    const btn = seg.querySelector(`button[data-val="${seg.dataset.correct}"]`);
+    btn.classList.add('sel');
+    seg.dataset.value = seg.dataset.correct;
+    seg.style.boxShadow = '0 0 0 2px rgba(47,122,102,.5)';
+  });
+
+  // Also open all reveal-only panels for consistency
+  document.querySelectorAll('.explain').forEach(e=>e.classList.add('show'));
+
+  updateScoreLive();
+}
+
+function resetAll(){
+  document.querySelectorAll('.seg[data-role="score"]').forEach(seg=>{
+    delete seg.dataset.value;
+    seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
+    const card = seg.closest('.q-card');
+    card.classList.remove('correct','incorrect');
+    card.querySelector('.result-icon').classList.remove('show','ok','bad');
+    card.querySelector('.explain').classList.remove('show');
+  });
+  document.querySelectorAll('.mcq-opts[data-role="score"]').forEach(group=>{
+    delete group.dataset.value;
+    group.querySelectorAll('.mcq-opt').forEach(b=>b.classList.remove('sel','correct','wrong'));
+    const card = group.closest('.q-card');
+    card.classList.remove('correct','incorrect');
+    card.querySelector('.explain').classList.remove('show');
+  });
+  document.querySelectorAll('.seg.score-item').forEach(seg=>{
+    delete seg.dataset.value;
+    seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
+    seg.style.boxShadow = 'none';
+  });
+  document.querySelectorAll('.disc-card .explain, .q-card .explain').forEach(e=>{
+    // keep discussion/PRP panels as-is toggle state reset too
+    e.classList.remove('show');
+  });
+  updateScoreLive();
+}
+</script>
+</body>
+</html>

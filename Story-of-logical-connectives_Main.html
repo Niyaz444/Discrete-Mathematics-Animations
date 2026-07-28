@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Story of Logical Connectives</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pcb:#0F1B15;        /* board substrate */
+    --pcb-light:#17251D;  /* raised panel */
+    --pcb-line:#25392C;   /* faint trace / hairline */
+    --copper:#C08552;     /* trace / accent metal */
+    --phosphor:#6FE3A6;   /* glowing TRUE signal */
+    --warn:#E0794F;       /* glowing FALSE signal */
+    --paper:#F3EEDF;      /* index card */
+    --paper-dim:#E7E1CE;
+    --ink:#211C12;        /* text on paper */
+    --ink-soft:#6B6250;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;background:var(--pcb);color:var(--paper);font-family:'IBM Plex Sans',sans-serif;
+    padding:0 0 100px;line-height:1.6;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(111,227,166,0.05) 1px, transparent 0);
+    background-size:26px 26px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+  ::selection{background:var(--phosphor);color:var(--pcb);}
+  a:focus-visible, button:focus-visible, .big-switch:focus-visible{outline:2px solid var(--phosphor); outline-offset:3px;}
+
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px;}
+
+  /* ================= HERO ================= */
+  .hero{
+    position:relative; padding:56px 16px 44px; text-align:center; overflow:hidden;
+    border-bottom:1px solid var(--pcb-line);
+    background:linear-gradient(180deg, #0B1410 0%, var(--pcb) 100%);
+  }
+  .hero::before{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+    background-image:
+      linear-gradient(var(--pcb-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--pcb-line) 1px, transparent 1px);
+    background-size:44px 44px;
+    mask-image:radial-gradient(ellipse at center, black 0%, transparent 72%);
+  }
+  .hero-inner{position:relative;z-index:1;}
+  .hero-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--copper);margin-bottom:14px;}
+  .hero-title{
+    font-family:'Fraunces',serif;font-weight:900;font-size:clamp(30px,7vw,54px);margin:0 0 12px;color:var(--paper);
+    text-shadow:0 0 30px rgba(111,227,166,.25);
+    letter-spacing:-0.01em;
+  }
+  .hero-sub{font-size:15px;color:#B9C4B9;max-width:520px;margin:0 auto 34px;}
+
+  .gate-row{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;}
+  .gate-chip{
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+    opacity:0; transform:translateY(10px) scale(.9);
+    animation:gatePowerOn .6s cubic-bezier(.2,1.4,.4,1) forwards;
+  }
+  .gate-chip:nth-child(1){animation-delay:.15s;}
+  .gate-chip:nth-child(2){animation-delay:.32s;}
+  .gate-chip:nth-child(3){animation-delay:.49s;}
+  .gate-chip:nth-child(4){animation-delay:.66s;}
+  .gate-chip:nth-child(5){animation-delay:.83s;}
+  .gate-chip:nth-child(6){animation-delay:1.0s;}
+  @keyframes gatePowerOn{ to{opacity:1; transform:translateY(0) scale(1);} }
+  .gate-icon-wrap{
+    width:56px;height:44px;display:flex;align-items:center;justify-content:center;
+    color:var(--copper); filter:drop-shadow(0 0 0 transparent);
+    animation:flicker 3.4s ease-in-out infinite;
+  }
+  .gate-chip:nth-child(2) .gate-icon-wrap{animation-delay:.4s;}
+  .gate-chip:nth-child(3) .gate-icon-wrap{animation-delay:.8s;}
+  .gate-chip:nth-child(4) .gate-icon-wrap{animation-delay:1.2s;}
+  .gate-chip:nth-child(5) .gate-icon-wrap{animation-delay:1.6s;}
+  .gate-chip:nth-child(6) .gate-icon-wrap{animation-delay:2s;}
+  @keyframes flicker{ 0%,92%,100%{color:var(--copper); filter:drop-shadow(0 0 0 transparent);} 96%{color:var(--phosphor); filter:drop-shadow(0 0 8px var(--phosphor));} }
+  .gate-icon-wrap svg{width:100%;height:100%;}
+  .gate-chip-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8FA093;text-transform:uppercase;letter-spacing:.06em;}
+
+  /* ================= NAV ================= */
+  .panel-nav{
+    position:sticky; top:0; z-index:40; background:rgba(15,27,21,.92); backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--pcb-line); padding:10px 16px;
+  }
+  .panel-nav-inner{max-width:760px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+  .nav-led{
+    display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;
+    color:#8FA093;text-decoration:none;padding:6px 11px;border-radius:20px;border:1px solid transparent;
+    transition:.2s ease;
+  }
+  .nav-led .dot{width:6px;height:6px;border-radius:50%;background:#3E4F44;transition:.2s ease;flex-shrink:0;}
+  .nav-led:hover{color:var(--paper);border-color:var(--pcb-line);}
+  .nav-led.active{color:var(--phosphor);border-color:rgba(111,227,166,.35);background:rgba(111,227,166,.06);}
+  .nav-led.active .dot{background:var(--phosphor); box-shadow:0 0 8px var(--phosphor);}
+
+  /* ================= SECTION SHELL ================= */
+  .connective-section{max-width:760px;margin:0 auto;padding:64px 16px 0;scroll-margin-top:64px;}
+  .section-head{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:8px;}
+  .gate-node{
+    width:88px;height:66px;display:flex;align-items:center;justify-content:center;color:var(--copper);
+    margin-bottom:14px; transition:color .5s ease, filter .5s ease; filter:drop-shadow(0 0 0 transparent);
+  }
+  .gate-node svg{width:100%;height:100%;}
+  .connective-section.in-view .gate-node{color:var(--phosphor); filter:drop-shadow(0 0 14px rgba(111,227,166,.55));}
+  .conn-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
+  .conn-title{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(24px,4.5vw,32px);margin:0;color:var(--paper);}
+  .fun-fact{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#8FA093;text-align:center;max-width:480px;margin:14px auto 30px;
+    border:1px dashed var(--pcb-line); border-radius:10px; padding:8px 14px; background:rgba(0,0,0,.15);
+  }
+  .fun-fact b{color:var(--copper);}
+
+  /* connector between sections */
+  .circuit-connector{position:relative;height:64px;max-width:760px;margin:0 auto;display:flex;justify-content:center;}
+  .circuit-connector .wire{width:2px;height:100%;background:repeating-linear-gradient(var(--copper) 0 6px, transparent 6px 12px);opacity:.5;}
+  .circuit-connector .pulse{
+    position:absolute; left:50%; transform:translateX(-50%); width:8px;height:8px;border-radius:50%;
+    background:var(--phosphor); box-shadow:0 0 10px var(--phosphor), 0 0 20px var(--phosphor);
+    animation:travel 3.2s linear infinite;
+  }
+  @keyframes travel{ 0%{top:-4%; opacity:0;} 10%{opacity:1;} 90%{opacity:1;} 100%{top:96%; opacity:0;} }
+
+  /* ================= STORY CARDS (index-card look) ================= */
+  .story-box{
+    position:relative; background:var(--paper); color:var(--ink); border-radius:6px;
+    padding:22px 24px 20px; margin-bottom:22px; box-shadow:0 18px 34px -18px rgba(0,0,0,.55), 0 2px 0 rgba(0,0,0,.06);
+  }
+  .story-box:nth-of-type(odd){transform:rotate(-0.4deg);}
+  .story-box:nth-of-type(even){transform:rotate(0.4deg);}
+  .story-box::before{
+    content:""; position:absolute; top:-9px; left:28px; width:26px; height:18px; border-radius:3px;
+    background:linear-gradient(180deg,#D8CFAE,#B7AB82); box-shadow:0 2px 4px rgba(0,0,0,.35);
+  }
+  .story-tag{
+    display:inline-flex; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:11px;
+    padding:4px 12px; border-radius:20px; margin-bottom:14px; color:#fff; letter-spacing:.03em; text-transform:uppercase;
+    transform:rotate(-1deg);
+  }
+  .story-box p{margin:0 0 10px;font-size:15px;}
+  .story-box p:last-child{margin-bottom:0;}
+  .story-box .center-line{text-align:center;font-style:italic;margin:10px 0;font-size:15.5px;}
+  .story-box .boxed{font-family:'IBM Plex Mono',monospace;background:#fff;border:1.5px solid rgba(33,28,18,.18);border-radius:6px;padding:9px 15px;display:inline-block;margin:8px 0;color:var(--ink);}
+  .story-box .boxed-wrap{text-align:center;}
+  .story-box ul, .story-box ol{margin:8px 0;padding-left:22px;}
+
+  .tag-hook{background:var(--copper);}
+  .tag-think{background:#6B5B95;}
+  .tag-key{background:#2F7A5F;}
+  .tag-counter{background:#B5493D;}
+  .tag-mistake{background:#9A3B63;}
+
+  .reveal-btn{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;
+    background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:7px 14px;border-radius:20px;
+    cursor:pointer;transition:.2s ease;margin-top:4px;
+  }
+  .reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .reveal-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .reveal-panel.show{max-height:600px;opacity:1;margin-top:14px;}
+  .reveal-panel-inner{border-top:1.5px dashed rgba(33,28,18,.2);padding-top:12px;font-size:14.5px;}
+  .reveal-panel-inner strong{color:var(--ink);}
+  .reveal-panel-inner ol,.reveal-panel-inner ul{margin:8px 0 0;padding-left:20px;}
+  .reveal-panel-inner li{margin-bottom:8px;}
+
+  .scratch{width:100%;border:1.5px dashed rgba(33,28,18,.25);border-radius:8px;background:rgba(255,255,255,.5);padding:10px 12px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:var(--ink);resize:vertical;min-height:40px;margin:8px 0;}
+  .scratch::placeholder{color:var(--ink-soft);font-style:italic;}
+
+  /* ================= quote block + promise table (clean readout style) ================= */
+  .quote-block{
+    border-left:3px solid var(--copper); padding:4px 0 4px 16px; margin:2px 0 16px;
+    font-family:'Fraunces',serif; font-weight:600; font-size:16.5px; font-style:italic; color:var(--ink);
+  }
+  .plain-line{font-size:14.5px; margin:0 0 10px;}
+  .plain-line strong{color:var(--ink);}
+  table.promise-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px;}
+  table.promise-table th{
+    text-align:left; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase;
+    letter-spacing:.04em; color:var(--ink-soft); padding:0 14px 10px 0; border-bottom:2px solid rgba(33,28,18,.18);
+  }
+  table.promise-table td{padding:12px 14px 12px 0; border-bottom:1px solid rgba(33,28,18,.1); font-family:'IBM Plex Sans',sans-serif;}
+  table.promise-table tr:last-child td{border-bottom:none;}
+  table.promise-table td.broken{color:var(--brick-txt,#B5493D); font-weight:700;}
+
+  /* ================= mini truth table ================= */
+  .mini-ref{margin:26px 0 10px;text-align:center;}
+  .mini-ref-label{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#8FA093;margin-bottom:10px;}
+  table.reftable{border-collapse:separate;border-spacing:5px;margin:0 auto;}
+  table.reftable th,table.reftable td{padding:7px 15px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:13px;border-radius:6px;}
+  table.reftable th{background:var(--pcb-light);color:var(--copper);font-size:10.5px;text-transform:uppercase;border:1px solid var(--pcb-line);}
+  table.reftable td{background:var(--pcb-light);color:var(--paper);font-weight:600;border:1px solid var(--pcb-line);}
+
+  /* ================= switch widget ================= */
+  .switch-widget{
+    background:var(--pcb-light); border:1px solid var(--pcb-line); border-radius:14px;
+    padding:26px 24px; margin:24px 0; text-align:center; position:relative;
+  }
+  .switch-widget::before,.switch-widget::after{
+    content:""; position:absolute; width:8px;height:8px;border:1px solid var(--copper); border-radius:50%; top:10px;
+  }
+  .switch-widget::before{left:10px;} .switch-widget::after{right:10px;}
+  .switch-widget-label{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#8FA093;margin-bottom:18px;}
+  .switches-row{display:flex;justify-content:center;gap:36px;flex-wrap:wrap;margin-bottom:20px;}
+  .switch-unit{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .switch-unit .name{font-family:'Fraunces',serif;font-weight:600;font-size:15px;color:var(--paper);}
+  .big-switch{
+    position:relative;width:60px;height:32px;border-radius:6px;cursor:pointer;
+    background:#2A1712;border:2px solid var(--warn);transition:.2s ease; box-shadow:inset 0 2px 4px rgba(0,0,0,.4);
+  }
+  .big-switch.on{background:#0F2A20;border-color:var(--phosphor); box-shadow:inset 0 2px 4px rgba(0,0,0,.4), 0 0 14px rgba(111,227,166,.5);}
+  .big-switch .knob{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:4px;background:linear-gradient(180deg,#DDD,#999);box-shadow:0 2px 4px rgba(0,0,0,.4);transition:left .2s ease;}
+  .big-switch.on .knob{left:31px;background:linear-gradient(180deg,#BFFFE0,#6FE3A6);}
+  .switch-state{font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:700;letter-spacing:.04em;}
+  .switch-state.off{color:var(--warn);}
+  .switch-state.on{color:var(--phosphor);}
+  .result-display{
+    font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;padding:12px 22px;border-radius:8px;
+    display:inline-block;background:#0B140F;border:1px solid var(--pcb-line);color:var(--paper);
+  }
+  .result-display .val{margin-left:10px; padding:2px 10px; border-radius:4px;}
+  .result-display .val.on{color:var(--phosphor); text-shadow:0 0 10px rgba(111,227,166,.6);}
+  .result-display .val.off{color:var(--warn); text-shadow:0 0 10px rgba(224,121,79,.5);}
+
+  /* ================= cheat sheet ================= */
+  .cheat-sheet{max-width:760px;margin:80px auto 0;padding:0 16px;}
+  .cheat-title{text-align:center;font-family:'Fraunces',serif;font-weight:700;font-size:clamp(22px,4vw,28px);margin-bottom:8px;color:var(--paper);}
+  .cheat-sub{text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--copper);margin-bottom:26px;text-transform:uppercase;letter-spacing:.08em;}
+  .cheat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;}
+  .cheat-card{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:12px;padding:18px 16px;text-align:center;}
+  .cheat-card .gate-icon-wrap{width:48px;height:38px;margin:0 auto 10px;color:var(--phosphor);filter:drop-shadow(0 0 8px rgba(111,227,166,.4));}
+  .cheat-card .name{font-family:'Fraunces',serif;font-weight:600;font-size:14.5px;margin-bottom:6px;color:var(--paper);}
+  .cheat-card .hint{font-size:12px;color:#8FA093;}
+
+  footer{text-align:center;font-size:11.5px;color:#5C6B60;margin-top:60px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;}
+  footer .ok{color:var(--phosphor);}
+</style>
+</head>
+<body>
+
+  <!-- ================= HERO ================= -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+      <h1 class="hero-title">The Story of<br>Logical Connectives</h1>
+      <p class="hero-sub">Six symbols, six ideas — wired together through Professor Na's classroom, one promise, one puzzle, and one scholarship at a time.</p>
+      <div class="gate-row" id="heroGateRow"></div>
+    </div>
+  </div>
+
+  <div class="panel-nav">
+    <div class="panel-nav-inner" id="navRow"></div>
+  </div>
+
+  <div class="wrap" style="padding-top:6px;"></div>
+
+  <!-- ============================================================ -->
+  <!-- NEGATION -->
+  <!-- ============================================================ -->
+  <div class="connective-section" id="negation" data-gate="not">
+    <div class="section-head">
+      <div class="gate-node" data-icon="not"></div>
+      <div class="conn-tag">3.3 · The simplest but most powerful connective</div>
+      <h2 class="conn-title">Negation</h2>
+    </div>
+    <div class="fun-fact">In electronics, this exact symbol is called an <b>inverter</b> — the triangle-and-bubble shape you'll find on real circuit diagrams.</div>
+
+    <div class="story-box">
+      <span class="story-tag tag-think">Think Before Reading</span>
+      <p>Suppose</p>
+      <div class="boxed-wrap"><span class="boxed"><em>P</em>: "Today is Monday."</span></div>
+      <p>Without learning any mathematics, how would you express "the opposite" of this statement? Write your answer below. Now think carefully. Is</p>
+      <div class="boxed-wrap"><span class="boxed">Today is Tuesday</span></div>
+      <p>really the opposite? Or could it be Wednesday, Thursday, Friday, Saturday, or Sunday?</p>
+      <textarea class="scratch" placeholder="Write your own answer here first..."></textarea>
+      <button class="reveal-btn" onclick="toggleReveal('neg1')">Reveal the Answer</button>
+      <div class="reveal-panel" id="neg1"><div class="reveal-panel-inner">
+        "Today is Tuesday" is a tempting first guess — but it's far too specific. If today isn't Monday, it doesn't have to be Tuesday; it could be any of the other six days. The true negation only needs to say <strong>one thing</strong>: "Today is <strong>not</strong> Monday." That single sentence stays true across Tuesday, Wednesday, Thursday, Friday, Saturday, <em>and</em> Sunday — because negation isn't about naming the opposite day, it's about flipping a truth value.
+      </div></div>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-key">The Key Idea</span>
+      <p>Negation does <strong>not</strong> change the subject, the object, or the meaning of the sentence. It changes only one thing:</p>
+      <div class="boxed-wrap"><span class="boxed" style="font-size:18px;font-weight:700;">THE TRUTH VALUE</span></div>
+      <p>Think of a light switch.</p>
+      <div class="boxed-wrap"><span class="boxed">ON &#8660; OFF</span></div>
+      <p>Negation performs exactly this logical switching.</p>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-key">The Proof — Both Cases</span>
+      <div class="quote-block">"Today is Monday."</div>
+      <p class="plain-line">This is a <strong>statement</strong>, call it P.</p>
+      <p class="plain-line">There are only two things that can happen.</p>
+      <table class="promise-table">
+        <tr><th>Is it Monday? (P)</th><th>Is "Today is NOT Monday" true? (&not;P)</th></tr>
+        <tr><td>Yes</td><td>No</td></tr>
+        <tr><td>No</td><td>Yes</td></tr>
+      </table>
+    </div>
+
+    <div class="switch-widget">
+      <div class="switch-widget-label">Try it — flip the switch</div>
+      <div class="switches-row">
+        <div class="switch-unit">
+          <span class="name">p</span>
+          <div class="big-switch" id="negSwitch" tabindex="0" role="button" aria-label="Toggle p" onclick="toggleNegSwitch()" onkeydown="if(event.key==='Enter'||event.key===' '){toggleNegSwitch();event.preventDefault();}"><div class="knob"></div></div>
+          <span class="switch-state off" id="negState">p = OFF</span>
+        </div>
+      </div>
+      <div class="result-display">&not;p = <span class="val on" id="negResult">TRUE</span></div>
+    </div>
+
+    <div class="mini-ref">
+      <div class="mini-ref-label">Notation: &not;p (sometimes written ~p)</div>
+      <table class="reftable"><tr><th>p</th><th>&not;p</th></tr><tr><td>T</td><td>F</td></tr><tr><td>F</td><td>T</td></tr></table>
+    </div>
+  </div>
+
+  <div class="circuit-connector"><div class="wire"></div><div class="pulse" style="animation-delay:0s;"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- CONJUNCTION -->
+  <!-- ============================================================ -->
+  <div class="connective-section" id="conjunction" data-gate="and">
+    <div class="section-head">
+      <div class="gate-node" data-icon="and"></div>
+      <div class="conn-tag">Both, or nothing</div>
+      <h2 class="conn-title">Conjunction</h2>
+    </div>
+    <div class="fun-fact">This D-shaped symbol is the standard <b>AND gate</b> used on real circuit diagrams — flat back, rounded front.</div>
+
+    <div class="story-box">
+      <span class="story-tag tag-hook">The Hook — The Scholarship Challenge</span>
+      <p class="center-line">"One student will receive this scholarship."</p>
+      <div class="boxed-wrap"><span class="boxed">P: Attendance ≥ 90%&nbsp;&nbsp;&nbsp;Q: Final Marks ≥ 90</span></div>
+      <div class="boxed-wrap"><span class="boxed">P ∧ Q</span></div>
+      <p class="center-line">"What does this symbol mean?" — "Both conditions must be satisfied?" — "<strong>Exactly.</strong>"</p>
+      <p>The scholarship is awarded only when <strong>both</strong> conditions are fulfilled. This logical operation is called <strong>CONJUNCTION</strong>.</p>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-key">The Golden Rule</span>
+      <p>Think of conjunction as a security system. Imagine a bank locker requiring</p>
+      <ul><li>Password<br><strong>AND</strong></li><li>Fingerprint</li></ul>
+      <p>If even one requirement fails, the locker does not open. Mathematical conjunction works in exactly the same way. Both conditions must succeed.</p>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-key">The Proof — All Four Cases</span>
+      <div class="quote-block">"One student will receive this scholarship."</div>
+      <p class="plain-line">This is a <strong>conjunction</strong> (P ∧ Q).</p>
+      <p class="plain-line">There are only four things that can happen.</p>
+      <table class="promise-table">
+        <tr><th>Attendance ≥ 90%? (P)</th><th>Marks ≥ 90? (Q)</th><th>Scholarship Awarded?</th></tr>
+        <tr><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>Yes</td><td>No</td><td class="broken">No</td></tr>
+        <tr><td>No</td><td>Yes</td><td class="broken">No</td></tr>
+        <tr><td>No</td><td>No</td><td class="broken">No</td></tr>
+      </table>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-counter">Counter Example — "Almost True" is Still False</span>
+      <p>Students often argue,</p>
+      <p class="center-line">"One statement is true. Shouldn't the conjunction be partially true?"</p>
+      <p>Mathematics says No. Consider</p>
+      <div class="boxed-wrap"><span class="boxed">P: "You entered the examination hall." (True)</span></div>
+      <div class="boxed-wrap"><span class="boxed">Q: "You submitted the answer script." (False)</span></div>
+      <p>Can the university award marks? No. Completing only one condition is insufficient. Conjunction demands both conditions simultaneously.</p>
+    </div>
+
+    <div class="mini-ref">
+      <div class="mini-ref-label">Notation: p ∧ q — true only when both are true</div>
+      <table class="reftable"><tr><th>p</th><th>q</th><th>p∧q</th></tr><tr><td>T</td><td>T</td><td>T</td></tr><tr><td>T</td><td>F</td><td>F</td></tr><tr><td>F</td><td>T</td><td>F</td></tr><tr><td>F</td><td>F</td><td>F</td></tr></table>
+    </div>
+  </div>
+
+  <div class="circuit-connector"><div class="wire"></div><div class="pulse" style="animation-delay:.5s;"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- DISJUNCTION -->
+  <!-- ============================================================ -->
+  <div class="connective-section" id="disjunction" data-gate="or">
+    <div class="section-head">
+      <div class="gate-node" data-icon="or"></div>
+      <div class="conn-tag">One of the greatest surprises in logic</div>
+      <h2 class="conn-title">Disjunction</h2>
+    </div>
+    <div class="fun-fact">The curved shield shape is the standard <b>OR gate</b> symbol — its curved back is what tells engineers "at least one," not "exactly one."</div>
+
+    <div class="story-box">
+      <span class="story-tag tag-hook">The Hook — Free Refreshments!</span>
+      <p>Professor Na smiles and announces,</p>
+      <p class="center-line" style="font-family:'Fraunces',serif;font-weight:700;font-size:19px;">Today's Refreshments</p>
+      <p>He writes on the board</p>
+      <div class="boxed-wrap"><span class="boxed">Tea OR Coffee</span></div>
+      <p class="center-line">"Can we have both?" — "No! OR means only one."</p>
+      <div class="boxed-wrap"><span class="boxed" style="font-weight:700;">OR</span></div>
+      <p>In everyday English, OR sometimes means <em>choose exactly one</em>. But in Mathematics, OR has a completely different meaning. Today, we shall discover one of the greatest surprises in logic.</p>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-key">The Golden Rule</span>
+      <p>Mathematical OR means</p>
+      <div class="boxed-wrap"><span class="boxed" style="font-size:18px;font-weight:700;">AT LEAST ONE</span></div>
+      <p>It never means "exactly one" unless explicitly stated. Always remember</p>
+      <div class="boxed-wrap"><span class="boxed" style="font-weight:700;">At Least One</span></div>
+      <p>This single sentence prevents one of the most common mistakes in logic. So Professor Na's "No, only one" was actually the <em>everyday English</em> answer — mathematically, Tea, Coffee, or <em>both</em> would all satisfy "Tea ∨ Coffee."</p>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-key">The Proof — All Four Cases</span>
+      <div class="quote-block">"Tea OR Coffee."</div>
+      <p class="plain-line">This is a <strong>disjunction</strong> (P ∨ Q).</p>
+      <p class="plain-line">There are only four things that can happen.</p>
+      <table class="promise-table">
+        <tr><th>Ordered Tea? (P)</th><th>Ordered Coffee? (Q)</th><th>Refreshment Served?</th></tr>
+        <tr><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>Yes</td><td>No</td><td>Yes</td></tr>
+        <tr><td>No</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>No</td><td>No</td><td class="broken">No</td></tr>
+      </table>
+    </div>
+
+    <div class="mini-ref">
+      <div class="mini-ref-label">Notation: p ∨ q — false only when both are false</div>
+      <table class="reftable"><tr><th>p</th><th>q</th><th>p∨q</th></tr><tr><td>T</td><td>T</td><td>T</td></tr><tr><td>T</td><td>F</td><td>T</td></tr><tr><td>F</td><td>T</td><td>T</td></tr><tr><td>F</td><td>F</td><td>F</td></tr></table>
+    </div>
+  </div>
+
+  <div class="circuit-connector"><div class="wire"></div><div class="pulse" style="animation-delay:1s;"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- IMPLICATION -->
+  <!-- ============================================================ -->
+  <div class="connective-section" id="implication" data-gate="imp">
+    <div class="section-head">
+      <div class="gate-node" data-icon="imp"></div>
+      <div class="conn-tag">A promise with only one way to break it</div>
+      <h2 class="conn-title">Implication</h2>
+    </div>
+    <div class="fun-fact">Circuit-wise, p→q is built from an <b>OR gate with p inverted first</b> (¬p ∨ q) — that little bubble on the input is the whole trick.</div>
+
+    <div class="story-box">
+      <span class="story-tag tag-hook">The Hook — Professor Na's Laptop Promise</span>
+      <div class="boxed-wrap"><span class="boxed" style="font-weight:700;">If you score above 90 marks in the final examination,<br>then I shall give you this laptop.</span></div>
+      <p class="center-line">"Challenge accepted!"</p>
+      <p class="center-line" style="font-family:'Fraunces',serif;font-weight:700;font-size:19px;">When exactly have I broken my promise?</p>
+      <p>Instead of guessing, let us investigate logically.</p>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-think">Think Before Reading</span>
+      <p>Suppose Professor Na made the following promise.</p>
+      <div class="boxed-wrap"><span class="boxed">If you score above 90, then I will give you a laptop.</span></div>
+      <p>Now consider the following situations. For each: has the promise been broken?</p>
+      <ol>
+        <li>A student scores 95. Professor Na gives the laptop.</li>
+        <li>A student scores 95. Professor Na refuses to give the laptop.</li>
+        <li>A student scores only 40. Professor Na still gives the laptop.</li>
+        <li>A student scores only 40. Professor Na gives nothing.</li>
+      </ol>
+      <textarea class="scratch" placeholder="Write your answers for all four before reading further..."></textarea>
+      <button class="reveal-btn" onclick="toggleReveal('imp1')">Reveal the Answers</button>
+      <div class="reveal-panel" id="imp1"><div class="reveal-panel-inner">
+        <ol>
+          <li><strong>Not broken.</strong> P (score&gt;90) is True, Q (laptop given) is True — the promise holds.</li>
+          <li><strong>Broken!</strong> P is True, Q is False — this is the <em>only</em> way a conditional promise can fail.</li>
+          <li><strong>Not broken.</strong> P is False — the promise never said what happens below 90, so extra generosity doesn't violate anything.</li>
+          <li><strong>Not broken.</strong> P is False again — nothing was promised in this case either, so giving nothing is perfectly consistent.</li>
+        </ol>
+      </div></div>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-key">The Secret Behind Implication</span>
+      <p>A conditional statement does <strong>not</strong> claim that P causes Q. Instead, it simply promises that whenever P is true, Q must also be true. Therefore, the implication fails only in one situation.</p>
+      <div class="boxed-wrap"><span class="boxed" style="font-weight:700;">P = True&nbsp;&nbsp;&nbsp;&nbsp;Q = False</span></div>
+      <p>That is exactly the situation where the promise has been broken.</p>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-key">The Proof — All Four Cases</span>
+      <div class="quote-block">"If you score above 90 marks in the final examination, then I shall give you this laptop."</div>
+      <p class="plain-line">This is a <strong>promise.</strong></p>
+      <p class="plain-line">There are only four things that can happen.</p>
+      <table class="promise-table">
+        <tr><th>Marks &gt; 90? (P)</th><th>Got Laptop? (Q)</th><th>Did I break my promise?</th></tr>
+        <tr><td>Yes</td><td>Yes</td><td>No</td></tr>
+        <tr><td>Yes</td><td>No</td><td class="broken">Yes (Promise broken)</td></tr>
+        <tr><td>No</td><td>Yes</td><td>No</td></tr>
+        <tr><td>No</td><td>No</td><td>No</td></tr>
+      </table>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-counter">Counter Example — Implication is NOT Causation</span>
+      <p>Consider the statement</p>
+      <div class="boxed-wrap"><span class="boxed">If I wear a blue shirt, then 2 + 2 = 4.</span></div>
+      <p>Since <span class="boxed" style="padding:2px 8px;">2 + 2 = 4</span> is always true, the implication is logically True. However, wearing a blue shirt does not <em>cause</em> mathematics to change. Implication is about logical truth, not physical cause and effect.</p>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-mistake">Most Common Mistake</span>
+      <p>Students often believe</p>
+      <div class="boxed-wrap"><span class="boxed">P → Q</span></div>
+      <p>means</p>
+      <div class="boxed-wrap"><span class="boxed">Q → P.</span></div>
+      <p>This is incorrect. Example: "If it rains, the roads become wet" does not imply "If the roads are wet, then it rained." Perhaps someone washed the road, or a water pipe burst. The reversed statement is called the <strong>converse</strong>, and it is generally not equivalent to the original.</p>
+    </div>
+
+    <div class="mini-ref">
+      <div class="mini-ref-label">Notation: p → q — false only when p is true and q is false</div>
+      <table class="reftable"><tr><th>p</th><th>q</th><th>p→q</th></tr><tr><td>T</td><td>T</td><td>T</td></tr><tr><td>T</td><td>F</td><td>F</td></tr><tr><td>F</td><td>T</td><td>T</td></tr><tr><td>F</td><td>F</td><td>T</td></tr></table>
+    </div>
+  </div>
+
+  <div class="circuit-connector"><div class="wire"></div><div class="pulse" style="animation-delay:1.5s;"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- BICONDITIONAL -->
+  <!-- ============================================================ -->
+  <div class="connective-section" id="biconditional" data-gate="bicond">
+    <div class="section-head">
+      <div class="gate-node" data-icon="bicond"></div>
+      <div class="conn-tag">Two promises at once</div>
+      <h2 class="conn-title">Biconditional</h2>
+    </div>
+    <div class="fun-fact">This is an <b>XNOR gate</b> — an XOR gate with its output inverted. Engineers use it whenever two signals need to match exactly.</div>
+
+    <div class="story-box">
+      <span class="story-tag tag-hook">The Hook — The Secret Club</span>
+      <p class="center-line" style="font-family:'Fraunces',serif;font-weight:700;font-size:19px;">"Only official members may wear this badge."</p>
+      <p class="center-line">"If I become a member, can I wear the badge?"</p>
+      <p>Professor Na replies,</p>
+      <div class="boxed-wrap"><span class="boxed" style="font-weight:700;">YES</span></div>
+      <p class="center-line">"What if someone is wearing the badge? Must they already be a member?"</p>
+      <p>Again, Professor Na replies,</p>
+      <div class="boxed-wrap"><span class="boxed" style="font-weight:700;">YES</span></div>
+      <p>Notice carefully. Two promises are being made.</p>
+      <div class="boxed-wrap"><span class="boxed">Member → Badge<br>Badge → Member</span></div>
+      <p>Both directions are true. This relationship is stronger than implication. It is called</p>
+      <p class="center-line" style="font-family:'Fraunces',serif;font-weight:700;font-size:22px;">BICONDITIONAL</p>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-key">Golden Rule</span>
+      <p>The biconditional is True whenever both statements possess the <strong>same truth value.</strong> That means</p>
+      <div class="boxed-wrap"><span class="boxed">T, T → T<br>F, F → T</span></div>
+      <p>If one statement is True and the other is False, the biconditional becomes False.</p>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-key">The Proof — All Four Cases</span>
+      <div class="quote-block">"Only official members may wear this badge."</div>
+      <p class="plain-line">This is a <strong>biconditional</strong> (P ↔ Q) — two promises at once.</p>
+      <p class="plain-line">There are only four things that can happen.</p>
+      <table class="promise-table">
+        <tr><th>Is a Member? (P)</th><th>Wearing Badge? (Q)</th><th>Rule Satisfied?</th></tr>
+        <tr><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>Yes</td><td>No</td><td class="broken">No</td></tr>
+        <tr><td>No</td><td>Yes</td><td class="broken">No</td></tr>
+        <tr><td>No</td><td>No</td><td>Yes</td></tr>
+      </table>
+    </div>
+
+    <div class="mini-ref">
+      <div class="mini-ref-label">Notation: p ↔ q — true when p and q match</div>
+      <table class="reftable"><tr><th>p</th><th>q</th><th>p↔q</th></tr><tr><td>T</td><td>T</td><td>T</td></tr><tr><td>T</td><td>F</td><td>F</td></tr><tr><td>F</td><td>T</td><td>F</td></tr><tr><td>F</td><td>F</td><td>T</td></tr></table>
+    </div>
+  </div>
+
+  <div class="circuit-connector"><div class="wire"></div><div class="pulse" style="animation-delay:2s;"></div></div>
+
+  <!-- ============================================================ -->
+  <!-- XOR -->
+  <!-- ============================================================ -->
+  <div class="connective-section" id="xor" data-gate="xor">
+    <div class="section-head">
+      <div class="gate-node" data-icon="xor"></div>
+      <div class="conn-tag">Exactly one, no more, no less</div>
+      <h2 class="conn-title">Exclusive OR (XOR)</h2>
+    </div>
+    <div class="fun-fact">The extra curved line behind an OR gate is what makes it an <b>XOR gate</b> — the mark that rules out "both."</div>
+
+    <div class="story-box">
+      <span class="story-tag tag-key">Light Switch</span>
+      <p>Suppose</p>
+      <div class="boxed-wrap"><span class="boxed">p: The first switch is ON<br>q: The second switch is ON</span></div>
+      <p>Then</p>
+      <div class="boxed-wrap"><span class="boxed">p ⊕ q</span></div>
+      <p>means</p>
+      <p class="center-line" style="font-weight:700;">Exactly one switch is ON.</p>
+      <p>If both switches are ON or both are OFF, then</p>
+      <div class="boxed-wrap"><span class="boxed">p ⊕ q</span></div>
+      <p>is false.</p>
+    </div>
+
+    <div class="switch-widget">
+      <div class="switch-widget-label">Try it — flip both switches</div>
+      <div class="switches-row">
+        <div class="switch-unit">
+          <span class="name">p</span>
+          <div class="big-switch" id="xorSwitchP" tabindex="0" role="button" aria-label="Toggle p" onclick="toggleXorSwitch('P')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleXorSwitch('P');event.preventDefault();}"><div class="knob"></div></div>
+          <span class="switch-state off" id="xorStateP">p = OFF</span>
+        </div>
+        <div class="switch-unit">
+          <span class="name">q</span>
+          <div class="big-switch" id="xorSwitchQ" tabindex="0" role="button" aria-label="Toggle q" onclick="toggleXorSwitch('Q')" onkeydown="if(event.key==='Enter'||event.key===' '){toggleXorSwitch('Q');event.preventDefault();}"><div class="knob"></div></div>
+          <span class="switch-state off" id="xorStateQ">q = OFF</span>
+        </div>
+      </div>
+      <div class="result-display">p ⊕ q = <span class="val off" id="xorResult">FALSE</span></div>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-key">Scholarship Eligibility</span>
+      <p>Suppose a university announces:</p>
+      <p style="padding-left:20px;">A student will receive the scholarship if he or she is a sports champion <strong>or</strong> a cultural champion, but not both.</p>
+      <p>Let</p>
+      <div class="boxed-wrap"><span class="boxed">p: The student is a sports champion<br>q: The student is a cultural champion</span></div>
+      <p>Then the condition is represented by</p>
+      <div class="boxed-wrap"><span class="boxed">p ⊕ q.</span></div>
+      <p>Only one achievement qualifies the student — being <em>both</em> a sports champion and a cultural champion, strictly speaking, does not.</p>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-think">The Golden Rule</span>
+      <p>Mathematical XOR means</p>
+      <div class="boxed-wrap"><span class="boxed" style="font-size:18px;font-weight:700;">EXACTLY ONE</span></div>
+      <p>It never means</p>
+      <div class="boxed-wrap"><span class="boxed" style="font-weight:700;">AT LEAST ONE</span></div>
+      <p>Exactly one proposition must be true.</p>
+    </div>
+
+    <div class="story-box">
+      <span class="story-tag tag-key">The Proof — All Four Cases</span>
+      <div class="quote-block">"A student will receive the scholarship if he or she is a sports champion or a cultural champion, but not both."</div>
+      <p class="plain-line">This is an <strong>exclusive or</strong> (P ⊕ Q).</p>
+      <p class="plain-line">There are only four things that can happen.</p>
+      <table class="promise-table">
+        <tr><th>Sports Champion? (P)</th><th>Cultural Champion? (Q)</th><th>Scholarship Awarded?</th></tr>
+        <tr><td>Yes</td><td>Yes</td><td class="broken">No — disqualified!</td></tr>
+        <tr><td>Yes</td><td>No</td><td>Yes</td></tr>
+        <tr><td>No</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>No</td><td>No</td><td class="broken">No</td></tr>
+      </table>
+    </div>
+
+    <div class="mini-ref">
+      <div class="mini-ref-label">Notation: p ⊕ q — true only when p and q differ</div>
+      <table class="reftable"><tr><th>p</th><th>q</th><th>p⊕q</th></tr><tr><td>T</td><td>T</td><td>F</td></tr><tr><td>T</td><td>F</td><td>T</td></tr><tr><td>F</td><td>T</td><td>T</td></tr><tr><td>F</td><td>F</td><td>F</td></tr></table>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- CHEAT SHEET -->
+  <!-- ============================================================ -->
+  <div class="cheat-sheet">
+    <div class="cheat-title">The Whole Circuit, One Glance</div>
+    <div class="cheat-sub">All six gates, powered on</div>
+    <div class="cheat-grid" id="cheatGrid"></div>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Topic 2 &nbsp;—&nbsp; <span class="ok">CIRCUIT COMPLETE ✓</span></footer>
+
+<script>
+/* ===================== Gate icon library (SVG, stroke = currentColor) ===================== */
+const GATES = {
+  not: `<svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="6,6 6,42 46,24" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="53" cy="24" r="6" stroke="currentColor" stroke-width="3"/>
+  </svg>`,
+  and: `<svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8,6 H30 A18,18 0 0 1 30,42 H8 Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+  </svg>`,
+  or: `<svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8,5 Q20,24 8,43 Q40,42 56,24 Q40,6 8,5 Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  </svg>`,
+  xor: `<svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8,5 Q20,24 8,43 Q40,42 56,24 Q40,6 8,5 Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M2,5 Q14,24 2,43" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+  </svg>`,
+  imp: `<svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8,5 Q20,24 8,43 Q40,42 56,24 Q40,6 8,5 Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="2" cy="13" r="4" stroke="currentColor" stroke-width="3"/>
+  </svg>`,
+  bicond: `<svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8,5 Q20,24 8,43 Q40,42 56,24 Q40,6 8,5 Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M2,5 Q14,24 2,43" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="61" cy="24" r="4" stroke="currentColor" stroke-width="3"/>
+  </svg>`
+};
+
+const SECTIONS = [
+  {id:'negation', gate:'not', sym:'¬', label:'NOT', name:'Negation', hint:'Flips the truth value only — like a light switch.'},
+  {id:'conjunction', gate:'and', sym:'∧', label:'AND', name:'Conjunction', hint:'Both required — like a locker needing password AND fingerprint.'},
+  {id:'disjunction', gate:'or', sym:'∨', label:'OR', name:'Disjunction', hint:'At least one — never "exactly one" unless stated.'},
+  {id:'implication', gate:'imp', sym:'→', label:'IMPLIES', name:'Implication', hint:'Only broken when P is True and Q is False.'},
+  {id:'biconditional', gate:'bicond', sym:'↔', label:'IFF', name:'Biconditional', hint:'Two promises at once — true when both sides match.'},
+  {id:'xor', gate:'xor', sym:'⊕', label:'XOR', name:'XOR', hint:'Exactly one — both-true makes it False too.'}
+];
+
+/* ---------- Build hero gate row ---------- */
+const heroRow = document.getElementById('heroGateRow');
+SECTIONS.forEach(s=>{
+  const chip = document.createElement('a');
+  chip.href = '#'+s.id;
+  chip.className = 'gate-chip';
+  chip.style.textDecoration = 'none';
+  chip.innerHTML = `<div class="gate-icon-wrap">${GATES[s.gate]}</div><span class="gate-chip-label">${s.sym} ${s.label}</span>`;
+  heroRow.appendChild(chip);
+});
+
+/* ---------- Build nav ---------- */
+const navRow = document.getElementById('navRow');
+SECTIONS.forEach(s=>{
+  const a = document.createElement('a');
+  a.href = '#'+s.id;
+  a.className = 'nav-led';
+  a.dataset.target = s.id;
+  a.innerHTML = `<span class="dot"></span>${s.sym} ${s.name}`;
+  navRow.appendChild(a);
+});
+
+/* ---------- Fill in each section's gate-node icon ---------- */
+document.querySelectorAll('.gate-node').forEach(node=>{
+  node.innerHTML = GATES[node.dataset.icon];
+});
+
+/* ---------- Cheat sheet ---------- */
+const cheatGrid = document.getElementById('cheatGrid');
+SECTIONS.forEach(s=>{
+  const card = document.createElement('div');
+  card.className = 'cheat-card';
+  card.innerHTML = `<div class="gate-icon-wrap">${GATES[s.gate]}</div><div class="name">${s.sym} ${s.name}</div><div class="hint">${s.hint}</div>`;
+  cheatGrid.appendChild(card);
+});
+
+/* ---------- IntersectionObserver: active section glow + nav highlight ---------- */
+const sectionEls = document.querySelectorAll('.connective-section');
+const navLeds = document.querySelectorAll('.nav-led');
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    const id = entry.target.id;
+    if(entry.isIntersecting){
+      entry.target.classList.add('in-view');
+      navLeds.forEach(l=>l.classList.toggle('active', l.dataset.target===id));
+    } else {
+      entry.target.classList.remove('in-view');
+    }
+  });
+}, {threshold:0.35});
+sectionEls.forEach(el=>observer.observe(el));
+
+/* ---------- Reveal toggler ---------- */
+function toggleReveal(id){
+  document.getElementById(id).classList.toggle('show');
+}
+
+/* ---------- Negation switch ---------- */
+let negOn = false;
+function toggleNegSwitch(){
+  negOn = !negOn;
+  const sw = document.getElementById('negSwitch');
+  const state = document.getElementById('negState');
+  const result = document.getElementById('negResult');
+  sw.classList.toggle('on', negOn);
+  state.textContent = 'p = ' + (negOn ? 'ON' : 'OFF');
+  state.className = 'switch-state ' + (negOn ? 'on' : 'off');
+  result.textContent = negOn ? 'FALSE' : 'TRUE';
+  result.className = 'val ' + (negOn ? 'off' : 'on');
+}
+
+/* ---------- XOR switches ---------- */
+let xorP = false, xorQ = false;
+function toggleXorSwitch(which){
+  if(which==='P') xorP = !xorP; else xorQ = !xorQ;
+  document.getElementById('xorSwitchP').classList.toggle('on', xorP);
+  document.getElementById('xorSwitchQ').classList.toggle('on', xorQ);
+  const stateP = document.getElementById('xorStateP');
+  const stateQ = document.getElementById('xorStateQ');
+  stateP.textContent = 'p = ' + (xorP ? 'ON':'OFF');
+  stateP.className = 'switch-state ' + (xorP ? 'on':'off');
+  stateQ.textContent = 'q = ' + (xorQ ? 'ON':'OFF');
+  stateQ.className = 'switch-state ' + (xorQ ? 'on':'off');
+  const result = xorP !== xorQ;
+  const resultEl = document.getElementById('xorResult');
+  resultEl.textContent = result ? 'TRUE' : 'FALSE';
+  resultEl.className = 'val ' + (result ? 'on' : 'off');
+}
+</script>
+</body>
+</html>

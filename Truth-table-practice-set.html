@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Truth Table Practice Set · Tables 1.15–1.24</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pcb:#0F1B15; --pcb-light:#17251D; --pcb-line:#25392C;
+    --copper:#C08552; --phosphor:#6FE3A6; --warn:#E0794F; --bonus:#D9A441;
+    --paper:#F3EEDF; --ink:#211C12; --ink-soft:#6B6250;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--pcb);font-family:'IBM Plex Sans',sans-serif;color:var(--paper);padding:0 0 90px;
+    background-image:radial-gradient(circle at 1px 1px, rgba(111,227,166,0.05) 1px, transparent 0);
+    background-size:26px 26px;
+  }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  ::selection{background:var(--phosphor);color:var(--pcb);}
+  a:focus-visible, button:focus-visible, .toggle:focus-visible{outline:2px solid var(--phosphor); outline-offset:3px;}
+
+  .hero{
+    position:relative; padding:48px 16px 34px; text-align:center; overflow:hidden;
+    border-bottom:1px solid var(--pcb-line); background:linear-gradient(180deg,#0B1410 0%, var(--pcb) 100%);
+  }
+  .hero::before{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+    background-image:linear-gradient(var(--pcb-line) 1px, transparent 1px), linear-gradient(90deg, var(--pcb-line) 1px, transparent 1px);
+    background-size:44px 44px; mask-image:radial-gradient(ellipse at center, black 0%, transparent 72%);
+  }
+  .hero-inner{position:relative;z-index:1;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:700;text-align:center;font-size:clamp(23px,4.8vw,40px);margin:0 0 10px;color:var(--paper);text-shadow:0 0 30px rgba(111,227,166,.2);}
+  .sub{text-align:center;color:#B9C4B9;font-size:14.5px;margin:0 auto;max-width:640px;line-height:1.6;}
+
+  .wrap{max-width:1050px;margin:0 auto;padding:36px 16px 0;}
+
+  .howto{
+    background:var(--pcb-light); border:1px dashed var(--pcb-line); border-radius:12px;
+    padding:14px 18px; margin-bottom:22px; font-size:13.5px; line-height:1.65; color:#B9C4B9;
+  }
+  .howto strong{color:var(--paper);}
+
+  .nav-strip{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:22px;}
+  .nav-chip{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;background:var(--pcb-light);border:1px solid var(--pcb-line);
+    color:#8FA093;padding:6px 12px;border-radius:20px;text-decoration:none;transition:.15s ease;
+  }
+  .nav-chip:hover{background:rgba(111,227,166,.12);color:var(--phosphor);border-color:var(--phosphor);}
+
+  .toolbar{
+    position:sticky; top:10px; z-index:30;
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+    background:rgba(15,27,21,.92); backdrop-filter:blur(6px); border:1px solid var(--pcb-line); border-radius:14px;
+    padding:12px 18px; margin-bottom:34px; box-shadow:0 12px 28px -16px rgba(0,0,0,.6);
+    font-family:'IBM Plex Mono',monospace; font-size:13px;
+  }
+  .toolbar .score span{color:var(--bonus);font-weight:700;font-size:16px;text-shadow:0 0 10px rgba(217,164,65,.4);}
+  .toolbar .btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .tbtn{
+    background:transparent;border:1.5px solid var(--pcb-line);color:#B9C4B9;border-radius:20px;
+    padding:6px 13px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.03em;
+    text-transform:uppercase;cursor:pointer;transition:.15s ease;
+  }
+  .tbtn:hover{background:var(--pcb-light);color:var(--paper);border-color:var(--copper);}
+  .tbtn.primary{background:rgba(111,227,166,.12);border-color:var(--phosphor);color:var(--phosphor);}
+  .tbtn.primary:hover{background:rgba(111,227,166,.22);}
+  .tbtn.small{padding:4px 10px;font-size:10.5px;}
+
+  .problem-section{margin-bottom:56px; scroll-margin-top:80px;}
+  .formula-banner{
+    text-align:center; background:var(--pcb-light); color:var(--paper); border:1px solid var(--pcb-line); border-radius:14px;
+    padding:16px 18px; margin-bottom:16px; font-family:'IBM Plex Mono',monospace;
+    font-size:clamp(14px,2.6vw,19px); letter-spacing:.01em;
+  }
+  .formula-banner .tag{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--copper);margin-bottom:8px;font-family:'IBM Plex Mono',monospace;}
+
+  .local-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .local-score{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8FA093;}
+  .local-score strong{color:var(--phosphor);}
+  .local-btns{display:flex;gap:6px;flex-wrap:wrap;}
+
+  .table-scroll{
+    overflow-x:auto; border-radius:14px; box-shadow:0 14px 30px -18px rgba(0,0,0,.5);
+    background:var(--pcb-light); border:1px solid var(--pcb-line); padding:12px 10px; margin-bottom:16px;
+  }
+  table.ttable{border-collapse:separate; border-spacing:8px 5px; width:100%;}
+  table.ttable th{
+    background:#1C2B21; padding:8px 8px 10px; text-align:center; font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; color:#8FA093; border-radius:8px;
+    white-space:nowrap;
+  }
+  table.ttable th.given{background:#20301F;}
+  table.ttable th .step-num{display:block;font-size:9px;color:var(--bonus);}
+  table.ttable th .sym{display:block;font-size:12.5px;font-weight:700;color:var(--paper);}
+  table.ttable th.given .sym{color:var(--copper);font-size:15px;}
+  table.ttable th.final{background:#123024;}
+  table.ttable th.final .sym{color:var(--phosphor);}
+  table.ttable td{text-align:center; padding:7px 6px; background:#132018; border-radius:8px;}
+  table.ttable tr:nth-child(even) td{background:#0F1911;}
+  table.ttable tr:nth-child(even) td.given{background:#1A2818;}
+  table.ttable td.given{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:13.5px; background:#20301F; color:var(--copper);}
+  table.ttable td.final-col{background:#0E2019;}
+  table.ttable tr:nth-child(even) td.final-col{background:#0B1A14;}
+
+  .cell-wrap{position:relative; display:inline-block;}
+  .toggle{
+    position:relative; width:42px; height:22px; border-radius:20px; cursor:pointer;
+    background:rgba(0,0,0,.3); border:1.5px solid var(--warn); display:inline-flex; align-items:center;
+    font-family:'IBM Plex Mono',monospace; font-size:8.5px; font-weight:700; user-select:none;
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  .toggle .lab{position:absolute; width:50%; text-align:center; transition:opacity .2s ease;}
+  .toggle .lab.t{left:0; color:var(--phosphor); opacity:.35;}
+  .toggle .lab.f{right:0; color:var(--warn); opacity:1;}
+  .toggle.on .lab.t{opacity:1;}
+  .toggle.on .lab.f{opacity:.35;}
+  .toggle .knob{
+    position:absolute; top:2px; left:22px; width:16px; height:16px; border-radius:50%;
+    background:linear-gradient(180deg,#E0794F,#B5493D); box-shadow:0 1px 3px rgba(0,0,0,.5); transition:left .2s ease, background .2s ease;
+  }
+  .toggle.on{border-color:var(--phosphor); box-shadow:0 0 8px rgba(111,227,166,.35);}
+  .toggle.on .knob{left:2px; background:linear-gradient(180deg,#BFFFE0,#6FE3A6);}
+  .cell-wrap.ok .toggle{box-shadow:0 0 0 2.5px rgba(111,227,166,.35);}
+  .cell-wrap.bad .toggle{box-shadow:0 0 0 2.5px rgba(224,121,79,.35);}
+  .mark{
+    position:absolute; top:-7px; right:-7px; width:14px; height:14px; border-radius:50%;
+    font-size:8.5px; line-height:14px; text-align:center; font-weight:700; color:#0B140F;
+    opacity:0; transform:scale(.5); transition:all .25s cubic-bezier(.2,1.6,.4,1);
+  }
+  .cell-wrap.ok .mark{opacity:1; transform:scale(1); background:var(--phosphor);}
+  .cell-wrap.bad .mark{opacity:1; transform:scale(1); background:var(--warn); color:#fff;}
+
+  .verdict-box{
+    background:var(--pcb-light); border-radius:14px; padding:16px 18px; margin-bottom:8px;
+    border:1.5px solid var(--pcb-line); transition:border-color .25s ease, background .25s ease;
+  }
+  .verdict-box.correct{border-color:var(--phosphor); background:#10241B;}
+  .verdict-box.incorrect{border-color:var(--warn); background:#241713;}
+  .classify-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .control-label{font-family:'IBM Plex Mono',monospace;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:#8FA093;}
+  .seg{display:inline-flex;border:1.5px solid var(--pcb-line);border-radius:20px;overflow:hidden;background:rgba(0,0,0,.25);}
+  .seg button{border:none;background:transparent;padding:7px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;color:#8FA093;transition:.15s ease;}
+  .seg button.sel.taut-sel{background:rgba(111,227,166,.18);color:var(--phosphor);}
+  .seg button.sel.contra-sel{background:rgba(224,121,79,.18);color:var(--warn);}
+  .seg button.sel.conting-sel{background:rgba(217,164,65,.18);color:var(--bonus);}
+  .result-icon{width:20px;height:20px;border-radius:50%;font-size:12px;line-height:20px;text-align:center;font-weight:700;color:#0B140F;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .result-icon.show{opacity:1;transform:scale(1);}
+  .result-icon.ok{background:var(--phosphor);}
+  .result-icon.bad{background:var(--warn); color:#fff;}
+
+  .explain{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .explain.show{max-height:200px;opacity:1;margin-top:12px;}
+  .explain-inner{border-top:1px dashed var(--pcb-line);padding-top:10px;font-size:13px;line-height:1.6;color:#B9C4B9;}
+  .explain-inner strong{color:var(--paper);}
+
+  footer{text-align:center;font-size:11.5px;color:#5C6B60;margin-top:44px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;}
+  footer .ok{color:var(--phosphor);}
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+      <h1 class="page-title">Truth Table Practice Set</h1>
+      <p class="sub">Ten compound propositions, column by column. Nothing is pre-filled — set every toggle yourself, then check.</p>
+    </div>
+  </div>
+
+<div class="wrap">
+  <div class="howto">
+    <strong>How this works:</strong> each problem below shows the compound proposition and a blank working table. The given variable columns are fixed; every other column — including the final one — is a toggle you set yourself. Work left to right, one column at a time. Finish the table, then set the classification switch (Tautology / Contradiction / Contingency) underneath it.
+  </div>
+
+  <div class="nav-strip" id="navStrip"></div>
+
+  <div class="toolbar">
+    <div class="score">Overall Score: <span id="scoreDisplay">0 / 0</span> correct</div>
+    <div class="btns">
+      <button class="tbtn primary" onclick="checkAll()">Check Everything</button>
+      <button class="tbtn" onclick="revealAll()">Reveal Everything</button>
+      <button class="tbtn" onclick="resetAll()">Reset Everything</button>
+    </div>
+  </div>
+
+  <div id="problemsContainer"></div>
+
+  <footer>Discrete Mathematics · Module 1 · Truth Table Practice Set — Tables 1.15–1.24 &nbsp;—&nbsp; <span class="ok">CIRCUIT COMPLETE ✓</span></footer>
+</div>
+
+<script>
+/* =====================================================================
+   Problem definitions — every column's correctness is computed live
+   from its formula, never hard-coded as an answer key.
+   ===================================================================== */
+const problems = [
+{ id:'t1', label:'Table 1.15', vars:2, formula:'(p ∨ q) → (p ∧ q)',
+  cols:[
+    {sym:'p ∨ q', fn:(p,q)=>p||q},
+    {sym:'p ∧ q', fn:(p,q)=>p&&q},
+    {sym:'(p∨q)→(p∧q)', fn:(p,q)=>(!(p||q))||(p&&q), final:true}
+  ]},
+{ id:'t2', label:'Table 1.16', vars:2, formula:'(p → q) → (q → p)',
+  cols:[
+    {sym:'p → q', fn:(p,q)=>(!p)||q},
+    {sym:'q → p', fn:(p,q)=>(!q)||p},
+    {sym:'(p→q)→(q→p)', fn:(p,q)=>(!((!p)||q))||((!q)||p), final:true}
+  ]},
+{ id:'t3', label:'Table 1.17', vars:2, formula:'(q → ¬p) ↔ (p ↔ q)',
+  cols:[
+    {sym:'¬p', fn:(p,q)=>!p},
+    {sym:'q → ¬p', fn:(p,q)=>(!q)||(!p)},
+    {sym:'p ↔ q', fn:(p,q)=>p===q},
+    {sym:'(q→¬p)↔(p↔q)', fn:(p,q)=>((!q)||(!p))===(p===q), final:true}
+  ]},
+{ id:'t4', label:'Table 1.18', vars:2, formula:'(p ↔ q) ↔ ((p ∧ q) ∨ (¬p ∧ ¬q))',
+  cols:[
+    {sym:'¬p', fn:(p,q)=>!p},
+    {sym:'¬q', fn:(p,q)=>!q},
+    {sym:'p ↔ q', fn:(p,q)=>p===q},
+    {sym:'p ∧ q', fn:(p,q)=>p&&q},
+    {sym:'¬p ∧ ¬q', fn:(p,q)=>(!p)&&(!q)},
+    {sym:'(p∧q)∨(¬p∧¬q)', fn:(p,q)=>(p&&q)||((!p)&&(!q))},
+    {sym:'f', fn:(p,q)=>(p===q)===((p&&q)||((!p)&&(!q))), final:true}
+  ]},
+{ id:'t5', label:'Table 1.19', vars:2, formula:'(¬p ↔ ¬q) ↔ (p ↔ q)',
+  cols:[
+    {sym:'¬p', fn:(p,q)=>!p},
+    {sym:'¬q', fn:(p,q)=>!q},
+    {sym:'¬p ↔ ¬q', fn:(p,q)=>(!p)===(!q)},
+    {sym:'p ↔ q', fn:(p,q)=>p===q},
+    {sym:'(¬p↔¬q)↔(p↔q)', fn:(p,q)=>((!p)===(!q))===(p===q), final:true}
+  ]},
+{ id:'t6', label:'Table 1.20', vars:3, formula:'(p → (q → r)) → ((p → q) → (p → r))',
+  cols:[
+    {sym:'p → q', fn:(p,q,r)=>(!p)||q},
+    {sym:'q → r', fn:(p,q,r)=>(!q)||r},
+    {sym:'p → r', fn:(p,q,r)=>(!p)||r},
+    {sym:'a = p→(q→r)', fn:(p,q,r)=>(!p)||((!q)||r)},
+    {sym:'b = (p→q)→(p→r)', fn:(p,q,r)=>(!((!p)||q))||((!p)||r)},
+    {sym:'a → b', fn:(p,q,r)=>{const a=(!p)||((!q)||r); const b=(!((!p)||q))||((!p)||r); return (!a)||b;}, final:true}
+  ]},
+{ id:'t7', label:'Table 1.21', vars:3, formula:'¬(p ∨ (q ∧ r)) ↔ ((p ∨ q) ∧ (p → r))',
+  cols:[
+    {sym:'q ∧ r', fn:(p,q,r)=>q&&r},
+    {sym:'a = p∨(q∧r)', fn:(p,q,r)=>p||(q&&r)},
+    {sym:'¬a', fn:(p,q,r)=>!(p||(q&&r))},
+    {sym:'p ∨ q', fn:(p,q,r)=>p||q},
+    {sym:'p → r', fn:(p,q,r)=>(!p)||r},
+    {sym:'b = (p∨q)∧(p→r)', fn:(p,q,r)=>(p||q)&&((!p)||r)},
+    {sym:'¬a ↔ b', fn:(p,q,r)=>(!(p||(q&&r)))===((p||q)&&((!p)||r)), final:true}
+  ]},
+{ id:'t8', label:'Table 1.22', vars:3, formula:'(¬p ↔ ¬q) ↔ (q ↔ r)',
+  cols:[
+    {sym:'¬p', fn:(p,q,r)=>!p},
+    {sym:'¬q', fn:(p,q,r)=>!q},
+    {sym:'a = ¬p↔¬q', fn:(p,q,r)=>(!p)===(!q)},
+    {sym:'b = q↔r', fn:(p,q,r)=>q===r},
+    {sym:'a ↔ b', fn:(p,q,r)=>((!p)===(!q))===(q===r), final:true}
+  ]},
+{ id:'t9', label:'Table 1.23', vars:4, formula:'(p → (q → s)) ∧ (¬r ∨ p) ∧ q',
+  cols:[
+    {sym:'a = q→s', fn:(p,q,r,s)=>(!q)||s},
+    {sym:'b = p→a', fn:(p,q,r,s)=>(!p)||((!q)||s)},
+    {sym:'¬r', fn:(p,q,r,s)=>!r},
+    {sym:'c = ¬r∨p', fn:(p,q,r,s)=>(!r)||p},
+    {sym:'b ∧ c', fn:(p,q,r,s)=>((!p)||((!q)||s))&&((!r)||p)},
+    {sym:'b∧c∧q', fn:(p,q,r,s)=>((!p)||((!q)||s))&&((!r)||p)&&q, final:true}
+  ]},
+{ id:'t10', label:'Table 1.24', vars:4, formula:'((p → q) → r) → s',
+  cols:[
+    {sym:'p → q', fn:(p,q,r,s)=>(!p)||q},
+    {sym:'(p→q)→r', fn:(p,q,r,s)=>(!((!p)||q))||r},
+    {sym:'((p→q)→r)→s', fn:(p,q,r,s)=>(!((!((!p)||q))||r))||s, final:true}
+  ]}
+];
+
+const VAR_NAMES = ['p','q','r','s'];
+
+function rowsFor(n){
+  const rows = [];
+  const gen = (arr)=>{ if(arr.length===n){ rows.push(arr.slice()); return; } gen(arr.concat(true)); gen(arr.concat(false)); };
+  gen([]);
+  return rows;
+}
+
+function computeClassification(prob){
+  const rows = rowsFor(prob.vars);
+  const finalCol = prob.cols.find(c=>c.final);
+  const vals = rows.map(r=>finalCol.fn(...r));
+  if(vals.every(v=>v)) return 'Tautology';
+  if(vals.every(v=>!v)) return 'Contradiction';
+  return 'Contingency';
+}
+
+/* =====================================================================
+   Render
+   ===================================================================== */
+const navStrip = document.getElementById('navStrip');
+const container = document.getElementById('problemsContainer');
+let GRAND_TOTAL = 0;
+
+problems.forEach((prob, pi)=>{
+  prob.classification = computeClassification(prob);
+  const rows = rowsFor(prob.vars);
+  const varNames = VAR_NAMES.slice(0, prob.vars);
+
+  // nav chip
+  const chip = document.createElement('a');
+  chip.href = '#'+prob.id;
+  chip.className = 'nav-chip';
+  chip.textContent = prob.label;
+  navStrip.appendChild(chip);
+
+  // section
+  const section = document.createElement('div');
+  section.className = 'problem-section';
+  section.id = prob.id;
+
+  const localTotal = rows.length * prob.cols.length + 1;
+  GRAND_TOTAL += localTotal;
+
+  section.innerHTML = `
+    <div class="formula-banner"><span class="tag">${prob.label} — Problem ${pi+1} of ${problems.length}</span>${prob.formula}</div>
+    <div class="local-toolbar">
+      <span class="local-score">This table: <strong data-localscore>0</strong> / ${localTotal}</span>
+      <div class="local-btns">
+        <button class="tbtn small primary" data-action="check">Check</button>
+        <button class="tbtn small" data-action="reveal">Reveal</button>
+        <button class="tbtn small" data-action="reset">Reset</button>
+      </div>
+    </div>
+    <div class="table-scroll"><table class="ttable"><thead><tr class="headrow"></tr></thead><tbody></tbody></table></div>
+    <div class="verdict-box">
+      <div class="classify-row">
+        <span class="control-label">Classification?</span>
+        <div class="seg" data-role="classify">
+          <button data-val="Tautology" type="button">Tautology</button>
+          <button data-val="Contradiction" type="button">Contradiction</button>
+          <button data-val="Contingency" type="button">Contingency</button>
+        </div>
+        <span class="result-icon" data-icon="classify"></span>
+      </div>
+      <div class="explain"><div class="explain-inner" data-explain></div></div>
+    </div>
+  `;
+  container.appendChild(section);
+
+  // header row
+  const headRow = section.querySelector('.headrow');
+  varNames.forEach(v=>{
+    const th = document.createElement('th');
+    th.className = 'given';
+    th.innerHTML = `<span class="sym">${v}</span>`;
+    headRow.appendChild(th);
+  });
+  prob.cols.forEach((c,ci)=>{
+    const th = document.createElement('th');
+    th.className = c.final ? 'final' : '';
+    th.innerHTML = `<span class="step-num">Step ${ci+1}${c.final?' · Final':''}</span><span class="sym">${c.sym}</span>`;
+    headRow.appendChild(th);
+  });
+
+  // body rows
+  const tbody = section.querySelector('tbody');
+  rows.forEach((row, ri)=>{
+    const tr = document.createElement('tr');
+    row.forEach(v=>{
+      const td = document.createElement('td');
+      td.className = 'given';
+      td.textContent = v ? 'T':'F';
+      tr.appendChild(td);
+    });
+    prob.cols.forEach(c=>{
+      const td = document.createElement('td');
+      if(c.final) td.className = 'final-col';
+      const correct = c.fn(...row);
+      const wrap = document.createElement('div');
+      wrap.className = 'cell-wrap';
+      wrap.dataset.correct = correct ? '1':'0';
+      wrap.dataset.value = '0';
+      wrap.innerHTML = `<div class="toggle" role="button" tabindex="0"><span class="lab t">T</span><span class="lab f">F</span><span class="knob"></span></div><span class="mark"></span>`;
+      const toggleFlip = ()=>{
+        const on = wrap.dataset.value === '1';
+        wrap.dataset.value = on ? '0':'1';
+        wrap.querySelector('.toggle').classList.toggle('on', !on);
+        wrap.classList.remove('ok','bad');
+        wrap.querySelector('.mark').textContent = '';
+        updateGrandScore();
+        updateLocalScore(section);
+      };
+      wrap.querySelector('.toggle').addEventListener('click', toggleFlip);
+      wrap.querySelector('.toggle').addEventListener('keydown', (e)=>{
+        if(e.key==='Enter'||e.key===' '){ toggleFlip(); e.preventDefault(); }
+      });
+      td.appendChild(wrap);
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+
+  // classification control
+  const seg = section.querySelector('[data-role="classify"]');
+  seg.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','taut-sel','contra-sel','conting-sel'));
+      btn.classList.add('sel');
+      if(btn.dataset.val==='Tautology') btn.classList.add('taut-sel');
+      if(btn.dataset.val==='Contradiction') btn.classList.add('contra-sel');
+      if(btn.dataset.val==='Contingency') btn.classList.add('conting-sel');
+      seg.dataset.value = btn.dataset.val;
+      const vbox = section.querySelector('.verdict-box');
+      vbox.classList.remove('correct','incorrect');
+      section.querySelector('[data-icon="classify"]').classList.remove('show','ok','bad');
+      section.querySelector('.explain').classList.remove('show');
+      updateGrandScore();
+      updateLocalScore(section);
+    });
+  });
+
+  // local buttons
+  section.querySelector('[data-action="check"]').addEventListener('click', ()=>checkSection(section, prob));
+  section.querySelector('[data-action="reveal"]').addEventListener('click', ()=>revealSection(section, prob, rows));
+  section.querySelector('[data-action="reset"]').addEventListener('click', ()=>resetSection(section));
+});
+
+document.getElementById('scoreDisplay').textContent = '0 / ' + GRAND_TOTAL;
+
+/* =====================================================================
+   Scoring helpers
+   ===================================================================== */
+function sectionWraps(section){ return section.querySelectorAll('.cell-wrap'); }
+
+function sectionScore(section, prob){
+  let correct = 0, total = 0;
+  sectionWraps(section).forEach(w=>{ total++; if(w.dataset.value === w.dataset.correct) correct++; });
+  const seg = section.querySelector('[data-role="classify"]');
+  total++;
+  if(seg.dataset.value === prob.classification) correct++;
+  return {correct, total};
+}
+
+function updateLocalScore(section){
+  const idx = problems.findIndex(p=>p.id===section.id);
+  const {correct} = sectionScore(section, problems[idx]);
+  section.querySelector('[data-localscore]').textContent = correct;
+}
+
+function updateGrandScore(){
+  let total=0, correct=0;
+  document.querySelectorAll('.problem-section').forEach(section=>{
+    const idx = problems.findIndex(p=>p.id===section.id);
+    const r = sectionScore(section, problems[idx]);
+    total += r.total; correct += r.correct;
+  });
+  document.getElementById('scoreDisplay').textContent = correct + ' / ' + total;
+}
+
+function checkSection(section, prob){
+  sectionWraps(section).forEach(w=>{
+    const ok = w.dataset.value === w.dataset.correct;
+    w.classList.remove('ok','bad');
+    w.classList.add(ok?'ok':'bad');
+    w.querySelector('.mark').textContent = ok ? '✓':'✗';
+  });
+  const seg = section.querySelector('[data-role="classify"]');
+  const icon = section.querySelector('[data-icon="classify"]');
+  const vbox = section.querySelector('.verdict-box');
+  let anyRowWrong = false;
+  sectionWraps(section).forEach(w=>{ if(w.dataset.value !== w.dataset.correct) anyRowWrong = true; });
+  const clsOk = seg.dataset.value === prob.classification;
+  if(seg.dataset.value !== undefined){
+    icon.classList.add('show', clsOk?'ok':'bad');
+    icon.textContent = clsOk ? '✓':'✗';
+  }
+  vbox.classList.remove('correct','incorrect');
+  vbox.classList.add((clsOk && !anyRowWrong) ? 'correct':'incorrect');
+  section.querySelector('.explain').classList.add('show');
+  section.querySelector('[data-explain]').innerHTML = `<strong>Classification:</strong> this compound proposition is a <strong>${prob.classification}</strong> — ${prob.classification==='Tautology' ? 'True in every row.' : prob.classification==='Contradiction' ? 'False in every row.' : 'a mix of True and False across rows.'}`;
+  updateLocalScore(section);
+  updateGrandScore();
+}
+
+function revealSection(section, prob, rows){
+  sectionWraps(section).forEach(w=>{
+    w.dataset.value = w.dataset.correct;
+    w.querySelector('.toggle').classList.toggle('on', w.dataset.correct==='1');
+    w.classList.remove('ok','bad');
+    w.classList.add('ok');
+    w.querySelector('.mark').textContent = '✓';
+  });
+  const seg = section.querySelector('[data-role="classify"]');
+  seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','taut-sel','contra-sel','conting-sel'));
+  const btn = seg.querySelector(`button[data-val="${prob.classification}"]`);
+  btn.classList.add('sel');
+  if(prob.classification==='Tautology') btn.classList.add('taut-sel');
+  if(prob.classification==='Contradiction') btn.classList.add('contra-sel');
+  if(prob.classification==='Contingency') btn.classList.add('conting-sel');
+  seg.dataset.value = prob.classification;
+  const icon = section.querySelector('[data-icon="classify"]');
+  icon.classList.add('show','ok'); icon.textContent = '✓';
+  section.querySelector('.verdict-box').classList.remove('incorrect');
+  section.querySelector('.verdict-box').classList.add('correct');
+  section.querySelector('.explain').classList.add('show');
+  section.querySelector('[data-explain]').innerHTML = `<strong>Classification:</strong> this compound proposition is a <strong>${prob.classification}</strong> — ${prob.classification==='Tautology' ? 'True in every row.' : prob.classification==='Contradiction' ? 'False in every row.' : 'a mix of True and False across rows.'}`;
+  updateLocalScore(section);
+  updateGrandScore();
+}
+
+function resetSection(section){
+  sectionWraps(section).forEach(w=>{
+    w.dataset.value = '0';
+    w.querySelector('.toggle').classList.remove('on');
+    w.classList.remove('ok','bad');
+    w.querySelector('.mark').textContent = '';
+  });
+  const seg = section.querySelector('[data-role="classify"]');
+  delete seg.dataset.value;
+  seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','taut-sel','contra-sel','conting-sel'));
+  const icon = section.querySelector('[data-icon="classify"]');
+  icon.classList.remove('show','ok','bad');
+  section.querySelector('.verdict-box').classList.remove('correct','incorrect');
+  section.querySelector('.explain').classList.remove('show');
+  updateLocalScore(section);
+  updateGrandScore();
+}
+
+/* =====================================================================
+   Global controls
+   ===================================================================== */
+function checkAll(){
+  document.querySelectorAll('.problem-section').forEach(section=>{
+    const prob = problems.find(p=>p.id===section.id);
+    checkSection(section, prob);
+  });
+}
+function revealAll(){
+  document.querySelectorAll('.problem-section').forEach(section=>{
+    const prob = problems.find(p=>p.id===section.id);
+    const rows = rowsFor(prob.vars);
+    revealSection(section, prob, rows);
+  });
+}
+function resetAll(){
+  document.querySelectorAll('.problem-section').forEach(section=>resetSection(section));
+}
+</script>
+</body>
+</html>

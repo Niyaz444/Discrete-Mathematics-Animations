@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Are Inference Rules Actually Coined?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pcb:#0F1B15; --pcb-light:#17251D; --pcb-line:#25392C;
+    --copper:#C08552; --phosphor:#6FE3A6; --warn:#E0794F; --bonus:#D9A441;
+    --paper:#F3EEDF; --ink:#211C12; --ink-soft:#6B6250;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--pcb);color:var(--paper);font-family:'IBM Plex Sans',sans-serif;padding:0 0 100px;line-height:1.6;
+    background-image:radial-gradient(circle at 1px 1px, rgba(111,227,166,0.05) 1px, transparent 0); background-size:26px 26px;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  ::selection{background:var(--phosphor);color:var(--pcb);}
+  a:focus-visible, button:focus-visible, .toggle:focus-visible{outline:2px solid var(--phosphor); outline-offset:3px;}
+
+  .hero{position:relative;padding:48px 16px 34px;text-align:center;overflow:hidden;border-bottom:1px solid var(--pcb-line);background:linear-gradient(180deg,#0B1410 0%, var(--pcb) 100%);}
+  .hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;background-image:linear-gradient(var(--pcb-line) 1px, transparent 1px),linear-gradient(90deg, var(--pcb-line) 1px, transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse at center, black 0%, transparent 72%);}
+  .hero-inner{position:relative;z-index:1;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(22px,4.6vw,38px);margin:0 0 10px;color:var(--paper);text-shadow:0 0 30px rgba(111,227,166,.2);}
+  .sub{text-align:center;color:#B9C4B9;font-size:14.5px;margin:0 auto;max-width:640px;line-height:1.6;}
+
+  .panel-nav{position:sticky;top:0;z-index:40;background:rgba(15,27,21,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--pcb-line);padding:10px 16px;}
+  .panel-nav-inner{max-width:960px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+  .nav-led{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8FA093;text-decoration:none;padding:5px 10px;border-radius:20px;border:1px solid transparent;transition:.2s ease;}
+  .nav-led:hover{color:var(--paper);border-color:var(--pcb-line);}
+
+  .toolbar{position:sticky;top:39px;z-index:35;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;background:rgba(15,27,21,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--pcb-line);padding:10px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+  .toolbar-inner{max-width:960px;width:100%;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;}
+  .toolbar .score span{color:var(--bonus);font-weight:700;font-size:15px;}
+  .toolbar .btns{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .wrap{max-width:960px;margin:0 auto;padding:0 16px;}
+  .concept-box{margin:22px auto 0;background:var(--pcb-light);border:1.5px solid var(--bonus);border-radius:14px;padding:18px 20px;}
+  .concept-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--bonus);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+  .concept-box h3{font-family:'Fraunces',serif;font-weight:700;font-size:19px;margin:0 0 10px;color:var(--paper);}
+  .concept-box p{font-size:13.5px;color:#DDE6DF;margin:0 0 10px;line-height:1.65;}
+  .concept-box p:last-child{margin-bottom:0;}
+  .concept-recipe{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;font-size:13px;background:#0E1912;border-radius:10px;padding:12px;margin:10px 0;}
+  .concept-recipe .step{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:8px;padding:6px 12px;color:var(--paper);}
+  .concept-recipe .arrow{color:#8FA093;}
+
+  .rule-section{max-width:960px;margin:0 auto;padding:52px 16px 0;scroll-margin-top:96px;}
+  .r-head{margin-bottom:14px;text-align:center;}
+  .r-num-badge{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:var(--copper);color:var(--pcb);font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:15px;margin-bottom:10px;}
+  .r-name{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(19px,3.6vw,25px);margin:0 0 10px;color:var(--paper);}
+  .r-formula{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:12px;padding:12px 18px;display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:14px;color:#DDE6DF;}
+  .r-formula .prem{color:#B9C4B9;} .r-formula .concl{color:var(--phosphor);}
+
+  .tt-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin:16px 0 10px;}
+  .tt-score{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#8FA093;}
+  .tt-score strong{color:var(--phosphor);}
+  .tt-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .tbtn{background:transparent;border:1.5px solid var(--pcb-line);color:#B9C4B9;border-radius:20px;padding:5px 12px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;transition:.15s ease;}
+  .tbtn:hover{background:var(--pcb-light);color:var(--paper);border-color:var(--copper);}
+  .tbtn.primary{background:rgba(111,227,166,.12);border-color:var(--phosphor);color:var(--phosphor);}
+  .tbtn.primary:hover{background:rgba(111,227,166,.22);}
+
+  .table-scroll{overflow-x:auto;border-radius:14px;box-shadow:0 14px 30px -18px rgba(0,0,0,.5);background:var(--pcb-light);border:1px solid var(--pcb-line);padding:10px 8px;margin-bottom:14px;}
+  table.ttable{border-collapse:separate;border-spacing:6px 4px;width:100%;}
+  table.ttable th{background:#1C2B21;padding:7px 7px 9px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.02em;color:#8FA093;border-radius:7px;white-space:nowrap;}
+  table.ttable th.given{background:#20301F;color:var(--copper);font-size:13px;}
+  table.ttable th.final{background:#123024;color:var(--phosphor);}
+  table.ttable td{text-align:center;padding:6px 5px;background:#132018;border-radius:7px;}
+  table.ttable tr:nth-child(even) td{background:#0F1911;}
+  table.ttable td.given{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12.5px;background:#20301F;color:var(--copper);}
+  table.ttable tr:nth-child(even) td.given{background:#1A2818;}
+  table.ttable td.final-col{background:#0E2019;}
+
+  .cell-wrap{position:relative;display:inline-block;}
+  .toggle{position:relative;width:38px;height:20px;border-radius:20px;cursor:pointer;background:rgba(0,0,0,.3);border:1.5px solid var(--warn);display:inline-flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:7.5px;font-weight:700;user-select:none;transition:border-color .2s ease, box-shadow .2s ease;}
+  .toggle .lab{position:absolute;width:50%;text-align:center;transition:opacity .2s ease;}
+  .toggle .lab.t{left:0;color:var(--phosphor);opacity:.35;} .toggle .lab.f{right:0;color:var(--warn);opacity:1;}
+  .toggle.on .lab.t{opacity:1;} .toggle.on .lab.f{opacity:.35;}
+  .toggle .knob{position:absolute;top:2px;left:20px;width:14px;height:14px;border-radius:50%;background:linear-gradient(180deg,#E0794F,#B5493D);box-shadow:0 1px 3px rgba(0,0,0,.5);transition:left .2s ease, background .2s ease;}
+  .toggle.on{border-color:var(--phosphor);box-shadow:0 0 8px rgba(111,227,166,.35);}
+  .toggle.on .knob{left:2px;background:linear-gradient(180deg,#BFFFE0,#6FE3A6);}
+  .cell-wrap.ok .toggle{box-shadow:0 0 0 2.5px rgba(111,227,166,.35);}
+  .cell-wrap.bad .toggle{box-shadow:0 0 0 2.5px rgba(224,121,79,.35);}
+  .vmark{position:absolute;top:-7px;right:-7px;width:14px;height:14px;border-radius:50%;font-size:8px;line-height:14px;text-align:center;font-weight:700;color:#0B140F;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .cell-wrap.ok .vmark{opacity:1;transform:scale(1);background:var(--phosphor);}
+  .cell-wrap.bad .vmark{opacity:1;transform:scale(1);background:var(--warn);color:#fff;}
+
+  .verdict-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:12px;padding:14px 16px;margin-bottom:8px;}
+  .verdict-label{font-family:'IBM Plex Mono',monospace;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:#8FA093;}
+  .seg{display:inline-flex;border:1.5px solid var(--pcb-line);border-radius:20px;overflow:hidden;background:rgba(0,0,0,.25);}
+  .seg button{border:none;background:transparent;padding:7px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:#8FA093;transition:.15s ease;}
+  .seg button.sel{background:rgba(111,227,166,.16);color:var(--phosphor);}
+  .seg button.sel.bad-sel{background:rgba(224,121,79,.16);color:var(--warn);}
+  .verdict-icon{width:18px;height:18px;border-radius:50%;font-size:11px;line-height:18px;text-align:center;font-weight:700;color:#0B140F;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .verdict-icon.show{opacity:1;transform:scale(1);}
+  .verdict-icon.ok{background:var(--phosphor);} .verdict-icon.bad{background:var(--warn);color:#fff;}
+
+  .explain-box{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .explain-box.show{max-height:260px;opacity:1;margin-top:4px;}
+  .explain-inner{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:10px;padding:12px 16px;font-size:13px;line-height:1.6;color:#B9C4B9;}
+  .explain-inner strong{color:var(--paper);}
+
+  .mono{font-family:'IBM Plex Mono',monospace;background:rgba(0,0,0,.25);color:var(--copper);padding:1px 6px;border-radius:4px;}
+
+  footer{text-align:center;font-size:11.5px;color:#5C6B60;margin-top:60px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;}
+  footer .ok{color:var(--phosphor);}
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Discrete Mathematics · Module 1 · Theory of Inference</div>
+      <h1 class="page-title">How Are Inference Rules Actually Coined?</h1>
+      <p class="sub">Not by convention. Not by tradition. Every single rule exists because someone built exactly this truth table and found the last column was True in every row.</p>
+    </div>
+  </div>
+
+  <div class="panel-nav">
+    <div class="panel-nav-inner" id="navRow"></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-inner">
+      <div class="score">Overall Score: <span id="scoreDisplay">0 / 0</span> correct</div>
+      <div class="btns">
+        <button class="tbtn primary" onclick="checkAll()">Check Everything</button>
+        <button class="tbtn" onclick="revealAll()">Reveal Everything</button>
+        <button class="tbtn" onclick="resetAll()">Reset Everything</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="concept-box">
+      <div class="concept-tag">The One Idea Behind All Ten</div>
+      <h3>A rule is "coined" the moment this recipe checks out</h3>
+      <div class="concept-recipe">
+        <span class="step">Premises</span><span class="arrow">combine with ∧</span>
+        <span class="step">Premises → Conclusion</span><span class="arrow">build the truth table</span>
+        <span class="step">Every row True?</span>
+      </div>
+      <p>Take everything you're given (the premises), <span class="mono">AND</span> them together, then ask: does that combination <span class="mono">→</span> imply the conclusion, <strong>no matter what truth values p, q, r… take?</strong> If the final column is True in <em>every single row</em> — a tautology — the rule is valid, forever, for any statements you plug in. If even one row comes out False, it isn't a rule at all; it's a <strong>fallacy</strong>.</p>
+      <p>Below, you'll build that exact final column yourself for all ten classic rules — and watch every one of them come out True in every row. That <em>is</em> the proof. That's how they were coined.</p>
+    </div>
+  </div>
+
+  <div id="rulesContainer"></div>
+
+  <footer>Discrete Mathematics · Module 1 · How Inference Rules Are Coined &nbsp;—&nbsp; <span class="ok">CIRCUIT COMPLETE ✓</span></footer>
+
+<script>
+/* ===================== helpers ===================== */
+function rowsFor(n){
+  const out = [];
+  const gen = (arr)=>{ if(arr.length===n){ out.push(arr.slice()); return; } gen(arr.concat(true)); gen(arr.concat(false)); };
+  gen([]);
+  return out;
+}
+const VNAMES = ['p','q','r','s'];
+
+/* ===================== truth table builder (reused pattern) ===================== */
+function buildTruthTable(config){
+  const container = document.getElementById(config.containerId);
+  const rows = rowsFor(config.nvars);
+  const vnames = VNAMES.slice(0, config.nvars);
+  const totalCells = rows.length * config.cols.length + 1;
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'tt-toolbar';
+  toolbar.innerHTML = `<span class="tt-score">This rule: <strong data-local>0</strong> / ${totalCells}</span>
+    <span class="tt-btns">
+      <button class="tbtn primary" data-act="check">Check</button>
+      <button class="tbtn" data-act="reveal">Reveal</button>
+      <button class="tbtn" data-act="reset">Reset</button>
+    </span>`;
+  container.appendChild(toolbar);
+
+  const scrollWrap = document.createElement('div');
+  scrollWrap.className = 'table-scroll';
+  const table = document.createElement('table');
+  table.className = 'ttable';
+  const headTr = document.createElement('tr');
+  vnames.forEach(v=>{ const th=document.createElement('th'); th.className='given'; th.textContent=v; headTr.appendChild(th); });
+  config.cols.forEach(c=>{ const th=document.createElement('th'); if(c.final) th.className='final'; th.textContent=c.sym; headTr.appendChild(th); });
+  table.appendChild(headTr);
+
+  rows.forEach(row=>{
+    const tr = document.createElement('tr');
+    row.forEach(v=>{ const td=document.createElement('td'); td.className='given'; td.textContent=v?'T':'F'; tr.appendChild(td); });
+    config.cols.forEach(c=>{
+      const td = document.createElement('td'); if(c.final) td.className='final-col';
+      const correct = c.fn(...row);
+      const wrap = document.createElement('div');
+      wrap.className='cell-wrap'; wrap.dataset.correct=correct?'1':'0'; wrap.dataset.value='0';
+      wrap.innerHTML = `<div class="toggle" role="button" tabindex="0"><span class="lab t">T</span><span class="lab f">F</span><span class="knob"></span></div><span class="vmark"></span>`;
+      const tgl = wrap.querySelector('.toggle');
+      const flip = ()=>{
+        const on = wrap.dataset.value==='1';
+        wrap.dataset.value = on?'0':'1';
+        tgl.classList.toggle('on', !on);
+        wrap.classList.remove('ok','bad'); wrap.querySelector('.vmark').textContent='';
+        updateTTLocal(container);
+      };
+      tgl.addEventListener('click', flip);
+      tgl.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){flip(); e.preventDefault();} });
+      td.appendChild(wrap); tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
+  scrollWrap.appendChild(table);
+  container.appendChild(scrollWrap);
+
+  const vrow = document.createElement('div');
+  vrow.className = 'verdict-row';
+  vrow.innerHTML = `<span class="verdict-label">Is the final column True in every row (a tautology)?</span><div class="seg" data-role="verdict"><button data-val="Yes">Yes — valid rule</button><button data-val="No">No — fallacy</button></div><span class="verdict-icon"></span>`;
+  container.appendChild(vrow);
+  const vSeg = vrow.querySelector('.seg'); const vIcon = vrow.querySelector('.verdict-icon');
+  vSeg.querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      vSeg.querySelectorAll('button').forEach(x=>x.classList.remove('sel','bad-sel'));
+      b.classList.add('sel'); vSeg.dataset.value=b.dataset.val;
+      vIcon.classList.remove('show','ok','bad'); explainBox.classList.remove('show');
+      updateTTLocal(container);
+    });
+  });
+  const explainBox = document.createElement('div'); explainBox.className='explain-box';
+  explainBox.innerHTML = `<div class="explain-inner">${config.note}</div>`;
+  container.appendChild(explainBox);
+
+  toolbar.querySelectorAll('[data-act]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const act = btn.dataset.act;
+      if(act==='check') checkTT(container, 'Yes', vSeg, vIcon, explainBox);
+      if(act==='reveal') revealTT(container, 'Yes', vSeg, vIcon, explainBox);
+      if(act==='reset') resetTT(container, vSeg, vIcon, explainBox);
+    });
+  });
+}
+function updateTTLocal(container){
+  let correct = 0;
+  container.querySelectorAll('.cell-wrap').forEach(w=>{ if(w.dataset.value===w.dataset.correct) correct++; });
+  const seg = container.querySelector('[data-role="verdict"]');
+  if(seg && seg.dataset.value !== undefined && seg.dataset.value === 'Yes') correct++;
+  const el = container.querySelector('[data-local]');
+  if(el) el.textContent = correct;
+}
+function checkTT(container, correctVerdict, vSeg, vIcon, explainBox){
+  container.querySelectorAll('.cell-wrap').forEach(w=>{
+    const ok = w.dataset.value===w.dataset.correct;
+    w.classList.remove('ok','bad'); w.classList.add(ok?'ok':'bad');
+    w.querySelector('.vmark').textContent = ok?'✓':'✗';
+  });
+  if(vSeg.dataset.value !== undefined){
+    const ok = vSeg.dataset.value === correctVerdict;
+    vIcon.classList.add('show', ok?'ok':'bad'); vIcon.textContent = ok?'✓':'✗';
+    if(!ok){ const sel = vSeg.querySelector('button.sel'); if(sel) sel.classList.add('bad-sel'); }
+  }
+  explainBox.classList.add('show');
+  updateTTLocal(container);
+}
+function revealTT(container, correctVerdict, vSeg, vIcon, explainBox){
+  container.querySelectorAll('.cell-wrap').forEach(w=>{
+    w.dataset.value = w.dataset.correct;
+    w.querySelector('.toggle').classList.toggle('on', w.dataset.correct==='1');
+    w.classList.remove('ok','bad'); w.classList.add('ok');
+    w.querySelector('.vmark').textContent = '✓';
+  });
+  vSeg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','bad-sel'));
+  const btn = vSeg.querySelector(`button[data-val="${correctVerdict}"]`);
+  if(btn) btn.classList.add('sel');
+  vSeg.dataset.value = correctVerdict;
+  vIcon.classList.add('show','ok'); vIcon.textContent='✓';
+  explainBox.classList.add('show');
+  updateTTLocal(container);
+}
+function resetTT(container, vSeg, vIcon, explainBox){
+  container.querySelectorAll('.cell-wrap').forEach(w=>{
+    w.dataset.value='0'; w.querySelector('.toggle').classList.remove('on');
+    w.classList.remove('ok','bad'); w.querySelector('.vmark').textContent='';
+  });
+  delete vSeg.dataset.value;
+  vSeg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','bad-sel'));
+  vIcon.classList.remove('show','ok','bad'); explainBox.classList.remove('show');
+  updateTTLocal(container);
+}
+
+/* ===================== global controls ===================== */
+function checkAll(){ document.querySelectorAll('[data-rule-container]').forEach(c=>{
+  const seg=c.querySelector('[data-role="verdict"]'); const icon=c.querySelector('.verdict-icon'); const explain=c.querySelector('.explain-box');
+  checkTT(c,'Yes',seg,icon,explain);
+}); updateGrandScore(); }
+function revealAll(){ document.querySelectorAll('[data-rule-container]').forEach(c=>{
+  const seg=c.querySelector('[data-role="verdict"]'); const icon=c.querySelector('.verdict-icon'); const explain=c.querySelector('.explain-box');
+  revealTT(c,'Yes',seg,icon,explain);
+}); updateGrandScore(); }
+function resetAll(){ document.querySelectorAll('[data-rule-container]').forEach(c=>{
+  const seg=c.querySelector('[data-role="verdict"]'); const icon=c.querySelector('.verdict-icon'); const explain=c.querySelector('.explain-box');
+  resetTT(c,seg,icon,explain);
+}); updateGrandScore(); }
+function updateGrandScore(){
+  let correct=0, total=0;
+  document.querySelectorAll('[data-rule-container] .cell-wrap').forEach(w=>{ total++; if(w.dataset.value===w.dataset.correct) correct++; });
+  document.querySelectorAll('[data-rule-container] [data-role="verdict"]').forEach(seg=>{
+    total++; if(seg.dataset.value==='Yes') correct++;
+  });
+  document.getElementById('scoreDisplay').textContent = correct + ' / ' + total;
+}
+// live-update grand score whenever any local score changes
+const origUpdateTTLocal = updateTTLocal;
+updateTTLocal = function(container){ origUpdateTTLocal(container); updateGrandScore(); };
+
+/* ===================== nav + rule sections ===================== */
+const RULES = [
+  {id:'r1', name:'1. Modus Ponens', nvars:2,
+   formula:'<span class="prem">P₁: p→q &nbsp; P₂: p</span> &nbsp;⟹&nbsp; <span class="concl">C: q</span>',
+   cols:[
+     {sym:'P₁: p→q', fn:(p,q)=>(!p)||q},
+     {sym:'Premises: P₁∧P₂', fn:(p,q)=>((!p)||q)&&p},
+     {sym:'final: Premises→q', fn:(p,q)=>{const prem=((!p)||q)&&p; return (!prem)||q;}, final:true}
+   ],
+   note:'<strong>Every row is True.</strong> Whenever "p→q" and "p" are both true, "q" simply has to be true too — there\'s no possible world where the premises hold and q fails. That\'s the whole proof.'},
+
+  {id:'r2', name:'2. Modus Tollens', nvars:2,
+   formula:'<span class="prem">P₁: p→q &nbsp; P₂: ¬q</span> &nbsp;⟹&nbsp; <span class="concl">C: ¬p</span>',
+   cols:[
+     {sym:'P₁: p→q', fn:(p,q)=>(!p)||q},
+     {sym:'P₂: ¬q', fn:(p,q)=>!q},
+     {sym:'Premises: P₁∧P₂', fn:(p,q)=>((!p)||q)&&(!q)},
+     {sym:'C: ¬p', fn:(p,q)=>!p},
+     {sym:'final: Premises→¬p', fn:(p,q)=>{const prem=((!p)||q)&&(!q); return (!prem)||(!p);}, final:true}
+   ],
+   note:'<strong>Every row is True.</strong> If p→q holds and q is false, p can\'t possibly be true (otherwise q would have to be true) — so ¬p is forced.'},
+
+  {id:'r3', name:'3. Hypothetical Syllogism', nvars:3,
+   formula:'<span class="prem">P₁: p→q &nbsp; P₂: q→r</span> &nbsp;⟹&nbsp; <span class="concl">C: p→r</span>',
+   cols:[
+     {sym:'P₁: p→q', fn:(p,q,r)=>(!p)||q},
+     {sym:'P₂: q→r', fn:(p,q,r)=>(!q)||r},
+     {sym:'Premises: P₁∧P₂', fn:(p,q,r)=>((!p)||q)&&((!q)||r)},
+     {sym:'C: p→r', fn:(p,q,r)=>(!p)||r},
+     {sym:'final: Premises→(p→r)', fn:(p,q,r)=>{const prem=((!p)||q)&&((!q)||r); return (!prem)||((!p)||r);}, final:true}
+   ],
+   note:'<strong>Every row is True.</strong> Chaining two implications always produces a third — this is literally the "transitivity" of →, and 8 rows confirm it holds in every possible case.'},
+
+  {id:'r4', name:'4. Disjunctive Syllogism', nvars:2,
+   formula:'<span class="prem">P₁: p∨q &nbsp; P₂: ¬p</span> &nbsp;⟹&nbsp; <span class="concl">C: q</span>',
+   cols:[
+     {sym:'P₁: p∨q', fn:(p,q)=>p||q},
+     {sym:'Premises: P₁∧P₂', fn:(p,q)=>(p||q)&&(!p)},
+     {sym:'final: Premises→q', fn:(p,q)=>{const prem=(p||q)&&(!p); return (!prem)||q;}, final:true}
+   ],
+   note:'<strong>Every row is True.</strong> If at least one of p, q holds, and p is ruled out, q is the only option left standing.'},
+
+  {id:'r5', name:'5. Addition', nvars:2,
+   formula:'<span class="prem">P₁: p</span> &nbsp;⟹&nbsp; <span class="concl">C: p∨q</span>',
+   cols:[
+     {sym:'C: p∨q', fn:(p,q)=>p||q},
+     {sym:'final: p→(p∨q)', fn:(p,q)=>(!p)||(p||q), final:true}
+   ],
+   note:'<strong>Every row is True.</strong> This is almost too easy — if p alone is true, then "p or anything" is automatically true too. You can OR in any statement you like, q doesn\'t even need to be related to p.'},
+
+  {id:'r6', name:'6. Simplification', nvars:2,
+   formula:'<span class="prem">P₁: p∧q</span> &nbsp;⟹&nbsp; <span class="concl">C: p</span>',
+   cols:[
+     {sym:'P₁: p∧q', fn:(p,q)=>p&&q},
+     {sym:'final: (p∧q)→p', fn:(p,q)=>(!(p&&q))||p, final:true}
+   ],
+   note:'<strong>Every row is True.</strong> If "p and q" is true, then obviously p on its own is true — you\'re just throwing away half the information, which can never break the implication.'},
+
+  {id:'r7', name:'7. Conjunction', nvars:2,
+   formula:'<span class="prem">P₁: p &nbsp; P₂: q</span> &nbsp;⟹&nbsp; <span class="concl">C: p∧q</span>',
+   cols:[
+     {sym:'Premises: p∧q', fn:(p,q)=>p&&q},
+     {sym:'final: (p∧q)→(p∧q)', fn:(p,q)=>{const prem=p&&q; return (!prem)||prem;}, final:true}
+   ],
+   note:'<strong>Every row is True — trivially.</strong> The conclusion here is exactly the combined premises, so this is really A→A, which is always true no matter what A stands for.'},
+
+  {id:'r8', name:'8. Resolution', nvars:3,
+   formula:'<span class="prem">P₁: p∨q &nbsp; P₂: ¬p∨r</span> &nbsp;⟹&nbsp; <span class="concl">C: q∨r</span>',
+   cols:[
+     {sym:'P₁: p∨q', fn:(p,q,r)=>p||q},
+     {sym:'P₂: ¬p∨r', fn:(p,q,r)=>(!p)||r},
+     {sym:'Premises: P₁∧P₂', fn:(p,q,r)=>(p||q)&&((!p)||r)},
+     {sym:'C: q∨r', fn:(p,q,r)=>q||r},
+     {sym:'final: Premises→(q∨r)', fn:(p,q,r)=>{const prem=(p||q)&&((!p)||r); return (!prem)||(q||r);}, final:true}
+   ],
+   note:'<strong>Every row is True.</strong> p and ¬p can never both be the reason things work out — whichever one is true, it "resolves" against its opposite in the other premise, leaving q∨r standing.'},
+
+  {id:'r9', name:'9. Constructive Dilemma', nvars:4,
+   formula:'<span class="prem">P₁: (p→q)∧(r→s) &nbsp; P₂: p∨r</span> &nbsp;⟹&nbsp; <span class="concl">C: q∨s</span>',
+   cols:[
+     {sym:'P₁: (p→q)∧(r→s)', fn:(p,q,r,s)=>((!p)||q)&&((!r)||s)},
+     {sym:'P₂: p∨r', fn:(p,q,r,s)=>p||r},
+     {sym:'Premises: P₁∧P₂', fn:(p,q,r,s)=>(((!p)||q)&&((!r)||s))&&(p||r)},
+     {sym:'C: q∨s', fn:(p,q,r,s)=>q||s},
+     {sym:'final: Premises→(q∨s)', fn:(p,q,r,s)=>{const prem=(((!p)||q)&&((!r)||s))&&(p||r); return (!prem)||(q||s);}, final:true}
+   ],
+   note:'<strong>Every row is True — all 16.</strong> You\'re told two "if-then"s, and that at least one cause (p or r) is true. Whichever cause fired, its matching effect (q or s) must follow — so q∨s is guaranteed.'},
+
+  {id:'r10', name:'10. Destructive Dilemma', nvars:4,
+   formula:'<span class="prem">P₁: (p→q)∧(r→s) &nbsp; P₂: ¬q∨¬s</span> &nbsp;⟹&nbsp; <span class="concl">C: ¬p∨¬r</span>',
+   cols:[
+     {sym:'P₁: (p→q)∧(r→s)', fn:(p,q,r,s)=>((!p)||q)&&((!r)||s)},
+     {sym:'P₂: ¬q∨¬s', fn:(p,q,r,s)=>(!q)||(!s)},
+     {sym:'Premises: P₁∧P₂', fn:(p,q,r,s)=>(((!p)||q)&&((!r)||s))&&((!q)||(!s))},
+     {sym:'C: ¬p∨¬r', fn:(p,q,r,s)=>(!p)||(!r)},
+     {sym:'final: Premises→(¬p∨¬r)', fn:(p,q,r,s)=>{const prem=(((!p)||q)&&((!r)||s))&&((!q)||(!s)); return (!prem)||((!p)||(!r));}, final:true}
+   ],
+   note:'<strong>Every row is True — all 16.</strong> The mirror image of Constructive Dilemma: at least one effect (q or s) failed, so its matching cause (p or r) must also have failed — ¬p∨¬r follows every time.'}
+];
+
+const navRow = document.getElementById('navRow');
+RULES.forEach(r=>{
+  const a = document.createElement('a'); a.href='#'+r.id; a.className='nav-led'; a.textContent=r.name.replace(/^\d+\.\s*/,'');
+  navRow.appendChild(a);
+});
+
+const rulesContainer = document.getElementById('rulesContainer');
+RULES.forEach((r,i)=>{
+  const section = document.createElement('div');
+  section.className = 'rule-section';
+  section.id = r.id;
+  section.innerHTML = `
+    <div class="r-head">
+      <div class="r-num-badge">${i+1}</div>
+      <h2 class="r-name">${r.name.replace(/^\d+\.\s*/,'')}</h2>
+      <div class="r-formula">${r.formula}</div>
+    </div>
+    <div data-rule-container></div>
+  `;
+  rulesContainer.appendChild(section);
+  const container = section.querySelector('[data-rule-container]');
+  container.id = 'ruletable-'+r.id;
+  buildTruthTable({ containerId: container.id, nvars:r.nvars, cols:r.cols, note:r.note });
+});
+
+document.getElementById('scoreDisplay').textContent = '0 / 0';
+updateGrandScore();
+</script>
+</body>
+</html>

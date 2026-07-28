@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entry Ticket · Statements &amp; Notation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+    --lv1:#7FA79A; --lv2:#4F8A73; --lv3:#C79A3E; --lv4:#C17A3A; --lv5:#B5493D;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);background-image:radial-gradient(circle at 1px 1px, rgba(28,43,51,0.06) 1px, transparent 0);background-size:22px 22px;font-family:'IBM Plex Sans',sans-serif;color:var(--ink);padding:36px 16px 60px;}
+  .wrap{max-width:640px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(26px,5vw,34px);margin:0 0 4px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14px;margin-bottom:28px;}
+
+  .ticket{position:relative;background:var(--card);border-radius:14px;box-shadow:0 18px 40px -18px rgba(28,43,51,.35), 0 1px 0 rgba(28,43,51,.05);transform:rotate(-0.6deg);padding:24px 26px;margin-bottom:30px;border:1px solid rgba(28,43,51,.08);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .ticket h2{font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin:0 0 6px;}
+  .ticket p{margin:0;color:var(--ink-soft);font-size:13.5px;line-height:1.5;}
+  .badge{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:var(--ink);color:var(--paper);padding:6px 10px;border-radius:20px;white-space:nowrap;}
+
+  .q-card{background:var(--card);border-radius:12px;padding:18px 20px;margin-bottom:14px;border:1px solid rgba(28,43,51,.08);box-shadow:0 6px 16px -12px rgba(28,43,51,.4);}
+  .q-top{display:flex;gap:10px;align-items:center;margin-bottom:8px;}
+  .q-num{font-family:'Fraunces',serif;font-weight:600;font-size:15px;color:var(--ink-soft);min-width:26px;}
+  .lvl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#fff;padding:3px 8px;border-radius:20px;}
+  .lv1{background:var(--lv1);} .lv2{background:var(--lv2);} .lv3{background:var(--lv3);}
+  .lv4{background:var(--lv4);} .lv5{background:var(--lv5);}
+  .q-text{font-size:15px;line-height:1.55;margin:0 0 10px;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;}
+
+  .reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:6px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .reveal-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
+
+  .answer{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .q-card.revealed .answer{max-height:400px;opacity:1;margin-top:12px;}
+  .answer-inner{border-top:1px dashed var(--line);padding-top:12px;font-size:14px;line-height:1.6;display:flex;gap:12px;align-items:flex-start;}
+  .stamp{flex-shrink:0;display:inline-block;border:2.5px solid var(--teal);color:var(--teal);padding:5px 10px;border-radius:7px;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px;letter-spacing:.06em;transform:rotate(-8deg) scale(.7);opacity:0;mix-blend-mode:multiply;transition:all .4s cubic-bezier(.2,1.7,.4,1);white-space:nowrap;margin-top:2px;}
+  .q-card.revealed .stamp{opacity:1;transform:rotate(-8deg) scale(1);}
+  .stamp.brick{border-color:var(--brick);color:var(--brick);}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:30px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Entry Ticket</h1>
+  <p class="sub">Topic 1 — Introduction: Statements &amp; Notation</p>
+
+  <div class="ticket">
+    <div>
+      <h2>Admit to Logic</h2>
+      <p>10 quick-fire questions. Answer from instinct — we haven't officially covered this yet.</p>
+    </div>
+    <div class="badge">5 min</div>
+  </div>
+
+  <div class="q-card" id="q1"><div class="q-top"><span class="q-num">1</span><span class="lvl lv1">Lv1</span></div>
+    <p class="q-text">True or False (of the sentence itself): <em>"Shut the laboratory door."</em> — can this sentence be labelled True or False?</p>
+    <button class="reveal-btn" onclick="toggle('q1')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp brick">✗ NO</span><span>It's a command, not a claim about the world. There's nothing to check, so it can't be true or false.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q2"><div class="q-top"><span class="q-num">2</span><span class="lvl lv1">Lv1</span></div>
+    <p class="q-text">Which of these could you mark "right" or "wrong" on a test: <em>"The sum of the angles of a triangle is 180°"</em> or <em>"Geometry is the most elegant branch of mathematics"</em>?</p>
+    <button class="reveal-btn" onclick="toggle('q2')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">✓ FIRST</span><span>The triangle sentence describes a checkable fact. The "most elegant" sentence is a matter of opinion — no universal test decides it.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q3"><div class="q-top"><span class="q-num">3</span><span class="lvl lv1">Lv1</span></div>
+    <p class="q-text">In everyday speech, when someone "makes a statement," what are they usually doing? <span class="mono">(a)</span> asking something <span class="mono">(b)</span> asserting a claim <span class="mono">(c)</span> giving an order</p>
+    <button class="reveal-btn" onclick="toggle('q3')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">(b)</span><span>Asserting a claim — declaring that something is (or isn't) the case. That instinct is exactly what mathematicians formalise.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q4"><div class="q-top"><span class="q-num">4</span><span class="lvl lv2">Lv2</span></div>
+    <p class="q-text">Guess: can <span class="mono">"y − 3 = 4"</span> be called True or False right now, before <span class="mono">y</span> is told to you?</p>
+    <button class="reveal-btn" onclick="toggle('q4')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp brick">✗ NOT YET</span><span>Its truth depends entirely on the unknown <span class="mono">y</span>. Sentences like this are called <strong>open sentences</strong> — we'll meet them properly later.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q5"><div class="q-top"><span class="q-num">5</span><span class="lvl lv2">Lv2</span></div>
+    <p class="q-text">Try to pin one truth value on: <em>"This very sentence is false."</em> Can you do it without contradicting yourself?</p>
+    <button class="reveal-btn" onclick="toggle('q5')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp brick">✗ IMPOSSIBLE</span><span>Say it's true → it must be false. Say it's false → it must be true. It flips forever. This is the famous <strong>Liar Paradox</strong> — a preview of why logicians are careful about what counts as a statement.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q6"><div class="q-top"><span class="q-num">6</span><span class="lvl lv2">Lv2</span></div>
+    <p class="q-text">Quick sort — is this a statement or not: <em>"New Delhi is the capital of India."</em></p>
+    <button class="reveal-btn" onclick="toggle('q6')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">✓ YES</span><span>A checkable, declarative claim — and True. That's the shape every statement will have.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q7"><div class="q-top"><span class="q-num">7</span><span class="lvl lv3">Lv3</span></div>
+    <p class="q-text">Predict: mathematicians often replace a whole sentence with a single letter, like <span class="mono">p</span>. Why might that be useful, beyond just saving ink?</p>
+    <button class="reveal-btn" onclick="toggle('q7')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">💡 IDEA</span><span>Short symbols let us combine and manipulate claims with fixed rules — without getting distracted by what the sentence is actually about.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q8"><div class="q-top"><span class="q-num">8</span><span class="lvl lv3">Lv3</span></div>
+    <p class="q-text">Why do you think <em>opinions</em> ("this is the best theorem") cause trouble if we try to build a logical system out of them?</p>
+    <button class="reveal-btn" onclick="toggle('q8')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">💡 IDEA</span><span>Logic needs a truth value everyone can agree to check the same way. Opinions have no shared, objective test — so there's no fixed truth value to reason with.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q9"><div class="q-top"><span class="q-num">9</span><span class="lvl lv4">Lv4</span></div>
+    <p class="q-text">Can a <em>question</em> ever be rewritten so it becomes a genuine statement? If so, how?</p>
+    <button class="reveal-btn" onclick="toggle('q9')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">✓ YES</span><span>"Is it raining?" isn't a statement — but rewritten as "It is raining," it becomes one, checkable and assignable a truth value. The question form itself is what disqualifies it.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q10"><div class="q-top"><span class="q-num">10</span><span class="lvl lv5">Lv5</span></div>
+    <p class="q-text">One-line guess: based on the word <strong>predicate</strong>, what do you think "predicate calculus" studies?</p>
+    <button class="reveal-btn" onclick="toggle('q10')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">🔮 PREVIEW</span><span>"Predicate" = what's said <em>about</em> a subject (e.g. "___ is even"). By the end of this module, we'll formalise statements <em>with</em> unknowns like <span class="mono">x</span> — that's predicate calculus. Hold onto your guess!</span></div></div>
+  </div>
+
+  <footer>Keep this ticket — we'll revisit Q10 at the end of the unit.</footer>
+</div>
+
+<script>function toggle(id){document.getElementById(id).classList.toggle('revealed');}</script>
+</body>
+</html>

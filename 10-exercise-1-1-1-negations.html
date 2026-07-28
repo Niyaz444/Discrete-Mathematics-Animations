@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exercise 1.1.1 · Negations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);font-family:'IBM Plex Sans',sans-serif;color:var(--ink);padding:32px 16px 80px;}
+  .wrap{max-width:760px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(23px,4.5vw,33px);margin:0 0 6px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14.5px;margin:0 auto 26px;max-width:560px;line-height:1.6;}
+
+  .keydef{
+    background:#fff;border-left:4px solid var(--teal);border-radius:0 10px 10px 0;
+    padding:16px 18px;margin-bottom:30px;font-size:14px;line-height:1.75;
+    box-shadow:0 6px 16px -12px rgba(28,43,51,.4);
+  }
+  .keydef strong{font-family:'Fraunces',serif;font-weight:600;color:var(--teal);}
+  .keydef ul{margin:8px 0 0;padding-left:20px;}
+  .keydef li{margin-bottom:5px;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;}
+
+  .toolbar{
+    position:sticky; top:10px; z-index:20;
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center;
+    background:var(--ink); color:#F4F2EA; border-radius:14px; padding:12px 18px; margin-bottom:30px;
+    box-shadow:0 12px 28px -16px rgba(28,43,51,.6);
+  }
+  .tbtn{
+    background:transparent;border:1.5px solid #F4F2EA;color:#F4F2EA;border-radius:20px;
+    padding:7px 16px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.03em;
+    text-transform:uppercase;cursor:pointer;transition:.15s ease;
+  }
+  .tbtn:hover{background:#F4F2EA;color:var(--ink);}
+  .tbtn.primary{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .tbtn.primary:hover{background:#256150;}
+
+  .q-card{
+    background:var(--card); border-radius:14px; padding:20px 22px; margin-bottom:16px;
+    border:1.5px solid rgba(28,43,51,.08); box-shadow:0 8px 20px -14px rgba(28,43,51,.4);
+  }
+  .q-letter{
+    display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px;
+    border-radius:50%; background:var(--ink); color:#F4F2EA; font-family:'Fraunces',serif;
+    font-weight:600; font-size:15px; margin-right:10px; flex-shrink:0;
+  }
+  .q-top{display:flex; align-items:flex-start; gap:2px; margin-bottom:12px;}
+  .q-text{font-size:16px; line-height:1.6; margin:0; padding-top:4px;}
+  .q-text em{font-style:italic;}
+  .box-formula{font-family:'IBM Plex Mono',monospace;background:#F6F4EC;border:1px solid var(--line);border-radius:6px;padding:1px 8px;}
+
+  .scratch{
+    width:100%; border:1.5px dashed var(--line); border-radius:8px; background:#FAF9F4;
+    padding:10px 12px; font-family:'IBM Plex Sans',sans-serif; font-size:14px; color:var(--ink);
+    resize:vertical; min-height:44px; margin-bottom:10px;
+  }
+  .scratch::placeholder{color:var(--ink-soft); font-style:italic;}
+  .scratch:focus{outline:2px solid var(--gold); border-color:transparent;}
+
+  .reveal-btn{
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.05em; text-transform:uppercase;
+    background:transparent; border:1.5px solid var(--ink); color:var(--ink); padding:6px 12px;
+    border-radius:20px; cursor:pointer; transition:.2s ease;
+  }
+  .reveal-btn:hover{background:var(--ink); color:var(--paper);}
+
+  .explain{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .explain.show{max-height:260px;opacity:1;margin-top:14px;}
+  .explain-inner{border-top:1px dashed var(--line);padding-top:12px;font-size:14px;line-height:1.6;display:flex;gap:12px;align-items:flex-start;}
+  .stamp{
+    flex-shrink:0; display:inline-block; border:2px solid var(--teal); color:var(--teal);
+    padding:4px 10px; border-radius:7px; font-family:'IBM Plex Mono',monospace; font-weight:700;
+    font-size:11px; letter-spacing:.05em; white-space:nowrap; margin-top:2px;
+  }
+  .explain-inner .note{color:var(--ink-soft); display:block; margin-top:6px; font-size:13px;}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:40px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Exercise 1.1.1</h1>
+  <p class="sub">Write the negation of each statement below. Try it in the scratch box first, then reveal to compare.</p>
+
+  <div class="keydef">
+    <strong>Quick rules for negation.</strong>
+    <ul>
+      <li>To negate a sentence "X," the simplest form is "It is not the case that X" — usually shortened naturally, e.g. "X" → "not X."</li>
+      <li><strong>Double negatives cancel:</strong> negating "will <em>not</em> be open" gives "will be open."</li>
+      <li>To negate an equation <span class="mono">A = B</span>, write <span class="mono">A ≠ B</span>.</li>
+      <li>Negating a sentence doesn't change whether it's a statement — even opinions can be grammatically negated, even though neither the original nor its negation has a fixed, objective truth value.</li>
+    </ul>
+  </div>
+
+  <div class="toolbar">
+    <button class="tbtn primary" onclick="revealAll()">Reveal All Answers</button>
+    <button class="tbtn" onclick="resetAll()">Hide All / Reset</button>
+  </div>
+
+  <!-- (a) -->
+  <div class="q-card" id="qa">
+    <div class="q-top"><span class="q-letter">a</span><p class="q-text">I visited her place on Sunday.</p></div>
+    <textarea class="scratch" placeholder="Write your negation here..."></textarea>
+    <button class="reveal-btn" onclick="toggleReveal('qa')">Reveal Answer</button>
+    <div class="explain"><div class="explain-inner"><span class="stamp">✓</span><span>"I did <strong>not</strong> visit her place on Sunday."<span class="note">The simplest negation just inserts "not" before the main verb.</span></span></div></div>
+  </div>
+
+  <!-- (b) -->
+  <div class="q-card" id="qb">
+    <div class="q-top"><span class="q-letter">b</span><p class="q-text">The market will <em>not</em> be open in the evening.</p></div>
+    <textarea class="scratch" placeholder="Write your negation here..."></textarea>
+    <button class="reveal-btn" onclick="toggleReveal('qb')">Reveal Answer</button>
+    <div class="explain"><div class="explain-inner"><span class="stamp">✓</span><span>"The market <strong>will be open</strong> in the evening."<span class="note">The original sentence already contains a "not" — negating it a second time cancels it out (¬¬p ≡ p), rather than adding yet another "not."</span></span></div></div>
+  </div>
+
+  <!-- (c) -->
+  <div class="q-card" id="qc">
+    <div class="q-top"><span class="q-letter">c</span><p class="q-text">The square of the integer <span class="mono">n</span> is divisible by the prime <span class="mono">p</span>.</p></div>
+    <textarea class="scratch" placeholder="Write your negation here..."></textarea>
+    <button class="reveal-btn" onclick="toggleReveal('qc')">Reveal Answer</button>
+    <div class="explain"><div class="explain-inner"><span class="stamp">✓</span><span>"The square of the integer <span class="mono">n</span> is <strong>not</strong> divisible by the prime <span class="mono">p</span>."<span class="note">Negating a "divisible by" claim just adds "not" — no need to describe what it IS divisible by instead.</span></span></div></div>
+  </div>
+
+  <!-- (d) -->
+  <div class="q-card" id="qd">
+    <div class="q-top"><span class="q-letter">d</span><p class="q-text"><span class="box-formula">x² + 3 = 27</span></p></div>
+    <textarea class="scratch" placeholder="Write your negation here..."></textarea>
+    <button class="reveal-btn" onclick="toggleReveal('qd')">Reveal Answer</button>
+    <div class="explain"><div class="explain-inner"><span class="stamp">✓</span><span><span class="mono">x² + 3 ≠ 27</span><span class="note">Negating an equation swaps "=" for "≠" — you're negating the whole claim, not solving for x. (Also worth noticing: as written, this sentence has a free variable x, so strictly it's an open sentence, not a statement, until x is fixed.)</span></span></div></div>
+  </div>
+
+  <!-- (e) -->
+  <div class="q-card" id="qe">
+    <div class="q-top"><span class="q-letter">e</span><p class="q-text">The child is cute.</p></div>
+    <textarea class="scratch" placeholder="Write your negation here..."></textarea>
+    <button class="reveal-btn" onclick="toggleReveal('qe')">Reveal Answer</button>
+    <div class="explain"><div class="explain-inner"><span class="stamp">✓</span><span>"The child is <strong>not</strong> cute."<span class="note">Grammatically straightforward — but worth flagging: "cute" is subjective, so neither this sentence nor its negation is actually a mathematical statement. You can still negate a sentence's grammar even when it fails to be a statement in the first place.</span></span></div></div>
+  </div>
+
+  <!-- (f) -->
+  <div class="q-card" id="qf">
+    <div class="q-top"><span class="q-letter">f</span><p class="q-text">The apple is ripe.</p></div>
+    <textarea class="scratch" placeholder="Write your negation here..."></textarea>
+    <button class="reveal-btn" onclick="toggleReveal('qf')">Reveal Answer</button>
+    <div class="explain"><div class="explain-inner"><span class="stamp">✓</span><span>"The apple is <strong>not</strong> ripe."<span class="note">Unlike (e), "ripe" usually has an agreed, checkable test (colour, firmness, taste) — so this one plausibly IS a statement, and its negation is a statement too.</span></span></div></div>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Exercise 1.1.1 — Negations</footer>
+</div>
+
+<script>
+function toggleReveal(id){
+  document.getElementById(id).querySelector('.explain').classList.toggle('show');
+}
+function revealAll(){
+  document.querySelectorAll('.explain').forEach(e=>e.classList.add('show'));
+}
+function resetAll(){
+  document.querySelectorAll('.explain').forEach(e=>e.classList.remove('show'));
+}
+</script>
+</body>
+</html>

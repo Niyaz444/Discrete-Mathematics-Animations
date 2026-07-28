@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algebraic Proofs Without Truth Tables — Problem 1.12</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --indigo:#3730A3; --indigo-d:#262063; --violet:#7C3AED;
+  --paper:#f5f4fb; --card:#ffffff; --line:#e3e2f1; --muted:#5c5f7c; --ink:#1c1b3a;
+  --T:#0f9d6f; --Tb:#e6f6ef; --F:#e0523f; --Fb:#fdecea; --amber:#d98a1f; --amberb:#fdedcf;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:'Lora',Georgia,serif; -webkit-font-smoothing:antialiased}
+h1,h2,h3,.ui,button{font-family:'Inter',system-ui,sans-serif}
+
+.hero{background:linear-gradient(135deg,#262063,#3730A3 60%,#5b3fb0); color:#fff; text-align:center; padding:40px 20px 26px}
+.hero .eyebrow{font-family:'Inter'; letter-spacing:.22em; text-transform:uppercase; font-size:.66rem; opacity:.85}
+.hero h1{font-family:'Fraunces'; font-weight:700; font-size:clamp(1.5rem,4vw,2.1rem); margin:.3em 0 .12em}
+.hero p{font-family:'Inter'; opacity:.92; margin:0; font-size:.94rem; max-width:660px; margin:0 auto}
+
+main{max-width:920px; margin:0 auto; padding:26px 18px 70px}
+
+.notice{background:#fff; border:1px solid var(--line); border-left:4px solid var(--amber); border-radius:10px;
+  padding:12px 16px; font-family:'Inter'; font-size:.83rem; color:var(--muted); margin-bottom:16px}
+.notice b{color:var(--indigo-d)}
+
+.howto{background:#fff; border:1px solid var(--line); border-left:4px solid var(--violet); border-radius:10px;
+  padding:12px 16px; font-family:'Inter'; font-size:.85rem; color:var(--muted); margin-bottom:20px}
+.howto b{color:var(--indigo-d)}
+
+.pills{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px}
+.pill{font-family:'Inter'; font-weight:700; font-size:.84rem; padding:9px 16px; border-radius:999px;
+  border:1.5px solid var(--line); background:#fff; cursor:pointer; color:var(--muted)}
+.pill.active{background:var(--indigo); border-color:var(--indigo); color:#fff}
+
+.target{font-family:'Inter'; font-size:.86rem; color:var(--muted); margin:6px 0 18px}
+.target b{color:var(--indigo-d)}
+
+.predictbar{display:flex; align-items:center; gap:10px; margin-bottom:18px; font-family:'Inter'; font-size:.85rem; color:var(--muted)}
+.pswitch{width:46px; height:26px; border-radius:999px; border:none; cursor:pointer; position:relative; background:#d7d5ec; transition:.2s}
+.pswitch .k{position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff; transition:.2s; box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.pswitch.on{background:var(--violet)} .pswitch.on .k{left:23px}
+
+.stepper{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:22px 24px 20px;
+  box-shadow:0 8px 24px -16px rgba(30,20,80,.35); margin-bottom:20px}
+.stepcount{font-family:'Inter'; font-size:.78rem; color:var(--muted); text-align:center; margin-bottom:10px}
+.dots{display:flex; gap:6px; justify-content:center; margin-bottom:18px; flex-wrap:wrap}
+.dot{width:10px; height:10px; border-radius:50%; background:var(--line); border:none; cursor:pointer; padding:0}
+.dot.on{background:var(--indigo)}
+.dot.past{background:var(--indigo); opacity:.35}
+
+.expr{font-size:clamp(1.05rem,2.8vw,1.42rem); text-align:center; line-height:1.9; padding:20px 6px; min-height:2.2em}
+.expr i{font-style:italic; color:var(--indigo-d)}
+.expr .cT{color:var(--T); font-weight:700; font-style:normal}
+mark.chg{background:var(--amberb); border-bottom:2.5px solid var(--amber); padding:1px 5px; border-radius:5px; box-decoration-break:clone; -webkit-box-decoration-break:clone}
+
+.lawrow{display:flex; align-items:center; justify-content:center; gap:10px; margin:6px 0 4px}
+.lawbadge{font-family:'Inter'; font-weight:700; font-size:.88rem; background:var(--Tb); color:var(--T);
+  border:1.5px solid var(--T); padding:7px 16px; border-radius:10px; cursor:default; transition:.2s}
+.lawbadge.given{background:#f1f0fa; color:var(--muted); border-color:var(--line)}
+body.predict .lawbadge:not(.given){filter:blur(5px); cursor:pointer}
+body.predict .lawbadge.revealed{filter:none; cursor:default}
+.note{font-family:'Inter'; font-size:.82rem; color:var(--muted); text-align:center; margin:2px 0 4px; min-height:1.3em}
+
+.navrow{display:flex; align-items:center; justify-content:center; gap:12px; margin-top:14px}
+.navbtn{font-family:'Inter'; font-weight:600; font-size:.86rem; border:1.5px solid var(--line); background:#fff;
+  color:var(--ink); padding:9px 18px; border-radius:10px; cursor:pointer}
+.navbtn:hover{border-color:var(--indigo); color:var(--indigo)}
+.navbtn:disabled{opacity:.35; cursor:not-allowed}
+.navbtn.primary{background:var(--indigo); color:#fff; border-color:var(--indigo)}
+.navbtn.primary:hover{background:var(--indigo-d)}
+
+.synth{background:var(--amberb); border:1.5px solid var(--amber); border-radius:12px; padding:14px 18px;
+  font-family:'Inter'; font-size:.87rem; color:#5c3d0a; margin-bottom:20px}
+.synth b{color:var(--indigo-d)}
+
+.legend{font-family:'Inter'; font-size:.78rem; color:var(--muted); text-align:center; margin:-6px 0 20px}
+.legend mark{background:var(--amberb); border-bottom:2px solid var(--amber); padding:0 5px; border-radius:4px}
+
+h3.tth{font-family:'Inter'; font-weight:600; color:var(--indigo-d); font-size:1rem; margin:0 0 10px}
+.transcript{background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin-bottom:20px}
+.trow{display:flex; align-items:baseline; gap:12px; padding:8px 6px; border-radius:8px; cursor:pointer; font-family:'Inter'; font-size:.84rem}
+.trow:hover{background:#f4f3fc}
+.trow.cur{background:#eeedfa}
+.trow .tn{color:var(--muted); min-width:18px}
+.trow .te{font-family:'Lora'; font-size:.94rem; flex:1}
+.trow .te i{font-style:italic; color:var(--indigo-d)}
+.trow .tl{color:var(--indigo); font-weight:600; white-space:nowrap; font-size:.76rem}
+
+.gloss{background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px 18px}
+.gloss summary{cursor:pointer; font-family:'Inter'; font-weight:600; color:var(--indigo-d); font-size:.94rem}
+.glist{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:8px 18px; margin-top:12px; font-family:'Inter'; font-size:.82rem}
+.glist .gi b{color:var(--indigo-d); display:block; margin-bottom:1px}
+.glist .gi span{color:var(--muted)}
+
+.footer{text-align:center; font-family:'Inter'; color:var(--muted); font-size:.82rem; padding:8px 20px 50px}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">Discrete Mathematics · Statement Calculus</div>
+  <h1>Algebraic Proofs Without Truth Tables</h1>
+  <p>Problem 1.12 — three more identities, proved one law at a time, ending in a genuine tautology.</p>
+</header>
+
+<main>
+  <div class="notice"><b>A note on this problem:</b> the scanned source had a few OCR slips typical of textbook scans — a couple of negation signs (¬) were dropped and one arrow was misread. Each proof below was independently re-derived and checked by brute-force truth table (privately, by me — not shown to you, since the whole point is proving it without one) before being built into this tool, so what you're stepping through is verified correct.</div>
+
+  <div class="howto"><b>How to use this:</b> pick a proof below, then before you tap the law badge, ask yourself: <i>what single law turns this line into the next?</i> Toggle Predict mode to blur every law name until you tap it.</div>
+
+  <div class="pills" id="pills"></div>
+  <div class="target" id="targetLine"></div>
+
+  <div class="predictbar">
+    <button class="pswitch" id="predictSwitch" onclick="togglePredict()"><span class="k"></span></button>
+    <span>Predict mode — blur law names until tapped</span>
+  </div>
+
+  <div class="stepper">
+    <div class="stepcount" id="stepcount"></div>
+    <div class="dots" id="dots"></div>
+    <div class="expr" id="exprBox"></div>
+    <div class="lawrow"><span class="lawbadge" id="lawBadge" onclick="revealLaw()"></span></div>
+    <div class="note" id="noteBox"></div>
+    <div class="navrow">
+      <button class="navbtn" id="btnPrev" onclick="prevStep()">‹ Previous line</button>
+      <button class="navbtn primary" id="btnNext" onclick="nextStep()">Next line ›</button>
+    </div>
+  </div>
+
+  <div class="synth" id="synthBox" style="display:none"></div>
+
+  <div class="legend"><mark>highlighted</mark> = exactly the piece the law just acted on</div>
+
+  <div class="transcript">
+    <h3 class="tth">Proof so far</h3>
+    <div id="transRows"></div>
+  </div>
+
+  <details class="gloss">
+    <summary>Law glossary — quick reference</summary>
+    <div class="glist" id="glossList"></div>
+  </details>
+</main>
+
+<div class="footer">Every line here is the previous line rewritten by exactly one law — three variables now instead of two, same idea.</div>
+
+<script>
+const proofs = {
+  i: {
+    label:'(i)',
+    title:'¬p→(q→r) ≡ q→(p∨r)',
+    steps:[
+      {expr:'¬p→(q→r)', law:'Given', given:true},
+      {expr:'<mark class="chg">p∨(q→r)</mark>', law:'Conditional Law', note:'¬p→X ≡ ¬(¬p)∨X ≡ p∨X'},
+      {expr:'p∨<mark class="chg">(¬q∨r)</mark>', law:'Conditional Law', note:'q→r ≡ ¬q∨r'},
+      {expr:'<mark class="chg">(p∨¬q)</mark>∨r', law:'Associative Law', note:'Regroup — no values changed, only parentheses.'},
+      {expr:'<mark class="chg">(¬q∨p)</mark>∨r', law:'Commutative Law', note:'Swap p and ¬q inside the group.'},
+      {expr:'<mark class="chg">¬q∨(p∨r)</mark>', law:'Associative Law', note:'Regroup again.'},
+      {expr:'<mark class="chg">q→(p∨r)</mark>', law:'Conditional Law', note:'¬q∨X ≡ q→X — done.'}
+    ]
+  },
+  ii: {
+    label:'(ii)',
+    title:'p→(q→r) ≡ (p∧q)→r',
+    steps:[
+      {expr:'p→(q→r)', law:'Given', given:true},
+      {expr:'p→<mark class="chg">(¬q∨r)</mark>', law:'Conditional Law', note:'q→r ≡ ¬q∨r'},
+      {expr:'<mark class="chg">¬p∨(¬q∨r)</mark>', law:'Conditional Law', note:'p→X ≡ ¬p∨X'},
+      {expr:'<mark class="chg">(¬p∨¬q)</mark>∨r', law:'Associative Law', note:'Regroup — no values changed, only parentheses.'},
+      {expr:'<mark class="chg">¬(p∧q)</mark>∨r', law:"De Morgan's Law", note:'¬p∨¬q ≡ ¬(p∧q)'},
+      {expr:'<mark class="chg">(p∧q)→r</mark>', law:'Conditional Law', note:'¬X∨Y ≡ X→Y — done. This is implication currying: a two-step condition collapses into one conjoined hypothesis.'}
+    ]
+  },
+  iii: {
+    label:'(iii)',
+    title:'((p∨q) ∧ ¬(¬p∧(¬q∨¬r))) ∨ (¬p∧¬q) ∨ (¬p∧¬r)  is a tautology',
+    steps:[
+      {expr:'((p∨q)∧¬(¬p∧(¬q∨¬r))) ∨ (¬p∧¬q) ∨ (¬p∧¬r)', law:'Given', given:true},
+      {expr:'((p∨q)∧<mark class="chg">(¬(¬p)∨¬(¬q∨¬r))</mark>) ∨ (¬p∧¬q) ∨ (¬p∧¬r)', law:"De Morgan's Law", note:'¬(¬p∧X) ≡ ¬(¬p)∨¬X — the outer negation splits across the ∧.'},
+      {expr:'((p∨q)∧(<mark class="chg">p</mark>∨¬(¬q∨¬r))) ∨ (¬p∧¬q) ∨ (¬p∧¬r)', law:'Double Negation', note:'¬(¬p) ≡ p'},
+      {expr:'((p∨q)∧(p∨<mark class="chg">(q∧r)</mark>)) ∨ (¬p∧¬q) ∨ (¬p∧¬r)', law:"De Morgan's Law", note:'¬(¬q∨¬r) ≡ ¬(¬q)∧¬(¬r) ≡ q∧r'},
+      {expr:'((p∨q)∧(p∨(q∧r))) ∨ <mark class="chg">¬(p∨q)</mark> ∨ <mark class="chg">¬(p∨r)</mark>', law:"De Morgan's Law", note:'¬p∧¬q ≡ ¬(p∨q), and ¬p∧¬r ≡ ¬(p∨r)'},
+      {expr:'((p∨q)∧<mark class="chg">[(p∨q)∧(p∨r)]</mark>) ∨ [¬(p∨q) ∨ ¬(p∨r)]', law:'Distributive Law', note:'p∨(q∧r) ≡ (p∨q)∧(p∨r)'},
+      {expr:'<mark class="chg">((p∨q)∧(p∨r))</mark> ∨ [¬(p∨q) ∨ ¬(p∨r)]', law:'Associative &amp; Idempotent Laws', note:'(p∨q)∧[(p∨q)∧(p∨r)] ≡ [(p∨q)∧(p∨q)]∧(p∨r) ≡ (p∨q)∧(p∨r)'},
+      {expr:'<mark class="chg">[(p∨q)∧(p∨r)] ∨ ¬[(p∨q)∧(p∨r)]</mark>', law:"De Morgan's Law", note:'¬(p∨q)∨¬(p∨r) ≡ ¬[(p∨q)∧(p∨r)]'},
+      {expr:'<mark class="chg">T</mark>', law:'Complement Law', note:'The whole line now has the shape X∨¬X — always true, whatever X is. Done: tautology.'}
+    ],
+    synth:'Notice the shape of the last line before it collapsed: <b>X ∨ ¬X</b> where X = (p∨q)∧(p∨r). You never needed to know what X actually evaluates to — the Complement Law guarantees X∨¬X ≡ T no matter what X is. That is the real trick behind proving tautologies algebraically: maneuver the expression into that shape, and the conclusion is automatic.'
+  }
+};
+
+let curKey='i', curIndex=0, predictMode=false;
+
+function buildPills(){
+  const wrap=document.getElementById('pills');
+  wrap.innerHTML='';
+  Object.keys(proofs).forEach(k=>{
+    const b=document.createElement('button');
+    b.className='pill'+(k===curKey?' active':'');
+    b.textContent=proofs[k].label;
+    b.onclick=()=>selectProof(k);
+    wrap.appendChild(b);
+  });
+}
+
+function selectProof(k){
+  curKey=k; curIndex=0;
+  document.querySelectorAll('.pill').forEach((p,i)=>{
+    p.classList.toggle('active', Object.keys(proofs)[i]===k);
+  });
+  document.getElementById('targetLine').innerHTML = 'Proving: <b>'+proofs[k].title+'</b>';
+  render();
+}
+
+function buildDots(){
+  const steps=proofs[curKey].steps;
+  const wrap=document.getElementById('dots');
+  wrap.innerHTML='';
+  steps.forEach((s,i)=>{
+    const d=document.createElement('button');
+    d.className='dot'+(i===curIndex?' on':(i<curIndex?' past':''));
+    d.onclick=()=>{curIndex=i; render();};
+    wrap.appendChild(d);
+  });
+}
+
+function render(){
+  const steps=proofs[curKey].steps;
+  const step=steps[curIndex];
+  buildDots();
+  document.getElementById('stepcount').textContent='Line '+(curIndex+1)+' of '+steps.length;
+  document.getElementById('exprBox').innerHTML=step.expr;
+
+  const badge=document.getElementById('lawBadge');
+  badge.textContent = step.given ? 'Given' : step.law;
+  badge.className='lawbadge'+(step.given?' given':'')+(predictMode && !step.given ? '' : ' revealed');
+  badge.dataset.revealed = (predictMode && !step.given) ? 'false' : 'true';
+
+  document.getElementById('noteBox').textContent = (!predictMode || badge.dataset.revealed==='true') ? (step.note||'') : '';
+
+  document.getElementById('btnPrev').disabled = curIndex===0;
+  document.getElementById('btnNext').disabled = curIndex===steps.length-1;
+
+  const synth=document.getElementById('synthBox');
+  if(proofs[curKey].synth && curIndex===steps.length-1){
+    synth.style.display='block';
+    synth.innerHTML=proofs[curKey].synth;
+  } else {
+    synth.style.display='none';
+  }
+
+  renderTranscript();
+}
+
+function revealLaw(){
+  const badge=document.getElementById('lawBadge');
+  if(badge.classList.contains('given')) return;
+  badge.classList.add('revealed');
+  badge.dataset.revealed='true';
+  const step=proofs[curKey].steps[curIndex];
+  document.getElementById('noteBox').textContent = step.note || '';
+}
+
+function renderTranscript(){
+  const steps=proofs[curKey].steps;
+  const wrap=document.getElementById('transRows');
+  wrap.innerHTML='';
+  for(let i=0;i<=curIndex;i++){
+    const s=steps[i];
+    const row=document.createElement('div');
+    row.className='trow'+(i===curIndex?' cur':'');
+    row.onclick=()=>{curIndex=i; render();};
+    row.innerHTML='<span class="tn">'+(i+1)+'</span><span class="te">'+s.expr.replace(/<mark class="chg">/g,'').replace(/<\/mark>/g,'')+'</span><span class="tl">'+(s.given?'Given':s.law)+'</span>';
+    wrap.appendChild(row);
+  }
+}
+
+function nextStep(){ const steps=proofs[curKey].steps; if(curIndex<steps.length-1){curIndex++; render();} }
+function prevStep(){ if(curIndex>0){curIndex--; render();} }
+
+function togglePredict(){
+  predictMode=!predictMode;
+  document.getElementById('predictSwitch').classList.toggle('on',predictMode);
+  document.body.classList.toggle('predict',predictMode);
+  render();
+}
+
+const GLOSSARY=[
+  ['Idempotent Law','p∧p ≡ p,  p∨p ≡ p'],
+  ['Commutative Law','p∧q ≡ q∧p,  p∨q ≡ q∨p'],
+  ['Associative Law','(p∧q)∧r ≡ p∧(q∧r),  similarly for ∨'],
+  ['Distributive Law','p∨(q∧r) ≡ (p∨q)∧(p∨r),  and the ∧-over-∨ version'],
+  ['Identity Law','p∧T ≡ p,  p∨F ≡ p'],
+  ['Domination Law','p∧F ≡ F,  p∨T ≡ T'],
+  ['Complement Law','p∧¬p ≡ F,  p∨¬p ≡ T'],
+  ["De Morgan's Law",'¬(p∧q) ≡ ¬p∨¬q,  ¬(p∨q) ≡ ¬p∧¬q'],
+  ['Double Negation','¬(¬p) ≡ p'],
+  ['Conditional Law','p→q ≡ ¬p∨q']
+];
+function buildGlossary(){
+  const wrap=document.getElementById('glossList');
+  GLOSSARY.forEach(([name,rule])=>{
+    const d=document.createElement('div');
+    d.className='gi';
+    d.innerHTML='<b>'+name+'</b><span>'+rule+'</span>';
+    wrap.appendChild(d);
+  });
+}
+
+buildPills();
+buildGlossary();
+selectProof('i');
+</script>
+</body>
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suggested Exercises · Statements &amp; Notation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);font-family:'IBM Plex Sans',sans-serif;color:var(--ink);padding:32px 16px 80px;}
+  .wrap{max-width:800px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(23px,4.5vw,33px);margin:0 0 6px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14.5px;margin:0 auto 26px;max-width:600px;line-height:1.6;}
+
+  .toolbar{
+    position:sticky; top:10px; z-index:30;
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+    background:var(--ink); color:#F4F2EA; border-radius:14px; padding:12px 18px; margin-bottom:8px;
+    box-shadow:0 12px 28px -16px rgba(28,43,51,.6);
+    font-family:'IBM Plex Mono',monospace; font-size:13px;
+  }
+  .toolbar .score span{color:var(--gold);font-weight:700;font-size:16px;}
+  .toolbar .btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .tbtn{background:transparent;border:1.5px solid #F4F2EA;color:#F4F2EA;border-radius:20px;padding:6px 13px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;transition:.15s ease;}
+  .tbtn:hover{background:#F4F2EA;color:var(--ink);}
+  .tbtn.primary{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .tbtn.primary:hover{background:#256150;}
+  .toolbar-note{text-align:center;font-size:11px;color:var(--ink-soft);margin-bottom:30px;font-family:'IBM Plex Mono',monospace;}
+
+  .q-card{
+    background:var(--card); border-radius:14px; padding:18px 20px; margin-bottom:16px;
+    border:1.5px solid rgba(28,43,51,.08); box-shadow:0 8px 20px -14px rgba(28,43,51,.4);
+    transition:border-color .25s ease, background .25s ease;
+  }
+  .q-card.correct{border-color:var(--teal); background:#F3FAF7;}
+  .q-card.incorrect{border-color:var(--brick); background:#FCF3F2;}
+  .q-num{font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:var(--ink);margin-bottom:8px;display:flex;align-items:baseline;gap:8px;}
+  .q-num .n{color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;font-size:13px;}
+  .q-text{font-size:15.5px;line-height:1.65;margin:0 0 12px;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;}
+  .box-formula{font-family:'IBM Plex Mono',monospace;text-align:center;border:1.5px solid var(--line);border-radius:8px;padding:8px 16px;display:inline-block;margin:6px 0 10px;background:#F6F4EC;font-size:15px;}
+
+  .control-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
+  .control-label{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);}
+  .seg{display:inline-flex;border:1.5px solid var(--line);border-radius:20px;overflow:hidden;background:#F6F4EC;}
+  .seg button{border:none;background:transparent;padding:7px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ink-soft);transition:.15s ease;}
+  .seg button.sel{background:var(--ink);color:#fff;}
+  .result-icon{width:20px;height:20px;border-radius:50%;font-size:12px;line-height:20px;text-align:center;font-weight:700;color:#fff;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .result-icon.show{opacity:1;transform:scale(1);}
+  .result-icon.ok{background:var(--teal);}
+  .result-icon.bad{background:var(--brick);}
+  .na-note{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);font-style:italic;}
+
+  .mini-table{width:100%;border-collapse:separate;border-spacing:0 6px;margin:8px 0 10px;}
+  .mini-table td{padding:8px 10px;background:#FAF9F4;border-radius:8px;font-size:14px;vertical-align:middle;}
+  .mini-table td.sentence{width:60%;}
+  .mini-table td.ctrl{text-align:center;}
+
+  .data-table{border-collapse:separate;border-spacing:0;width:100%;margin:10px 0 14px;}
+  .data-table th,.data-table td{padding:7px 12px;text-align:center;border-bottom:1px solid var(--line);font-size:13.5px;}
+  .data-table th{font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);border-bottom:2px solid var(--ink);}
+  .data-table td:first-child, .data-table th:first-child{text-align:left;}
+
+  .explain{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .explain.show{max-height:500px;opacity:1;margin-top:12px;}
+  .explain-inner{border-top:1px dashed var(--line);padding-top:10px;font-size:13.5px;line-height:1.65;color:var(--ink-soft);}
+  .explain-inner strong{color:var(--ink);}
+  .explain-inner ul,.explain-inner ol{margin:6px 0 0;padding-left:20px;}
+  .explain-inner li{margin-bottom:4px;}
+
+  .reveal-btn{font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.05em; text-transform:uppercase; background:transparent; border:1.5px solid var(--ink); color:var(--ink); padding:6px 12px; border-radius:20px; cursor:pointer; transition:.2s ease;}
+  .reveal-btn:hover{background:var(--ink); color:var(--paper);}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:40px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Suggested Exercises</h1>
+  <p class="sub">Topic 1 — Statements &amp; Notation. Set each adjuster yourself, then check your work.</p>
+
+  <div class="toolbar">
+    <div class="score">Score: <span id="scoreDisplay">0 / 0</span> correct</div>
+    <div class="btns">
+      <button class="tbtn primary" onclick="checkAll()">Check My Answers</button>
+      <button class="tbtn" onclick="revealAll()">Reveal Answers</button>
+      <button class="tbtn" onclick="resetAll()">Reset All</button>
+    </div>
+  </div>
+  <p class="toolbar-note">A few questions ask you to construct or reason something out — those are reveal-only, since there's no toggle for "write the negation."</p>
+
+  <!-- Q1 -->
+  <div class="q-card" id="q1">
+    <div class="q-num"><span class="n">1.</span>Which of these sentences are propositions?</div>
+    <p class="q-text">For each sentence: is it a statement? If it is, what's its truth value?</p>
+    <table class="mini-table" id="q1table"></table>
+    <div class="explain"><div class="explain-inner"><strong>Why:</strong> "Boston is the capital of Massachusetts" and "2 + 3 = 5" are both declarative and checkable — both True. "x + 2 = 11" has a free variable <span class="mono">x</span>, so it's an open sentence, not a proposition.</div></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card" id="q2">
+    <div class="q-num"><span class="n">2.</span>Determine which of the following are propositions.</div>
+    <table class="mini-table" id="q2table"></table>
+    <div class="explain"><div class="explain-inner"><strong>Why:</strong> "What time is it?" is a question — not a statement. "The moon is made of green cheese" is declarative and checkable — a proposition, and False.</div></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card" id="q3">
+    <div class="q-num"><span class="n">3.</span>Find the negation of the proposition:</div>
+    <p class="q-text"><em>"Abby is richer than Ricardo."</em></p>
+    <button class="reveal-btn" onclick="toggleReveal('q3')">Reveal Answer</button>
+    <div class="explain"><div class="explain-inner"><strong>Negation:</strong> "Abby is not richer than Ricardo." <br><br>A negation only needs to flip the truth value — it doesn't need to assert the opposite extreme (like "Ricardo is richer than Abby"), since the original statement could also be False because Abby and Ricardo are equally rich.</div></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card" id="q4">
+    <div class="q-num"><span class="n">4.</span>What is the negation of:</div>
+    <div style="text-align:center;"><span class="box-formula">2 + 1 = 3</span></div>
+    <button class="reveal-btn" onclick="toggleReveal('q4')">Reveal Answer</button>
+    <div class="explain"><div class="explain-inner"><strong>Negation:</strong> <span class="mono">2 + 1 ≠ 3</span> — or equivalently, "It is not the case that 2 + 1 = 3." (Since the original is True, this negation is False — but it's still a perfectly valid proposition.)</div></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card" id="q5">
+    <div class="q-num"><span class="n">5.</span>Determine the truth value of the proposition:</div>
+    <p class="q-text"><em>"Smartphone B has the most RAM of these three smartphones."</em></p>
+    <table class="data-table">
+      <tr><th>Phone</th><th>RAM</th></tr>
+      <tr><td>Smartphone A</td><td>6 GB</td></tr>
+      <tr><td>Smartphone B</td><td>8 GB</td></tr>
+      <tr><td>Smartphone C</td><td>12 GB</td></tr>
+    </table>
+    <div class="control-row">
+      <div class="seg" data-role="score" data-correct="false">
+        <button data-val="true" type="button">True</button>
+        <button data-val="false" type="button">False</button>
+      </div>
+      <span class="result-icon"></span>
+    </div>
+    <div class="explain"><div class="explain-inner"><strong>Why:</strong> Smartphone C has the most RAM (12 GB), not Smartphone B (8 GB) — so the proposition is False.</div></div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card" id="q6">
+    <div class="q-num"><span class="n">6.</span>Determine the truth value of the proposition:</div>
+    <p class="q-text"><em>"Nadir Software had the lowest net profit and Acme Computer had the largest annual revenue."</em></p>
+    <table class="data-table">
+      <tr><th>Company</th><th>Net Profit</th><th>Revenue</th></tr>
+      <tr><td>Nadir Software</td><td>$12M</td><td>$340M</td></tr>
+      <tr><td>Acme Computer</td><td>$45M</td><td>$900M</td></tr>
+      <tr><td>Zenith Corp</td><td>$8M</td><td>$610M</td></tr>
+    </table>
+    <div class="control-row">
+      <div class="seg" data-role="score" data-correct="false">
+        <button data-val="true" type="button">True</button>
+        <button data-val="false" type="button">False</button>
+      </div>
+      <span class="result-icon"></span>
+    </div>
+    <div class="explain"><div class="explain-inner"><strong>Why:</strong> Zenith Corp had the lowest net profit ($8M), not Nadir Software ($12M) — so the first half is False. Acme Computer did have the largest revenue ($900M) — the second half is True. Since this is a conjunction ("and"), <strong>both</strong> halves must be True for the whole thing to be True. One False half is enough to make the entire proposition False.</div></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card" id="q7">
+    <div class="q-num"><span class="n">7.</span>Is the assertion a proposition?</div>
+    <p class="q-text"><em>"This statement is false."</em></p>
+    <div class="control-row">
+      <div class="seg" data-role="score" data-correct="no">
+        <button data-val="yes" type="button">Yes</button>
+        <button data-val="no" type="button">No</button>
+      </div>
+      <span class="result-icon"></span>
+    </div>
+    <div class="explain"><div class="explain-inner"><strong>Why:</strong> No — this is the Liar Paradox. Assuming it's True forces it to be False, and assuming it's False forces it to be True. No consistent truth value exists, so it fails to be a proposition.</div></div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card" id="q8">
+    <div class="q-num"><span class="n">8.</span>Determine whether this is a proposition:</div>
+    <div style="text-align:center;"><span class="box-formula">4 + x = 5</span></div>
+    <div class="control-row">
+      <div class="seg" data-role="score" data-correct="no">
+        <button data-val="yes" type="button">Yes, a proposition</button>
+        <button data-val="no" type="button">No, not a proposition</button>
+      </div>
+      <span class="result-icon"></span>
+    </div>
+    <div class="explain"><div class="explain-inner"><strong>Why:</strong> No — <span class="mono">x</span> is a free variable with no fixed value, so this is an open sentence. It becomes a proposition only once <span class="mono">x</span> is assigned a specific value (or bound by a quantifier).</div></div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card" id="q9">
+    <div class="q-num"><span class="n">9.</span>A list of 100 statements.</div>
+    <p class="q-text">The <span class="mono">n</span>-th statement in a list of 100 reads: <em>"Exactly n of the statements in this list are false."</em> What conclusions can be drawn?</p>
+    <button class="reveal-btn" onclick="toggleReveal('q9')">Reveal Reasoning</button>
+    <div class="explain"><div class="explain-inner">
+      <strong>Conclusion: statement 99 is True, and every other statement in the list is False.</strong>
+      <ol>
+        <li>At most one statement in the list can be True. If two different statements — say the <span class="mono">n</span>-th and the <span class="mono">m</span>-th, with <span class="mono">n ≠ m</span> — were both True, the list would have to contain exactly <span class="mono">n</span> false statements <em>and</em> exactly <span class="mono">m</span> false statements at once, which is impossible.</li>
+        <li>Suppose the <span class="mono">k</span>-th statement is the (unique) True one. Then exactly <span class="mono">k</span> statements are False, so exactly <span class="mono">100 − k</span> are True.</li>
+        <li>But we already know only <em>one</em> statement is True, so <span class="mono">100 − k = 1</span>, giving <span class="mono">k = 99</span>.</li>
+        <li>Check: if statement 99 is True, then exactly 99 statements are False and exactly 1 (itself) is True — perfectly consistent.</li>
+      </ol>
+    </div></div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card" id="q10">
+    <div class="q-num"><span class="n">10.</span>The barber puzzle.</div>
+    <p class="q-text">In a certain town, a barber shaves every person who does not shave themselves, and <strong>only</strong> those people. Does the barber shave himself?</p>
+    <button class="reveal-btn" onclick="toggleReveal('q10')">Reveal Reasoning</button>
+    <div class="explain"><div class="explain-inner">
+      <strong>Neither answer works — this is a paradox.</strong>
+      <ul>
+        <li>If the barber <em>does</em> shave himself, then by the rule ("shaves only those who do not shave themselves"), he shouldn't — contradiction.</li>
+        <li>If the barber <em>does not</em> shave himself, then by the rule ("shaves everyone who does not shave themselves"), he should — contradiction.</li>
+      </ul>
+      Both options collapse into contradictions, which means no such barber can consistently exist under that rule. This is a famous illustration of self-reference breaking a system — the same structure underlies Russell's Paradox in set theory.
+    </div></div>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Topic 1 — Suggested Exercises</footer>
+</div>
+
+<script>
+function toggleReveal(id){
+  document.getElementById(id).querySelector('.explain').classList.toggle('show');
+}
+
+/* ---------- Build Q1 and Q2 mini classification tables ---------- */
+function buildMiniTable(tableId, items){
+  const table = document.getElementById(tableId);
+  items.forEach(item=>{
+    const tr = document.createElement('tr');
+    let html = `<td class="sentence">${item.text}</td>`;
+    html += `<td class="ctrl">
+      <div class="seg score-item" data-correct="${item.isStatement?'1':'0'}">
+        <button data-val="1" type="button">Statement</button>
+        <button data-val="0" type="button">Not</button>
+      </div>
+    </td>`;
+    if(item.isStatement){
+      html += `<td class="ctrl">
+        <div class="seg score-item" data-correct="${item.truth?'1':'0'}">
+          <button data-val="1" type="button">True</button>
+          <button data-val="0" type="button">False</button>
+        </div>
+      </td>`;
+    } else {
+      html += `<td class="ctrl"><span class="na-note">N/A</span></td>`;
+    }
+    tr.innerHTML = html;
+    table.appendChild(tr);
+  });
+  table.querySelectorAll('.seg.score-item').forEach(seg=>{
+    seg.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
+        btn.classList.add('sel');
+        seg.dataset.value = btn.dataset.val;
+        seg.style.boxShadow = 'none';
+        updateScoreLive();
+      });
+    });
+  });
+}
+
+buildMiniTable('q1table', [
+  {text:'"Boston is the capital of Massachusetts."', isStatement:true, truth:true},
+  {text:'"2 + 3 = 5"', isStatement:true, truth:true},
+  {text:'"x + 2 = 11"', isStatement:false}
+]);
+
+buildMiniTable('q2table', [
+  {text:'"What time is it?"', isStatement:false},
+  {text:'"The moon is made of green cheese."', isStatement:true, truth:false}
+]);
+
+/* ---------- Wire up standalone segmented controls (Q5–Q8) ---------- */
+document.querySelectorAll('.seg[data-role="score"]').forEach(seg=>{
+  seg.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
+      btn.classList.add('sel');
+      seg.dataset.value = btn.dataset.val;
+      const card = seg.closest('.q-card');
+      card.classList.remove('correct','incorrect');
+      card.querySelector('.result-icon').classList.remove('show','ok','bad');
+      card.querySelector('.explain').classList.remove('show');
+      updateScoreLive();
+    });
+  });
+});
+
+/* ---------- Scoring ---------- */
+function getAllScoreControls(){
+  return [...document.querySelectorAll('.seg[data-role="score"]'), ...document.querySelectorAll('.seg.score-item')];
+}
+function computeTotal(){ return getAllScoreControls().length; }
+function countScore(){
+  let correct = 0;
+  getAllScoreControls().forEach(ctrl=>{
+    if(ctrl.dataset.value !== undefined && ctrl.dataset.value === ctrl.dataset.correct) correct++;
+  });
+  return correct;
+}
+function updateScoreLive(){
+  document.getElementById('scoreDisplay').textContent = countScore() + ' / ' + computeTotal();
+}
+updateScoreLive();
+
+function checkAll(){
+  document.querySelectorAll('.seg[data-role="score"]').forEach(seg=>{
+    const card = seg.closest('.q-card');
+    const icon = card.querySelector('.result-icon');
+    if(seg.dataset.value !== undefined){
+      const ok = seg.dataset.value === seg.dataset.correct;
+      icon.classList.add('show', ok?'ok':'bad');
+      icon.textContent = ok ? '✓':'✗';
+      card.classList.remove('correct','incorrect');
+      card.classList.add(ok?'correct':'incorrect');
+    }
+    card.querySelector('.explain').classList.add('show');
+  });
+  document.querySelectorAll('.seg.score-item').forEach(seg=>{
+    if(seg.dataset.value !== undefined){
+      const ok = seg.dataset.value === seg.dataset.correct;
+      seg.style.boxShadow = ok ? '0 0 0 2px rgba(47,122,102,.5)' : '0 0 0 2px rgba(181,73,61,.5)';
+    }
+  });
+  document.getElementById('q1').classList.add('correct');
+  document.getElementById('q1').querySelector('.explain').classList.add('show');
+  document.getElementById('q2').classList.add('correct');
+  document.getElementById('q2').querySelector('.explain').classList.add('show');
+  updateScoreLive();
+}
+
+function revealAll(){
+  document.querySelectorAll('.seg[data-role="score"]').forEach(seg=>{
+    seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
+    seg.querySelector(`button[data-val="${seg.dataset.correct}"]`).classList.add('sel');
+    seg.dataset.value = seg.dataset.correct;
+    const card = seg.closest('.q-card');
+    card.querySelector('.result-icon').classList.add('show','ok');
+    card.querySelector('.result-icon').textContent = '✓';
+    card.classList.remove('incorrect'); card.classList.add('correct');
+    card.querySelector('.explain').classList.add('show');
+  });
+  document.querySelectorAll('.seg.score-item').forEach(seg=>{
+    seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
+    seg.querySelector(`button[data-val="${seg.dataset.correct}"]`).classList.add('sel');
+    seg.dataset.value = seg.dataset.correct;
+    seg.style.boxShadow = '0 0 0 2px rgba(47,122,102,.5)';
+  });
+  document.querySelectorAll('.explain').forEach(e=>e.classList.add('show'));
+  document.getElementById('q1').classList.add('correct');
+  document.getElementById('q2').classList.add('correct');
+  updateScoreLive();
+}
+
+function resetAll(){
+  document.querySelectorAll('.seg[data-role="score"]').forEach(seg=>{
+    delete seg.dataset.value;
+    seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
+    const card = seg.closest('.q-card');
+    card.classList.remove('correct','incorrect');
+    card.querySelector('.result-icon').classList.remove('show','ok','bad');
+    card.querySelector('.explain').classList.remove('show');
+  });
+  document.querySelectorAll('.seg.score-item').forEach(seg=>{
+    delete seg.dataset.value;
+    seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
+    seg.style.boxShadow = 'none';
+  });
+  document.getElementById('q1').classList.remove('correct','incorrect');
+  document.getElementById('q2').classList.remove('correct','incorrect');
+  document.querySelectorAll('.explain').forEach(e=>e.classList.remove('show'));
+  updateScoreLive();
+}
+</script>
+</body>
+</html>

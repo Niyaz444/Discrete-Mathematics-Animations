@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards · Statements &amp; Notation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+    --lv1:#7FA79A; --lv2:#4F8A73; --lv3:#C79A3E; --lv4:#C17A3A; --lv5:#B5493D;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);font-family:'IBM Plex Sans',sans-serif;color:var(--ink);}
+  .wrap{max-width:1020px;margin:0 auto;padding:36px 16px 70px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(26px,5vw,36px);margin:0 0 4px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14px;margin-bottom:6px;}
+  .hint{text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--gold);margin-bottom:24px;}
+
+  .controls{display:flex;justify-content:center;gap:10px;margin-bottom:30px;flex-wrap:wrap;}
+  .ctrl-btn{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;background:#fff;border:1.5px solid var(--ink);color:var(--ink);padding:7px 14px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .ctrl-btn:hover{background:var(--ink);color:var(--paper);}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;}
+  .card-outer{perspective:1400px;height:230px;cursor:pointer;}
+  .card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d;}
+  .card-outer.flipped .card-inner{transform:rotateY(180deg);}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;padding:18px;display:flex;flex-direction:column;box-shadow:0 14px 30px -16px rgba(28,43,51,.45);}
+  .front{background:var(--card);border:1px solid rgba(28,43,51,.08);justify-content:space-between;}
+  .front .num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);}
+  .front .term{font-family:'Fraunces',serif;font-weight:600;font-size:20px;line-height:1.25;margin:auto 0;}
+  .front .tap-hint{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;align-self:flex-end;}
+  .back{background:var(--ink);color:#F4F2EA;transform:rotateY(180deg);justify-content:center;overflow-y:auto;}
+  .back .lvl{position:absolute;top:14px;right:14px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:#fff;padding:2px 8px;border-radius:20px;}
+  .lv1{background:var(--lv1);} .lv2{background:var(--lv2);} .lv3{background:var(--lv3);}
+  .lv4{background:var(--lv4);} .lv5{background:var(--lv5);}
+  .back p{font-size:13.5px;line-height:1.55;margin:0;}
+  .back .mono{font-family:'IBM Plex Mono',monospace;background:rgba(255,255,255,.12);padding:1px 5px;border-radius:4px;}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:44px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Flashcards</h1>
+  <p class="sub">Topic 1 — Introduction: Statements &amp; Notation</p>
+  <p class="hint">Tap / click any card to flip it</p>
+  <div class="controls">
+    <button class="ctrl-btn" onclick="flipAll(true)">Flip all</button>
+    <button class="ctrl-btn" onclick="flipAll(false)">Reset all</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>Discrete Mathematics · Module 1 · Topic 1 Flashcards</footer>
+</div>
+
+<script>
+const cards = [
+  {lvl:1,term:"Statement (Proposition)",back:"A declarative sentence that is either True or False — never both. The basic unit of logic."},
+  {lvl:1,term:"Truth Value",back:"The value assigned to a statement: <span class='mono'>True</span> or <span class='mono'>False</span> (also written T/F or 1/0)."},
+  {lvl:1,term:"Statement Notation",back:"Statements are named with lowercase letters: <span class='mono'>p, q, r, s, …</span> so we can manipulate them symbolically."},
+  {lvl:1,term:"Declarative Sentence",back:"A sentence that asserts or declares something about the world — the grammatical form every statement must take."},
+  {lvl:2,term:"Non-Statement: Question",back:"e.g. <span class='mono'>\"Where is the exam hall?\"</span> — asks rather than asserts, so it has no truth value."},
+  {lvl:2,term:"Non-Statement: Command",back:"e.g. <span class='mono'>\"Open your textbooks.\"</span> — orders an action, doesn't claim a fact."},
+  {lvl:2,term:"Non-Statement: Exclamation",back:"e.g. <span class='mono'>\"What a brilliant proof!\"</span> — expresses feeling, not a checkable claim."},
+  {lvl:2,term:"Opinion",back:"A claim with no shared objective test, e.g. <span class='mono'>\"This is the best theorem.\"</span> Excluded from statements."},
+  {lvl:3,term:"Open Sentence",back:"A sentence with a free variable, e.g. <span class='mono'>\"x is even\"</span> — not a statement until <span class='mono'>x</span> is fixed. Seeds <em>predicates</em>."},
+  {lvl:3,term:"True Statement (example)",back:"<span class='mono'>\"The Earth has exactly one moon.\"</span> — declarative, checkable, and True."},
+  {lvl:3,term:"False Statement (example)",back:"<span class='mono'>\"5 + 5 = 9.\"</span> — declarative, checkable, and False. Still a valid statement!"},
+  {lvl:3,term:"Symbolic Translation",back:"Let <span class='mono'>p</span>: \"It is raining.\" We now reason about <span class='mono'>p</span> using logic rules instead of rewriting the sentence each time."},
+  {lvl:4,term:"Determinate but Unknown",back:"e.g. <span class='mono'>\"There is life on other planets.\"</span> Still a statement — it has a fixed truth value in principle, even if we don't know it yet."},
+  {lvl:4,term:"The Liar Paradox",back:"<span class='mono'>\"This statement is false.\"</span> Assuming True → False, assuming False → True. No consistent truth value exists — not a statement."},
+  {lvl:4,term:"Simple vs. Compound (preview)",back:"A <em>simple</em> statement is a single claim (<span class='mono'>p</span>). A <em>compound</em> statement joins several with connectives (<span class='mono'>p ∧ q</span>) — our next topic."},
+  {lvl:5,term:"Why Symbols? (Challenge)",back:"Symbols strip away subject matter so we can study the <em>structure</em> of reasoning itself — the same rule (<span class='mono'>p → q</span>) applies whether <span class='mono'>p</span> is about rain or about numbers."}
+];
+
+const grid = document.getElementById('grid');
+cards.forEach((c,i)=>{
+  const outer = document.createElement('div');
+  outer.className='card-outer';
+  outer.innerHTML = `
+    <div class="card-inner">
+      <div class="face front">
+        <span class="num">#${String(i+1).padStart(2,'0')}</span>
+        <span class="term">${c.term}</span>
+        <span class="tap-hint">tap to flip</span>
+      </div>
+      <div class="face back">
+        <span class="lvl lv${c.lvl}">Lv${c.lvl}</span>
+        <p>${c.back}</p>
+      </div>
+    </div>`;
+  outer.addEventListener('click', ()=> outer.classList.toggle('flipped'));
+  grid.appendChild(outer);
+});
+
+function flipAll(state){
+  document.querySelectorAll('.card-outer').forEach(c=>{
+    if(state) c.classList.add('flipped'); else c.classList.remove('flipped');
+  });
+}
+</script>
+</body>
+</html>

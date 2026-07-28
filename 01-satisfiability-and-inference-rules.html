@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Satisfiability &amp; Theory of Inference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pcb:#0F1B15; --pcb-light:#17251D; --pcb-line:#25392C;
+    --copper:#C08552; --phosphor:#6FE3A6; --warn:#E0794F; --bonus:#D9A441;
+    --paper:#F3EEDF; --ink:#211C12; --ink-soft:#6B6250; --purple:#8B6FC9;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--pcb);color:var(--paper);font-family:'IBM Plex Sans',sans-serif;padding:0 0 100px;line-height:1.6;
+    background-image:radial-gradient(circle at 1px 1px, rgba(111,227,166,0.05) 1px, transparent 0); background-size:26px 26px;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  ::selection{background:var(--phosphor);color:var(--pcb);}
+  a:focus-visible, button:focus-visible, .toggle:focus-visible{outline:2px solid var(--phosphor); outline-offset:3px;}
+
+  .hero{position:relative;padding:48px 16px 34px;text-align:center;overflow:hidden;border-bottom:1px solid var(--pcb-line);background:linear-gradient(180deg,#0B1410 0%, var(--pcb) 100%);}
+  .hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;background-image:linear-gradient(var(--pcb-line) 1px, transparent 1px),linear-gradient(90deg, var(--pcb-line) 1px, transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse at center, black 0%, transparent 72%);}
+  .hero-inner{position:relative;z-index:1;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:12px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(24px,5vw,40px);margin:0 0 10px;color:var(--paper);text-shadow:0 0 30px rgba(111,227,166,.2);}
+  .sub{text-align:center;color:#B9C4B9;font-size:14.5px;margin:0 auto;max-width:620px;line-height:1.6;}
+
+  .panel-nav{position:sticky;top:0;z-index:40;background:rgba(15,27,21,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--pcb-line);padding:10px 16px;}
+  .panel-nav-inner{max-width:960px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+  .nav-led{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8FA093;text-decoration:none;padding:5px 10px;border-radius:20px;border:1px solid transparent;transition:.2s ease;}
+  .nav-led:hover{color:var(--paper);border-color:var(--pcb-line);}
+
+  .wrap{max-width:960px;margin:0 auto;padding:0 16px;}
+  .section-block{max-width:960px;margin:0 auto;padding:56px 16px 0;scroll-margin-top:64px;}
+  .sec-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.12em;text-align:center;margin-bottom:8px;}
+  .sec-title{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(22px,4.4vw,32px);text-align:center;margin:0 0 14px;color:var(--paper);}
+  .sec-sub{text-align:center;color:#B9C4B9;font-size:14px;max-width:600px;margin:0 auto 28px;}
+
+  .concept-box{background:var(--pcb-light);border:1.5px solid var(--pcb-line);border-radius:14px;padding:16px 20px;margin-bottom:22px;}
+  .concept-box p{font-size:13.5px;color:#DDE6DF;margin:0 0 8px;line-height:1.6;}
+  .concept-box p:last-child{margin-bottom:0;}
+  .concept-box strong{color:var(--paper);}
+  .mono{font-family:'IBM Plex Mono',monospace;background:rgba(0,0,0,.25);color:var(--copper);padding:1px 6px;border-radius:4px;}
+
+  /* ===== progress tracker ===== */
+  .progress-strip{display:flex;align-items:center;justify-content:center;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8FA093;margin-bottom:22px;flex-wrap:wrap;}
+  .progress-strip strong{color:var(--bonus);font-size:15px;}
+
+  /* ===== venn diagram ===== */
+  .venn-wrap{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:16px;padding:20px;margin-bottom:30px;}
+  .venn-wrap svg{width:100%;height:auto;display:block;}
+  .venn-region{transition:opacity .6s ease, filter .6s ease;}
+  .venn-region .shape{transition:stroke-opacity .6s ease, fill-opacity .6s ease, filter .6s ease;}
+  .venn-region .rlabel, .venn-region .rsub, .venn-region .rex{transition:opacity .6s ease;}
+  .venn-region:not(.lit) .shape{stroke-opacity:.35; fill-opacity:.04;}
+  .venn-region:not(.lit) .rlabel{opacity:.4;}
+  .venn-region:not(.lit) .rsub, .venn-region:not(.lit) .rex{opacity:.25;}
+  .venn-region.lit .shape{stroke-opacity:1; fill-opacity:.16; filter:drop-shadow(0 0 10px currentColor);}
+  .venn-region.lit .rlabel, .venn-region.lit .rsub, .venn-region.lit .rex{opacity:1;}
+  .venn-badge{opacity:0;transition:opacity .5s ease;}
+  .venn-region.lit .venn-badge{opacity:1;}
+
+  /* ===== mini-table exercises ===== */
+  .mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:28px;}
+  .mini-card{background:var(--pcb-light);border:1.5px solid var(--pcb-line);border-radius:14px;padding:16px 18px;transition:border-color .3s ease;}
+  .mini-card.solved{border-color:var(--phosphor);}
+  .mini-card .mtitle{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+  .mini-card .mformula{font-family:'Fraunces',serif;font-weight:700;font-size:19px;color:var(--paper);margin-bottom:12px;}
+  table.mtable{border-collapse:separate;border-spacing:5px;width:100%;margin-bottom:10px;}
+  table.mtable th{background:#1C2B21;padding:5px 6px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8FA093;border-radius:6px;}
+  table.mtable th.given{color:var(--copper);}
+  table.mtable td{text-align:center;padding:5px;background:#132018;border-radius:6px;}
+  table.mtable td.given{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--copper);background:#20301F;}
+  .seg{display:inline-flex;border:1.5px solid var(--pcb-line);border-radius:20px;overflow:hidden;background:rgba(0,0,0,.25);width:100%;margin-bottom:10px;}
+  .seg button{flex:1;border:none;background:transparent;padding:7px 8px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;color:#8FA093;transition:.15s ease;}
+  .seg button.sel{background:rgba(111,227,166,.16);color:var(--phosphor);}
+  .seg button.sel.bad-sel{background:rgba(224,121,79,.16);color:var(--warn);}
+  .mini-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .tbtn{background:transparent;border:1.5px solid var(--pcb-line);color:#B9C4B9;border-radius:20px;padding:5px 12px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;transition:.15s ease;}
+  .tbtn:hover{background:var(--pcb-light);color:var(--paper);border-color:var(--copper);}
+  .tbtn.primary{background:rgba(111,227,166,.12);border-color:var(--phosphor);color:var(--phosphor);}
+  .mini-feedback{font-size:12px;color:#8FA093;margin-top:8px;min-height:1.2em;}
+  .mini-feedback.ok{color:var(--phosphor);}
+
+  .toggle{position:relative;width:38px;height:20px;border-radius:20px;cursor:pointer;background:rgba(0,0,0,.3);border:1.5px solid var(--warn);display:inline-flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:7.5px;font-weight:700;user-select:none;transition:border-color .2s ease, box-shadow .2s ease;}
+  .toggle .lab{position:absolute;width:50%;text-align:center;transition:opacity .2s ease;}
+  .toggle .lab.t{left:0;color:var(--phosphor);opacity:.35;} .toggle .lab.f{right:0;color:var(--warn);opacity:1;}
+  .toggle.on .lab.t{opacity:1;} .toggle.on .lab.f{opacity:.35;}
+  .toggle .knob{position:absolute;top:2px;left:20px;width:14px;height:14px;border-radius:50%;background:linear-gradient(180deg,#E0794F,#B5493D);box-shadow:0 1px 3px rgba(0,0,0,.5);transition:left .2s ease, background .2s ease;}
+  .toggle.on{border-color:var(--phosphor);box-shadow:0 0 8px rgba(111,227,166,.35);}
+  .toggle.on .knob{left:2px;background:linear-gradient(180deg,#BFFFE0,#6FE3A6);}
+  .cell-wrap.ok .toggle{box-shadow:0 0 0 2.5px rgba(111,227,166,.35);}
+  .cell-wrap.bad .toggle{box-shadow:0 0 0 2.5px rgba(224,121,79,.35);}
+
+  /* ===== reference plate ===== */
+  .plate{background:var(--pcb-light);border:1px solid var(--pcb-line);border-radius:14px;padding:18px 20px;margin-bottom:16px;}
+  .plate-title{font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#8FA093;margin-bottom:10px;}
+  table.plate-table{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+  table.plate-table td,table.plate-table th{padding:7px 8px;text-align:left;border-bottom:1px solid var(--pcb-line);}
+  table.plate-table th{color:#8FA093;font-size:10px;text-transform:uppercase;}
+  table.plate-table tr:last-child td{border-bottom:none;}
+  .plate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#DDE6DF;}
+
+  /* ===== inference rule cards ===== */
+  .rule-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;}
+  .rule-card{background:var(--pcb-light);border:1.5px solid var(--pcb-line);border-radius:14px;padding:18px 20px;position:relative;}
+  .rule-num{position:absolute;top:-11px;left:16px;width:26px;height:26px;border-radius:50%;background:var(--copper);color:var(--pcb);font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;}
+  .rule-name{font-family:'Fraunces',serif;font-weight:700;font-size:17px;color:var(--paper);margin:8px 0 3px;}
+  .rule-alt{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8FA093;margin-bottom:10px;}
+  .rule-box{background:#0E1912;border:1px solid var(--pcb-line);border-radius:10px;padding:10px 14px;font-family:'IBM Plex Mono',monospace;font-size:13.5px;color:var(--paper);margin-bottom:12px;}
+  .rule-box .prem{color:#B9C4B9;}
+  .rule-box .concl{color:var(--phosphor);border-top:1px dashed var(--pcb-line);margin-top:5px;padding-top:5px;display:block;}
+  .r-reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;background:transparent;border:1.5px solid var(--pcb-line);color:#B9C4B9;padding:6px 13px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .r-reveal-btn:hover{border-color:var(--phosphor);color:var(--phosphor);}
+  .r-reveal-panel{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .3s ease,margin .3s ease;}
+  .r-reveal-panel.show{max-height:260px;opacity:1;margin-top:12px;}
+  .r-trick{background:rgba(217,164,65,.1);border-left:3px solid var(--bonus);border-radius:0 8px 8px 0;padding:8px 12px;font-size:12.5px;color:#E9DCC0;margin-bottom:8px;}
+  .r-trick b{color:var(--bonus);}
+  .r-example{background:rgba(111,227,166,.07);border-left:3px solid var(--phosphor);border-radius:0 8px 8px 0;padding:8px 12px;font-size:12.5px;color:#DDE6DF;font-style:italic;}
+  .r-example b{color:var(--phosphor);font-style:normal;}
+
+  footer{text-align:center;font-size:11.5px;color:#5C6B60;margin-top:60px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;}
+  footer .ok{color:var(--phosphor);}
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+      <h1 class="page-title">Satisfiability &amp; the Theory of Inference</h1>
+      <p class="sub">Build three truth tables to unlock the whole picture. Then meet all ten rules that let us draw conclusions from evidence.</p>
+    </div>
+  </div>
+
+  <div class="panel-nav">
+    <div class="panel-nav-inner" id="navRow"></div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- PART 1 — SATISFIABLE / UNSATISFIABLE -->
+  <!-- ============================================================ -->
+  <div class="section-block" id="satisfiability">
+    <div class="sec-eyebrow">Part 1</div>
+    <h2 class="sec-title">Satisfiable or Unsatisfiable?</h2>
+    <p class="sec-sub">A formula is <strong style="color:var(--phosphor)">Satisfiable</strong> if some assignment makes it True. It's <strong style="color:var(--warn)">Unsatisfiable</strong> if no assignment ever can.</p>
+
+    <div class="concept-box">
+      <p><strong>Satisfiable:</strong> there exists <em>at least one</em> assignment of truth values that makes the formula <span class="mono">TRUE</span>.</p>
+      <p><strong>Unsatisfiable:</strong> there is <em>no</em> assignment that makes the formula true — it's always <span class="mono">FALSE</span>.</p>
+    </div>
+
+    <div class="progress-strip">Regions unlocked: <strong id="unlockCount">0</strong> / 3 — build each table below to light one up</div>
+
+    <div class="venn-wrap">
+      <svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg">
+        <line x1="365" y1="20" x2="365" y2="280" stroke="#25392C" stroke-width="2" stroke-dasharray="6 6"/>
+
+        <g class="venn-region" id="region-sat-outer" color="#6FE3A6">
+          <ellipse class="shape" cx="175" cy="150" rx="165" ry="120" fill="#6FE3A6" stroke="#6FE3A6" stroke-width="2.5"/>
+          <text x="175" y="42" text-anchor="middle" class="rlabel" fill="#6FE3A6" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="700" letter-spacing="1">SATISFIABLE</text>
+        </g>
+
+        <g class="venn-region" id="region-taut" color="#6FE3A6">
+          <circle class="shape" cx="120" cy="165" r="85" fill="#6FE3A6" stroke="#6FE3A6" stroke-width="2.5"/>
+          <text x="90" y="120" text-anchor="middle" class="rlabel" fill="#6FE3A6" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="700">TAUTOLOGY</text>
+          <text x="90" y="138" text-anchor="middle" class="rsub" fill="#B9C4B9" font-family="IBM Plex Sans, sans-serif" font-size="9.5">Always True</text>
+          <text x="90" y="195" text-anchor="middle" class="rex" fill="#DDE6DF" font-family="IBM Plex Mono, monospace" font-size="13">P ∨ ¬P</text>
+          <text x="90" y="164" text-anchor="middle" class="venn-badge" fill="#6FE3A6" font-family="IBM Plex Mono, monospace" font-size="16">✓</text>
+        </g>
+
+        <g class="venn-region" id="region-contingency" color="#D9A441">
+          <circle class="shape" cx="222" cy="165" r="85" fill="#D9A441" stroke="#D9A441" stroke-width="2.5"/>
+          <text x="255" y="120" text-anchor="middle" class="rlabel" fill="#D9A441" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="700">CONTINGENCY</text>
+          <text x="255" y="138" text-anchor="middle" class="rsub" fill="#B9C4B9" font-family="IBM Plex Sans, sans-serif" font-size="9.5">Sometimes T, sometimes F</text>
+          <text x="255" y="195" text-anchor="middle" class="rex" fill="#DDE6DF" font-family="IBM Plex Mono, monospace" font-size="13">P ∧ Q</text>
+          <text x="255" y="164" text-anchor="middle" class="venn-badge" fill="#D9A441" font-family="IBM Plex Mono, monospace" font-size="16">✓</text>
+        </g>
+
+        <g class="venn-region" id="region-contra" color="#E0794F">
+          <ellipse class="shape" cx="490" cy="150" rx="120" ry="120" fill="#E0794F" stroke="#E0794F" stroke-width="2.5"/>
+          <text x="490" y="105" text-anchor="middle" class="rlabel" fill="#E0794F" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="700">CONTRADICTION</text>
+          <text x="490" y="124" text-anchor="middle" class="rsub" fill="#B9C4B9" font-family="IBM Plex Sans, sans-serif" font-size="10">= Unsatisfiable · Always False</text>
+          <text x="490" y="175" text-anchor="middle" class="rex" fill="#DDE6DF" font-family="IBM Plex Mono, monospace" font-size="13">P ∧ ¬P</text>
+          <text x="490" y="148" text-anchor="middle" class="venn-badge" fill="#E0794F" font-family="IBM Plex Mono, monospace" font-size="16">✓</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="mini-grid">
+      <div class="mini-card" id="mini-taut">
+        <div class="mtitle">Build it — 1 variable</div>
+        <div class="mformula">P ∨ ¬P</div>
+        <table class="mtable" id="mtable-taut"></table>
+        <div class="seg" id="seg-taut">
+          <button data-val="Tautology">Tautology</button><button data-val="Contingency">Contingency</button><button data-val="Contradiction">Contradiction</button>
+        </div>
+        <div class="mini-btns">
+          <button class="tbtn primary" data-act="check" data-target="taut">Check</button>
+          <button class="tbtn" data-act="reveal" data-target="taut">Reveal</button>
+          <button class="tbtn" data-act="reset" data-target="taut">Reset</button>
+        </div>
+        <div class="mini-feedback" id="feedback-taut"></div>
+      </div>
+
+      <div class="mini-card" id="mini-contingency">
+        <div class="mtitle">Build it — 2 variables</div>
+        <div class="mformula">P ∧ Q</div>
+        <table class="mtable" id="mtable-contingency"></table>
+        <div class="seg" id="seg-contingency">
+          <button data-val="Tautology">Tautology</button><button data-val="Contingency">Contingency</button><button data-val="Contradiction">Contradiction</button>
+        </div>
+        <div class="mini-btns">
+          <button class="tbtn primary" data-act="check" data-target="contingency">Check</button>
+          <button class="tbtn" data-act="reveal" data-target="contingency">Reveal</button>
+          <button class="tbtn" data-act="reset" data-target="contingency">Reset</button>
+        </div>
+        <div class="mini-feedback" id="feedback-contingency"></div>
+      </div>
+
+      <div class="mini-card" id="mini-contra">
+        <div class="mtitle">Build it — 1 variable</div>
+        <div class="mformula">P ∧ ¬P</div>
+        <table class="mtable" id="mtable-contra"></table>
+        <div class="seg" id="seg-contra">
+          <button data-val="Tautology">Tautology</button><button data-val="Contingency">Contingency</button><button data-val="Contradiction">Contradiction</button>
+        </div>
+        <div class="mini-btns">
+          <button class="tbtn primary" data-act="check" data-target="contra">Check</button>
+          <button class="tbtn" data-act="reveal" data-target="contra">Reveal</button>
+          <button class="tbtn" data-act="reset" data-target="contra">Reset</button>
+        </div>
+        <div class="mini-feedback" id="feedback-contra"></div>
+      </div>
+    </div>
+
+    <div class="plate">
+      <div class="plate-title">Summary</div>
+      <table class="plate-table">
+        <tr><th>Type</th><th>Truth Table Result</th><th>Satisfiable?</th><th>Relationship</th></tr>
+        <tr><td style="color:#6FE3A6;">Tautology</td><td>All rows True</td><td style="color:#6FE3A6;">Yes</td><td>Tautology ⊂ Satisfiable</td></tr>
+        <tr><td style="color:#D9A441;">Contingency</td><td>Some True, Some False</td><td style="color:#6FE3A6;">Yes</td><td>Contingency ⊂ Satisfiable</td></tr>
+        <tr><td style="color:#E0794F;">Contradiction</td><td>All rows False</td><td style="color:#E0794F;">No</td><td>Contradiction = Unsatisfiable</td></tr>
+      </table>
+    </div>
+    <div class="plate">
+      <div class="plate-title">Key Relationships</div>
+      <div class="plate-grid">
+        <div>Tautology ⊂ Satisfiable</div>
+        <div>Contingency ⊂ Satisfiable</div>
+        <div>Contradiction = Unsatisfiable</div>
+        <div>Satisfiable = Tautology ∪ Contingency</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- PART 2 — THEORY OF INFERENCE -->
+  <!-- ============================================================ -->
+  <div class="section-block" id="inference">
+    <div class="sec-eyebrow">Part 2</div>
+    <h2 class="sec-title">Theory of Inference</h2>
+    <p class="sec-sub">An inference rule draws a conclusion from evidence. Read the rule, try to invent your own example, then reveal the trick and a ready-made one.</p>
+
+    <div class="concept-box">
+      <p><strong>Premises</strong> (P₁, P₂, …) are statements you're given — simple or compound. The <strong>Conclusion</strong> (∴ C) is what you're allowed to derive from them.</p>
+      <p><strong>Checking validity:</strong> if P₁∧P₂∧…∧Pₙ → C is a <strong>Tautology</strong>, the rule is a genuine inference rule (T = IR ✓). If it can ever be False, it's a <strong>Fallacy</strong> (F ≠ IR ✗).</p>
+    </div>
+
+    <div id="ruleGrid" class="rule-grid"></div>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Satisfiability &amp; Theory of Inference &nbsp;—&nbsp; <span class="ok">CIRCUIT COMPLETE ✓</span></footer>
+
+<script>
+/* ===================== nav ===================== */
+const navSections = [
+  {id:'satisfiability', label:'Satisfiability'},
+  {id:'inference', label:'10 Inference Rules'}
+];
+const navRow = document.getElementById('navRow');
+navSections.forEach(s=>{
+  const a=document.createElement('a'); a.href='#'+s.id; a.className='nav-led'; a.textContent=s.label; navRow.appendChild(a);
+});
+
+/* ===================== mini truth-table exercises ===================== */
+function rowsFor(n){
+  const out=[]; const gen=(a)=>{ if(a.length===n){out.push(a.slice());return;} gen(a.concat(true)); gen(a.concat(false)); };
+  gen([]); return out;
+}
+let unlocked = 0;
+const TOTAL_REGIONS = 3;
+
+function buildMini(key, nvars, fn, correctClass, regionId){
+  const table = document.getElementById('mtable-'+key);
+  const rows = rowsFor(nvars);
+  const vnames = ['P','Q'].slice(0,nvars);
+  const headTr = document.createElement('tr');
+  vnames.forEach(v=>{ const th=document.createElement('th'); th.className='given'; th.textContent=v; headTr.appendChild(th); });
+  const thResult = document.createElement('th'); thResult.textContent='Result'; headTr.appendChild(thResult);
+  table.appendChild(headTr);
+
+  const wraps = [];
+  rows.forEach(row=>{
+    const tr = document.createElement('tr');
+    row.forEach(v=>{ const td=document.createElement('td'); td.className='given'; td.textContent=v?'T':'F'; tr.appendChild(td); });
+    const td = document.createElement('td');
+    const correct = fn(...row);
+    const wrap = document.createElement('div');
+    wrap.className='cell-wrap'; wrap.dataset.correct=correct?'1':'0'; wrap.dataset.value='0';
+    wrap.innerHTML = `<div class="toggle" role="button" tabindex="0"><span class="lab t">T</span><span class="lab f">F</span><span class="knob"></span></div>`;
+    const tgl = wrap.querySelector('.toggle');
+    const flip = ()=>{
+      const on = wrap.dataset.value==='1';
+      wrap.dataset.value = on?'0':'1';
+      tgl.classList.toggle('on', !on);
+      wrap.classList.remove('ok','bad');
+      document.getElementById('feedback-'+key).textContent='';
+      document.getElementById('feedback-'+key).className='mini-feedback';
+    };
+    tgl.addEventListener('click', flip);
+    tgl.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){flip(); e.preventDefault();} });
+    td.appendChild(wrap); tr.appendChild(td);
+    wraps.push(wrap);
+    table.appendChild(tr);
+  });
+
+  const seg = document.getElementById('seg-'+key);
+  seg.querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      seg.querySelectorAll('button').forEach(x=>x.classList.remove('sel','bad-sel'));
+      b.classList.add('sel'); seg.dataset.value = b.dataset.val;
+      document.getElementById('feedback-'+key).textContent='';
+      document.getElementById('feedback-'+key).className='mini-feedback';
+    });
+  });
+
+  const card = document.getElementById('mini-'+key);
+  const feedback = document.getElementById('feedback-'+key);
+
+  card.querySelectorAll('[data-act]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const act = btn.dataset.act;
+      if(act==='check'){
+        let allOk = true;
+        wraps.forEach(w=>{
+          const ok = w.dataset.value===w.dataset.correct;
+          w.classList.remove('ok','bad'); w.classList.add(ok?'ok':'bad');
+          if(!ok) allOk=false;
+        });
+        const classOk = seg.dataset.value === correctClass;
+        if(seg.dataset.value === undefined) allOk = false;
+        if(allOk && classOk){
+          feedback.textContent = '✓ Correct! Region unlocked below.';
+          feedback.className = 'mini-feedback ok';
+          card.classList.add('solved');
+          lightRegion(regionId, key);
+        } else {
+          feedback.textContent = 'Not quite yet — check the highlighted cells and classification.';
+          feedback.className = 'mini-feedback';
+          if(seg.dataset.value !== undefined && !classOk){
+            const sel = seg.querySelector('button.sel'); if(sel) sel.classList.add('bad-sel');
+          }
+        }
+      }
+      if(act==='reveal'){
+        wraps.forEach(w=>{
+          w.dataset.value = w.dataset.correct;
+          w.querySelector('.toggle').classList.toggle('on', w.dataset.correct==='1');
+          w.classList.remove('ok','bad'); w.classList.add('ok');
+        });
+        seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','bad-sel'));
+        const btn2 = seg.querySelector(`button[data-val="${correctClass}"]`);
+        if(btn2) btn2.classList.add('sel');
+        seg.dataset.value = correctClass;
+        feedback.textContent = '✓ Revealed — region unlocked below.';
+        feedback.className = 'mini-feedback ok';
+        card.classList.add('solved');
+        lightRegion(regionId, key);
+      }
+      if(act==='reset'){
+        wraps.forEach(w=>{
+          w.dataset.value='0'; w.querySelector('.toggle').classList.remove('on'); w.classList.remove('ok','bad');
+        });
+        seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','bad-sel'));
+        delete seg.dataset.value;
+        feedback.textContent=''; feedback.className='mini-feedback';
+      }
+    });
+  });
+}
+
+const litRegions = new Set();
+function lightRegion(regionId, key){
+  const el = document.getElementById(regionId);
+  if(el && !el.classList.contains('lit')){
+    el.classList.add('lit');
+    litRegions.add(regionId);
+    document.getElementById('unlockCount').textContent = litRegions.size;
+    // the outer "Satisfiable" boundary lights whenever either inner satisfiable region lights
+    if((regionId==='region-taut' || regionId==='region-contingency')){
+      document.getElementById('region-sat-outer').classList.add('lit');
+    }
+  }
+}
+
+buildMini('taut', 1, (p)=>p||(!p), 'Tautology', 'region-taut');
+buildMini('contingency', 2, (p,q)=>p&&q, 'Contingency', 'region-contingency');
+buildMini('contra', 1, (p)=>p&&(!p), 'Contradiction', 'region-contra');
+
+/* ===================== inference rules ===================== */
+const RULES = [
+  {name:'Modus Ponens', alt:'(Conditional) — same left side', prem:['P₁: p → q','P₂: p'], concl:'∴ C: q',
+   trick:'MP = <b>Push Forward</b> (push to \'q\')',
+   example:'<b>Example:</b> "If it rains, the ground gets wet. It is raining. Therefore, the ground gets wet."'},
+  {name:'Modus Tollens', alt:'(Contrapositive form: ¬q→¬p)', prem:['P₁: p → q','P₂: ¬q'], concl:'∴ C: ¬p',
+   trick:'MT = <b>Throw Backward</b> (throw back &amp; reject \'p\')',
+   example:'<b>Example:</b> "If it rains, the ground gets wet. The ground is not wet. Therefore, it is not raining."'},
+  {name:'Hypothetical Syllogism', alt:'', prem:['P₁: p → q','P₂: q → r'], concl:'∴ C: p → r',
+   trick:'HS = <b>Chain It</b>',
+   example:'<b>Example:</b> "If you study, you pass. If you pass, you graduate. Therefore, if you study, you graduate."'},
+  {name:'Disjunctive Syllogism', alt:'', prem:['P₁: p ∨ q','P₂: ¬p'], concl:'∴ C: q',
+   trick:'DS = <b>Cancel Out</b> / delete opposites',
+   example:'<b>Example:</b> "It\'s either tea or coffee. It\'s not tea. Therefore, it\'s coffee."'},
+  {name:'Addition', alt:'', prem:['P₁: p'], concl:'∴ C: p ∨ q',
+   trick:'<b>Add (OR)</b> a statement — always valid!',
+   example:'<b>Example:</b> "It is raining. Therefore, it is raining or it is snowing."'},
+  {name:'Simplification', alt:'', prem:['P₁: p ∧ q'], concl:'∴ C: p &nbsp;(or q)',
+   trick:'<b>Split</b> the "AND" statement',
+   example:'<b>Example:</b> "It is raining and cold. Therefore, it is raining."'},
+  {name:'Conjunction', alt:'', prem:['P₁: p','P₂: q'], concl:'∴ C: p ∧ q',
+   trick:'<b>Combine</b> two truths',
+   example:'<b>Example:</b> "It is raining. It is cold. Therefore, it is raining and cold."'},
+  {name:'Resolution', alt:'', prem:['P₁: p ∨ q','P₂: ¬p ∨ r'], concl:'∴ C: q ∨ r',
+   trick:'<b>Cancel</b> the opposites (p and ¬p)',
+   example:'<b>Example:</b> "The alarm rings or the door is locked. The alarm doesn\'t ring or the lights are on. Therefore, the door is locked or the lights are on."'},
+  {name:'Constructive Dilemma', alt:'', prem:['P₁: (p→q) ∧ (r→s)','P₂: p ∨ r'], concl:'∴ C: q ∨ s',
+   trick:'Two "if-then"s <b>plus</b> one of their causes',
+   example:'<b>Example:</b> "If it rains, I bring an umbrella; if it snows, I bring boots. It rains or it snows. Therefore, I bring an umbrella or boots."'},
+  {name:'Destructive Dilemma', alt:'', prem:['P₁: (p→q) ∧ (r→s)','P₂: ¬q ∨ ¬s'], concl:'∴ C: ¬p ∨ ¬r',
+   trick:'Two "if-then"s <b>minus</b> one of their effects',
+   example:'<b>Example:</b> "If it rains, I bring an umbrella; if it snows, I bring boots. I didn\'t bring an umbrella, or I didn\'t bring boots. Therefore, it didn\'t rain, or it didn\'t snow."'}
+];
+
+const ruleGrid = document.getElementById('ruleGrid');
+RULES.forEach((r,i)=>{
+  const card = document.createElement('div');
+  card.className = 'rule-card';
+  const premHtml = r.prem.map(p=>`<span class="prem">${p}</span>`).join('<br>');
+  card.innerHTML = `
+    <div class="rule-num">${i+1}</div>
+    <div class="rule-name">${r.name}</div>
+    ${r.alt ? `<div class="rule-alt">${r.alt}</div>` : ''}
+    <div class="rule-box">${premHtml}<span class="concl">${r.concl}</span></div>
+    <button class="r-reveal-btn">Think of your own example, then reveal</button>
+    <div class="r-reveal-panel">
+      <div class="r-trick">🔑 <b>Trick:</b> ${r.trick}</div>
+      <div class="r-example">💬 ${r.example}</div>
+    </div>
+  `;
+  card.querySelector('.r-reveal-btn').addEventListener('click', ()=>{
+    card.querySelector('.r-reveal-panel').classList.toggle('show');
+  });
+  ruleGrid.appendChild(card);
+});
+</script>
+</body>
+</html>

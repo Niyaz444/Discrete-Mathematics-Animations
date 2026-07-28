@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Truth Table Explorer · Three Statements (p, q, r)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+    --given:#EAE7DA;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);font-family:'IBM Plex Sans',sans-serif;color:var(--ink);padding:32px 16px 70px;}
+  .wrap{max-width:1250px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(24px,4.2vw,34px);margin:0 0 6px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14.5px;margin:0 auto 26px;max-width:660px;line-height:1.6;}
+
+  .howto{
+    background:#fff;border:1px dashed var(--line);border-radius:12px;
+    padding:14px 18px;margin-bottom:24px;font-size:13.5px;line-height:1.65;color:var(--ink-soft);
+    box-shadow:0 6px 16px -12px rgba(28,43,51,.35);
+  }
+  .howto strong{color:var(--ink);}
+  .howto .chip{display:inline-flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:1px 7px;border-radius:20px;background:var(--paper);border:1px solid var(--line);}
+
+  .toolbar{
+    position:sticky; top:10px; z-index:20;
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+    background:var(--ink); color:#F4F2EA; border-radius:14px; padding:12px 18px; margin-bottom:22px;
+    box-shadow:0 12px 28px -16px rgba(28,43,51,.6);
+    font-family:'IBM Plex Mono',monospace; font-size:13px;
+  }
+  .toolbar .score span{color:var(--gold);font-weight:700;font-size:16px;}
+  .toolbar .btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .tbtn{
+    background:transparent;border:1.5px solid #F4F2EA;color:#F4F2EA;border-radius:20px;
+    padding:6px 13px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.03em;
+    text-transform:uppercase;cursor:pointer;transition:.15s ease;
+  }
+  .tbtn:hover{background:#F4F2EA;color:var(--ink);}
+  .tbtn.primary{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .tbtn.primary:hover{background:#256150;}
+
+  .table-scroll{
+    overflow-x:auto; border-radius:14px; box-shadow:0 14px 34px -18px rgba(28,43,51,.45);
+    background:var(--card); border:1px solid rgba(28,43,51,.08); padding:4px;
+  }
+  table{border-collapse:separate;border-spacing:0;width:100%;min-width:1180px;}
+  thead th{
+    background:var(--card); padding:10px 6px 12px; text-align:center; vertical-align:bottom;
+    border-bottom:2px solid var(--ink); position:sticky; top:0; z-index:5;
+  }
+  thead th .sym{font-family:'IBM Plex Mono',monospace;font-size:14.5px;font-weight:700;color:var(--ink);display:block;white-space:nowrap;}
+  thead th .name{font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;display:block;margin-top:3px;}
+  thead th.given .sym{color:var(--ink-soft); font-size:17px;}
+  thead th.bonus .name{color:var(--gold);}
+
+  th.pcol, td.pcol{position:sticky;left:0;z-index:4;}
+  th.qcol, td.qcol{position:sticky;left:58px;z-index:4;}
+  th.rcol, td.rcol{position:sticky;left:116px;z-index:4;}
+
+  tbody td{
+    text-align:center; padding:9px 6px; border-bottom:1px solid var(--line);
+    background:var(--card);
+  }
+  tbody tr:nth-child(even) td{background:#FAF9F4;}
+  tbody tr:nth-child(even) td.given{background:#EDEAE0;}
+
+  td.given{
+    font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:15px;
+    background:var(--given); color:var(--ink);
+  }
+
+  .cell-wrap{position:relative; display:inline-block;}
+  .toggle{
+    position:relative; width:50px; height:26px; border-radius:20px; cursor:pointer;
+    background:#E4E0D2; border:1.5px solid var(--line); display:inline-flex; align-items:center;
+    font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; user-select:none;
+    transition:background .2s ease, border-color .2s ease;
+  }
+  .toggle .lab{position:absolute; width:50%; text-align:center; transition:opacity .2s ease, color .2s ease;}
+  .toggle .lab.f{left:0; color:var(--brick);}
+  .toggle .lab.t{right:0; color:var(--teal); opacity:.35;}
+  .toggle.on .lab.t{opacity:1;}
+  .toggle.on .lab.f{opacity:.35;}
+  .toggle .knob{
+    position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%;
+    background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.35); transition:left .2s ease;
+  }
+  .toggle.on{background:#DCEFE9; border-color:var(--teal);}
+  .toggle.on .knob{left:26px;}
+  .toggle:not(.on){background:#F6E4E0; border-color:var(--brick);}
+
+  .cell-wrap.correct .toggle{box-shadow:0 0 0 3px rgba(47,122,102,.35);}
+  .cell-wrap.incorrect .toggle{box-shadow:0 0 0 3px rgba(181,73,61,.35);}
+  .mark{
+    position:absolute; top:-9px; right:-9px; width:18px; height:18px; border-radius:50%;
+    font-size:11px; line-height:18px; text-align:center; font-weight:700; color:#fff;
+    opacity:0; transform:scale(.5); transition:all .25s cubic-bezier(.2,1.6,.4,1);
+  }
+  .cell-wrap.correct .mark{opacity:1; transform:scale(1); background:var(--teal); }
+  .cell-wrap.incorrect .mark{opacity:1; transform:scale(1); background:var(--brick);}
+
+  .legend{
+    margin-top:26px; background:#fff; border-left:4px solid var(--teal); border-radius:0 10px 10px 0;
+    padding:16px 18px; box-shadow:0 6px 16px -12px rgba(28,43,51,.4);
+  }
+  .legend h3{font-family:'Fraunces',serif; font-weight:600; font-size:16px; margin:0 0 10px; color:var(--teal);}
+  .legend-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:9px 18px; font-size:13px; line-height:1.5;}
+  .legend-grid .mono{font-family:'IBM Plex Mono',monospace; background:#F3F1E8; padding:1px 5px; border-radius:4px; margin-right:4px;}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:36px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Truth Table Explorer</h1>
+  <p class="sub">Topic 2 — Connectives, extended to three statements (p, q, r).</p>
+
+  <div class="howto">
+    <strong>How this works:</strong> the first three columns, <span class="chip">p</span>, <span class="chip">q</span>, and <span class="chip">r</span>, are already fixed for you — all eight possible True/False combinations. Every other column is a compound statement built from two or more connectives at once. Click each toggle to set what <em>you</em> think the result should be, then check your work. This is exactly how bigger, real proofs get built: one connective at a time, layered together.
+  </div>
+
+  <div class="toolbar">
+    <div class="score">Score: <span id="scoreDisplay">0 / 72</span> correct</div>
+    <div class="btns">
+      <button class="tbtn primary" onclick="checkAll()">Check My Answers</button>
+      <button class="tbtn" onclick="revealAll()">Reveal Answers</button>
+      <button class="tbtn" onclick="resetAll()">Reset All</button>
+    </div>
+  </div>
+
+  <div class="table-scroll">
+    <table id="ttable">
+      <thead>
+        <tr id="headRow"></tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="legend">
+    <h3>Reference — what each compound statement means</h3>
+    <div class="legend-grid" id="legendGrid"></div>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Topic 2 — Truth Table Explorer (3 Statements)</footer>
+</div>
+
+<script>
+// 8 rows: all combinations of p, q, r
+const rows = [];
+[true,false].forEach(p=>{
+  [true,false].forEach(q=>{
+    [true,false].forEach(r=>{
+      rows.push({p,q,r});
+    });
+  });
+});
+
+const formulas = [
+  {key:'and3',  sym:'p∧q∧r',        name:'Triple Conjunction', def:'True only when all three of p, q, r are True.', fn:(p,q,r)=>p&&q&&r},
+  {key:'or3',   sym:'p∨q∨r',        name:'Triple Disjunction', def:'True when at least one of p, q, r is True.', fn:(p,q,r)=>p||q||r},
+  {key:'ao',    sym:'(p∧q)∨r',      name:'AND then OR', def:'Group p∧q first, then OR the result with r.', fn:(p,q,r)=>(p&&q)||r},
+  {key:'oa',    sym:'(p∨q)∧r',      name:'OR then AND', def:'Group p∨q first, then AND the result with r — different from (p∧q)∨r!', fn:(p,q,r)=>(p||q)&&r},
+  {key:'condc', sym:'p→(q∧r)',      name:'Conditional into AND', def:'True unless p is True while q∧r is False.', fn:(p,q,r)=>(!p)||(q&&r)},
+  {key:'cfromc',sym:'(p∧q)→r',      name:'AND into Conditional', def:'False only when p and q are both True but r is False.', fn:(p,q,r)=>(!(p&&q))||r},
+  {key:'bicondo',sym:'p↔(q∨r)',     name:'Biconditional with OR', def:'True when p matches the truth value of q∨r.', fn:(p,q,r)=>p===(q||r)},
+  {key:'demorg',sym:'¬p∨¬q∨r',      name:'Mixed Negations', def:'True unless p and q are both True while r is False.', fn:(p,q,r)=>(!p)||(!q)||r},
+  {key:'chain', sym:'(p→q)∧(q→r)',  name:'Chained Conditionals', def:'Both links must hold. A preview of a rule called Hypothetical Syllogism.', fn:(p,q,r)=>((!p)||q) && ((!q)||r), bonus:true}
+];
+
+const TOTAL = rows.length * formulas.length;
+
+// ---------- Build header ----------
+const headRow = document.getElementById('headRow');
+['p','q','r'].forEach(v=>{
+  const th = document.createElement('th');
+  th.className = 'given ' + (v==='p'?'pcol':v==='q'?'qcol':'rcol');
+  th.innerHTML = `<span class="sym">${v}</span><span class="name">given</span>`;
+  headRow.appendChild(th);
+});
+formulas.forEach(c=>{
+  const th = document.createElement('th');
+  th.className = c.bonus ? 'bonus' : '';
+  th.title = c.def;
+  th.innerHTML = `<span class="sym">${c.sym}</span><span class="name">${c.name}${c.bonus?' · bonus':''}</span>`;
+  headRow.appendChild(th);
+});
+
+// ---------- Build body ----------
+const tbody = document.getElementById('tbody');
+rows.forEach((rw, ri)=>{
+  const tr = document.createElement('tr');
+
+  [['p',rw.p,'pcol'],['q',rw.q,'qcol'],['r',rw.r,'rcol']].forEach(([label,val,cls])=>{
+    const td = document.createElement('td');
+    td.className = 'given ' + cls;
+    td.textContent = val ? 'T' : 'F';
+    tr.appendChild(td);
+  });
+
+  formulas.forEach(c=>{
+    const td = document.createElement('td');
+    const correct = c.fn(rw.p, rw.q, rw.r);
+    const wrap = document.createElement('div');
+    wrap.className = 'cell-wrap';
+    wrap.dataset.correct = correct ? '1':'0';
+    wrap.dataset.value = '0';
+    wrap.dataset.row = ri;
+    wrap.dataset.key = c.key;
+    wrap.innerHTML = `
+      <div class="toggle" role="button" aria-label="Toggle ${c.sym} for row ${ri+1}">
+        <span class="lab f">F</span><span class="lab t">T</span>
+        <span class="knob"></span>
+      </div>
+      <span class="mark"></span>
+    `;
+    wrap.querySelector('.toggle').addEventListener('click', ()=>{
+      const on = wrap.dataset.value === '1';
+      wrap.dataset.value = on ? '0' : '1';
+      wrap.querySelector('.toggle').classList.toggle('on', !on);
+      wrap.classList.remove('correct','incorrect');
+      wrap.querySelector('.mark').textContent = '';
+      updateScoreLive();
+    });
+    td.appendChild(wrap);
+    tr.appendChild(td);
+  });
+
+  tbody.appendChild(tr);
+});
+
+// ---------- Legend ----------
+const legendGrid = document.getElementById('legendGrid');
+formulas.forEach(c=>{
+  const div = document.createElement('div');
+  div.innerHTML = `<span class="mono">${c.sym}</span><strong>${c.name}:</strong> ${c.def}`;
+  legendGrid.appendChild(div);
+});
+
+// ---------- Scoring ----------
+function allWraps(){ return document.querySelectorAll('.cell-wrap'); }
+
+function updateScoreLive(){
+  let correctCount = 0;
+  allWraps().forEach(w=>{
+    if(w.dataset.value === w.dataset.correct) correctCount++;
+  });
+  document.getElementById('scoreDisplay').textContent = correctCount + ' / ' + TOTAL;
+}
+
+function checkAll(){
+  let correctCount = 0;
+  allWraps().forEach(w=>{
+    const isCorrect = w.dataset.value === w.dataset.correct;
+    w.classList.remove('correct','incorrect');
+    w.classList.add(isCorrect ? 'correct' : 'incorrect');
+    w.querySelector('.mark').textContent = isCorrect ? '✓' : '✗';
+    if(isCorrect) correctCount++;
+  });
+  document.getElementById('scoreDisplay').textContent = correctCount + ' / ' + TOTAL;
+}
+
+function revealAll(){
+  allWraps().forEach(w=>{
+    w.dataset.value = w.dataset.correct;
+    const on = w.dataset.correct === '1';
+    w.querySelector('.toggle').classList.toggle('on', on);
+    w.classList.remove('correct','incorrect');
+    w.classList.add('correct');
+    w.querySelector('.mark').textContent = '✓';
+  });
+  document.getElementById('scoreDisplay').textContent = TOTAL + ' / ' + TOTAL;
+}
+
+function resetAll(){
+  allWraps().forEach(w=>{
+    w.dataset.value = '0';
+    w.querySelector('.toggle').classList.remove('on');
+    w.classList.remove('correct','incorrect');
+    w.querySelector('.mark').textContent = '';
+  });
+  document.getElementById('scoreDisplay').textContent = '0 / ' + TOTAL;
+}
+</script>
+</body>
+</html>

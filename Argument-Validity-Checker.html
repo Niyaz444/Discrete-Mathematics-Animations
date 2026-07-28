@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valid or Invalid? · Logic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+    --given:#EAE7DA;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);font-family:'IBM Plex Sans',sans-serif;color:var(--ink);padding:32px 16px 70px;}
+  .wrap{max-width:900px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(23px,4.5vw,33px);margin:0 0 6px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14.5px;margin:0 auto 26px;max-width:640px;line-height:1.6;}
+
+  .howto{
+    background:#fff;border:1px dashed var(--line);border-radius:12px;
+    padding:14px 18px;margin-bottom:22px;font-size:13.5px;line-height:1.65;color:var(--ink-soft);
+    box-shadow:0 6px 16px -12px rgba(28,43,51,.35);
+  }
+  .howto strong{color:var(--ink);}
+
+  .toolbar{
+    position:sticky; top:10px; z-index:20;
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+    background:var(--ink); color:#F4F2EA; border-radius:14px; padding:12px 18px; margin-bottom:24px;
+    box-shadow:0 12px 28px -16px rgba(28,43,51,.6);
+    font-family:'IBM Plex Mono',monospace; font-size:13px;
+  }
+  .toolbar .score span{color:var(--gold);font-weight:700;font-size:16px;}
+  .toolbar .btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .tbtn{
+    background:transparent;border:1.5px solid #F4F2EA;color:#F4F2EA;border-radius:20px;
+    padding:6px 13px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.03em;
+    text-transform:uppercase;cursor:pointer;transition:.15s ease;
+  }
+  .tbtn:hover{background:#F4F2EA;color:var(--ink);}
+  .tbtn.primary{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .tbtn.primary:hover{background:#256150;}
+
+  .a-card{
+    background:var(--card); border-radius:14px; padding:18px 20px; margin-bottom:16px;
+    border:1.5px solid rgba(28,43,51,.08); box-shadow:0 8px 20px -14px rgba(28,43,51,.4);
+    transition:border-color .25s ease, background .25s ease;
+  }
+  .a-card.correct{border-color:var(--teal); background:#F3FAF7;}
+  .a-card.incorrect{border-color:var(--brick); background:#FCF3F2;}
+
+  .a-head{margin-bottom:10px;}
+  .a-num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);}
+  .a-name{font-family:'Fraunces',serif;font-weight:600;font-size:18px;color:var(--ink);display:block;margin:2px 0 8px;}
+  .a-form{font-family:'IBM Plex Mono',monospace;font-size:13.5px;line-height:1.8;background:#F6F4EC;border-radius:8px;padding:8px 12px;display:inline-block;}
+  .a-form .lbl{color:var(--ink-soft);margin-right:6px;}
+
+  .scroll-x{overflow-x:auto;margin:12px 0 14px;}
+  table.mini{border-collapse:separate;border-spacing:0;}
+  table.mini th, table.mini td{padding:6px 12px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap;}
+  table.mini th{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.04em;
+    color:var(--ink-soft);border-bottom:2px solid var(--ink);
+  }
+  table.mini th.sep, table.mini td.sep{border-left:1.5px solid var(--line);}
+  table.mini td.given{font-family:'IBM Plex Mono',monospace;font-weight:700;background:var(--given);}
+  table.mini tr:nth-child(even) td.given{background:#DEDACB;}
+
+  .toggle{
+    position:relative; width:48px; height:25px; border-radius:20px; cursor:pointer;
+    background:#E4E0D2; border:1.5px solid var(--line); display:inline-flex; align-items:center;
+    font-family:'IBM Plex Mono',monospace; font-size:9.5px; font-weight:700; user-select:none;
+    transition:background .2s ease, border-color .2s ease;
+  }
+  .toggle .lab{position:absolute; width:50%; text-align:center; transition:opacity .2s ease, color .2s ease;}
+  .toggle .lab.f{left:0; color:var(--brick);}
+  .toggle .lab.t{right:0; color:var(--teal); opacity:.35;}
+  .toggle.on .lab.t{opacity:1;}
+  .toggle.on .lab.f{opacity:.35;}
+  .toggle .knob{
+    position:absolute; top:2px; left:2px; width:19px; height:19px; border-radius:50%;
+    background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.35); transition:left .2s ease;
+  }
+  .toggle.on{background:#DCEFE9; border-color:var(--teal);}
+  .toggle.on .knob{left:25px;}
+  .toggle:not(.on){background:#F6E4E0; border-color:var(--brick);}
+  .cell-wrap{position:relative; display:inline-block;}
+  .cell-wrap.ok .toggle{box-shadow:0 0 0 3px rgba(47,122,102,.35);}
+  .cell-wrap.bad .toggle{box-shadow:0 0 0 3px rgba(181,73,61,.35);}
+  .mark{
+    position:absolute; top:-8px; right:-8px; width:16px; height:16px; border-radius:50%;
+    font-size:9.5px; line-height:16px; text-align:center; font-weight:700; color:#fff;
+    opacity:0; transform:scale(.5); transition:all .25s cubic-bezier(.2,1.6,.4,1);
+  }
+  .cell-wrap.ok .mark{opacity:1; transform:scale(1); background:var(--teal);}
+  .cell-wrap.bad .mark{opacity:1; transform:scale(1); background:var(--brick);}
+
+  .classify-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .control-label{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);}
+  .seg{display:inline-flex;border:1.5px solid var(--line);border-radius:20px;overflow:hidden;background:#F6F4EC;}
+  .seg button{
+    border:none;background:transparent;padding:7px 15px;font-family:'IBM Plex Sans',sans-serif;
+    font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ink-soft);transition:.15s ease;
+  }
+  .seg button.sel.valid-sel{background:var(--teal);color:#fff;}
+  .seg button.sel.invalid-sel{background:var(--brick);color:#fff;}
+  .result-icon{width:20px;height:20px;border-radius:50%;font-size:12px;line-height:20px;text-align:center;font-weight:700;color:#fff;opacity:0;transform:scale(.5);transition:all .25s cubic-bezier(.2,1.6,.4,1);}
+  .result-icon.show{opacity:1;transform:scale(1);}
+  .result-icon.ok{background:var(--teal);}
+  .result-icon.bad{background:var(--brick);}
+
+  .explain{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .explain.show{max-height:220px;opacity:1;margin-top:12px;}
+  .explain-inner{border-top:1px dashed var(--line);padding-top:10px;font-size:13.5px;line-height:1.6;color:var(--ink-soft);}
+  .explain-inner strong{color:var(--ink);}
+
+  .legend{
+    margin-top:28px; background:#fff; border-left:4px solid var(--teal); border-radius:0 10px 10px 0;
+    padding:16px 18px; box-shadow:0 6px 16px -12px rgba(28,43,51,.4); font-size:13.5px; line-height:1.7;
+  }
+  .legend h3{font-family:'Fraunces',serif; font-weight:600; font-size:16px; margin:0 0 8px; color:var(--teal);}
+  .legend ul{margin:0;padding-left:20px;}
+  .legend li{margin-bottom:4px;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:36px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Valid or Invalid?</h1>
+  <p class="sub">Topic 3 — Tautologies, Logic · closing section: putting tautologies to work on real arguments</p>
+
+  <div class="howto">
+    <strong>How this works:</strong> each card shows an argument — some premises and a conclusion. The variable columns are fixed. Fill in the <strong>P1, P2</strong> (premise) and <strong>C</strong> (conclusion) columns yourself, row by row. Then decide: is the argument <strong>Valid</strong> or <strong>Invalid</strong>? An argument is valid only if <em>every</em> row where all its premises are True also has a True conclusion — one bad row is enough to break it.
+  </div>
+
+  <div class="toolbar">
+    <div class="score">Score: <span id="scoreDisplay">0 / 0</span> correct</div>
+    <div class="btns">
+      <button class="tbtn primary" onclick="checkAll()">Check My Answers</button>
+      <button class="tbtn" onclick="revealAll()">Reveal Answers</button>
+      <button class="tbtn" onclick="resetAll()">Reset All</button>
+    </div>
+  </div>
+
+  <div id="list"></div>
+
+  <div class="legend">
+    <h3>Reference — what makes an argument valid</h3>
+    <ul>
+      <li>An argument is <strong>Valid</strong> if, in every row where all premises are True, the conclusion is also True.</li>
+      <li>An argument is <strong>Invalid</strong> if there is even one row where every premise is True but the conclusion is False.</li>
+      <li>This connects directly back to tautologies: an argument is valid exactly when <span class="mono">(P1 ∧ P2 ∧ … ) → C</span> is a tautology.</li>
+      <li>Two of the arguments below are classic <strong>fallacies</strong> — they look like valid patterns but aren't. Find the row that breaks each one.</li>
+    </ul>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Topic 3 — Valid or Invalid? (Logic)</footer>
+</div>
+
+<script>
+const args = [
+  {name:'Modus Ponens', vars:2, valid:true,
+    premiseLabels:['p → q','p'], concLabel:'q',
+    premises:[(p,q,r)=>(!p)||q, (p,q,r)=>p], conc:(p,q,r)=>q,
+    why:'Check every row where both P1 and P2 are True — the conclusion q is True there too. No row breaks it, so the argument is Valid. This is the most-used rule of inference in mathematics.'},
+  {name:'Modus Tollens', vars:2, valid:true,
+    premiseLabels:['p → q','¬q'], concLabel:'¬p',
+    premises:[(p,q,r)=>(!p)||q, (p,q,r)=>!q], conc:(p,q,r)=>!p,
+    why:'Whenever p→q holds and q is False, p must be False too (otherwise p→q would be broken). No row makes both premises True while ¬p is False — Valid.'},
+  {name:'Denying the Antecedent', vars:2, valid:false,
+    premiseLabels:['p → q','¬p'], concLabel:'¬q',
+    premises:[(p,q,r)=>(!p)||q, (p,q,r)=>!p], conc:(p,q,r)=>!q,
+    why:'A classic fallacy. Take p = False, q = True: p→q is True, ¬p is True — both premises hold — but ¬q is False. That single row breaks it: Invalid.'},
+  {name:'Affirming the Consequent', vars:2, valid:false,
+    premiseLabels:['p → q','q'], concLabel:'p',
+    premises:[(p,q,r)=>(!p)||q, (p,q,r)=>q], conc:(p,q,r)=>p,
+    why:'Another classic fallacy. Take p = False, q = True: p→q is True, q is True — both premises hold — but the conclusion p is False. Invalid.'},
+  {name:'Disjunctive Syllogism', vars:2, valid:true,
+    premiseLabels:['p ∨ q','¬p'], concLabel:'q',
+    premises:[(p,q,r)=>p||q, (p,q,r)=>!p], conc:(p,q,r)=>q,
+    why:'If p∨q holds and p is ruled out by ¬p, then q has to carry the disjunction alone — it must be True. No breaking row exists: Valid.'},
+  {name:'Hypothetical Syllogism', vars:3, valid:true,
+    premiseLabels:['p → q','q → r'], concLabel:'p → r',
+    premises:[(p,q,r)=>(!p)||q, (p,q,r)=>(!q)||r], conc:(p,q,r)=>(!p)||r,
+    why:'Chaining two conditionals: if p forces q, and q forces r, then p forces r. Across all eight rows, no case has both premises True with the conclusion False: Valid.'}
+];
+
+function rowsFor(vars){
+  const rows = [];
+  if(vars===2){
+    [true,false].forEach(p=>{ [true,false].forEach(q=>{ rows.push({p,q,r:null}); }); });
+  } else {
+    [true,false].forEach(p=>{ [true,false].forEach(q=>{ [true,false].forEach(r=>{ rows.push({p,q,r}); }); }); });
+  }
+  return rows;
+}
+
+const listEl = document.getElementById('list');
+let TOTAL = 0;
+
+args.forEach((a, ai)=>{
+  const rows = rowsFor(a.vars);
+  const card = document.createElement('div');
+  card.className = 'a-card';
+  card.dataset.idx = ai;
+
+  const formStr = a.premiseLabels.map((l,i)=>`<span class="lbl">P${i+1}:</span>${l}`).join('&nbsp;&nbsp;&nbsp;') +
+                   `&nbsp;&nbsp;&nbsp;<span class="lbl">∴ C:</span>${a.concLabel}`;
+
+  let tableHtml = `<div class="scroll-x"><table class="mini"><thead><tr>`;
+  tableHtml += `<th>p</th><th>q</th>`;
+  if(a.vars===3) tableHtml += `<th>r</th>`;
+  a.premiseLabels.forEach((l,i)=>{ tableHtml += `<th class="sep">P${i+1}</th>`; });
+  tableHtml += `<th class="sep">C</th></tr></thead><tbody>`;
+
+  rows.forEach((row, ri)=>{
+    tableHtml += `<tr>`;
+    tableHtml += `<td class="given">${row.p?'T':'F'}</td><td class="given">${row.q?'T':'F'}</td>`;
+    if(a.vars===3) tableHtml += `<td class="given">${row.r?'T':'F'}</td>`;
+    a.premises.forEach((fn,pi)=>{
+      const correct = fn(row.p, row.q, row.r);
+      tableHtml += `<td class="sep"><div class="cell-wrap" data-correct="${correct?'1':'0'}" data-row="${ri}" data-col="p${pi}">
+          <div class="toggle" role="button"><span class="lab f">F</span><span class="lab t">T</span><span class="knob"></span></div>
+          <span class="mark"></span></div></td>`;
+      TOTAL++;
+    });
+    const cCorrect = a.conc(row.p, row.q, row.r);
+    tableHtml += `<td class="sep"><div class="cell-wrap" data-correct="${cCorrect?'1':'0'}" data-row="${ri}" data-col="c">
+        <div class="toggle" role="button"><span class="lab f">F</span><span class="lab t">T</span><span class="knob"></span></div>
+        <span class="mark"></span></div></td>`;
+    TOTAL++;
+    tableHtml += `</tr>`;
+  });
+  tableHtml += `</tbody></table></div>`;
+
+  card.innerHTML = `
+    <div class="a-head">
+      <span class="a-num">Argument ${ai+1} — ${a.vars} variables</span>
+      <span class="a-name">${a.name}</span>
+      <div class="a-form">${formStr}</div>
+    </div>
+    ${tableHtml}
+    <div class="classify-row">
+      <span class="control-label">Verdict?</span>
+      <div class="seg" data-role="validity">
+        <button data-val="valid" type="button">Valid</button>
+        <button data-val="invalid" type="button">Invalid</button>
+      </div>
+      <span class="result-icon" data-icon="validity"></span>
+    </div>
+    <div class="explain"><div class="explain-inner"><strong>Why:</strong> ${a.why}</div></div>
+  `;
+  listEl.appendChild(card);
+  TOTAL++; // validity classification
+
+  card.querySelectorAll('.cell-wrap').forEach(wrap=>{
+    wrap.dataset.value = '0';
+    wrap.querySelector('.toggle').addEventListener('click', ()=>{
+      const on = wrap.dataset.value === '1';
+      wrap.dataset.value = on ? '0' : '1';
+      wrap.querySelector('.toggle').classList.toggle('on', !on);
+      wrap.classList.remove('ok','bad');
+      wrap.querySelector('.mark').textContent = '';
+      card.classList.remove('correct','incorrect');
+      updateScoreLive();
+    });
+  });
+
+  const seg = card.querySelector('[data-role="validity"]');
+  seg.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','valid-sel','invalid-sel'));
+      btn.classList.add('sel', btn.dataset.val==='valid' ? 'valid-sel':'invalid-sel');
+      seg.dataset.value = btn.dataset.val;
+      card.classList.remove('correct','incorrect');
+      const icon = card.querySelector('[data-icon="validity"]');
+      icon.classList.remove('show','ok','bad'); icon.textContent = '';
+      card.querySelector('.explain').classList.remove('show');
+      updateScoreLive();
+    });
+  });
+});
+
+document.getElementById('scoreDisplay').textContent = '0 / ' + TOTAL;
+
+function countScore(){
+  let correct = 0;
+  document.querySelectorAll('.cell-wrap').forEach(w=>{
+    if(w.dataset.value === w.dataset.correct) correct++;
+  });
+  args.forEach((a, ai)=>{
+    const card = listEl.children[ai];
+    const seg = card.querySelector('[data-role="validity"]');
+    const correctVal = a.valid ? 'valid':'invalid';
+    if(seg.dataset.value === correctVal) correct++;
+  });
+  return correct;
+}
+
+function updateScoreLive(){
+  document.getElementById('scoreDisplay').textContent = countScore() + ' / ' + TOTAL;
+}
+
+function checkAll(){
+  document.querySelectorAll('.cell-wrap').forEach(w=>{
+    const isCorrect = w.dataset.value === w.dataset.correct;
+    w.classList.remove('ok','bad');
+    w.classList.add(isCorrect?'ok':'bad');
+    w.querySelector('.mark').textContent = isCorrect ? '✓':'✗';
+  });
+  args.forEach((a, ai)=>{
+    const card = listEl.children[ai];
+    const seg = card.querySelector('[data-role="validity"]');
+    const icon = card.querySelector('[data-icon="validity"]');
+    const correctVal = a.valid ? 'valid':'invalid';
+    const isCorrect = seg.dataset.value === correctVal;
+    let anyRowWrong = false;
+    card.querySelectorAll('.cell-wrap').forEach(w=>{ if(w.dataset.value !== w.dataset.correct) anyRowWrong = true; });
+    if(seg.dataset.value !== undefined){
+      icon.classList.add('show', isCorrect?'ok':'bad');
+      icon.textContent = isCorrect ? '✓':'✗';
+    }
+    card.classList.remove('correct','incorrect');
+    card.classList.add((isCorrect && !anyRowWrong) ? 'correct':'incorrect');
+    card.querySelector('.explain').classList.add('show');
+  });
+  updateScoreLive();
+}
+
+function revealAll(){
+  args.forEach((a, ai)=>{
+    const card = listEl.children[ai];
+    card.querySelectorAll('.cell-wrap').forEach(w=>{
+      w.dataset.value = w.dataset.correct;
+      w.querySelector('.toggle').classList.toggle('on', w.dataset.correct==='1');
+      w.classList.remove('ok','bad');
+      w.classList.add('ok');
+      w.querySelector('.mark').textContent = '✓';
+    });
+    const seg = card.querySelector('[data-role="validity"]');
+    const correctVal = a.valid ? 'valid':'invalid';
+    seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','valid-sel','invalid-sel'));
+    const btn = seg.querySelector(`button[data-val="${correctVal}"]`);
+    btn.classList.add('sel', correctVal==='valid' ? 'valid-sel':'invalid-sel');
+    seg.dataset.value = correctVal;
+    const icon = card.querySelector('[data-icon="validity"]');
+    icon.classList.add('show','ok');
+    icon.textContent = '✓';
+    card.classList.remove('incorrect');
+    card.classList.add('correct');
+    card.querySelector('.explain').classList.add('show');
+  });
+  document.getElementById('scoreDisplay').textContent = TOTAL + ' / ' + TOTAL;
+}
+
+function resetAll(){
+  document.querySelectorAll('.cell-wrap').forEach(w=>{
+    w.dataset.value = '0';
+    w.querySelector('.toggle').classList.remove('on');
+    w.classList.remove('ok','bad');
+    w.querySelector('.mark').textContent = '';
+  });
+  args.forEach((a, ai)=>{
+    const card = listEl.children[ai];
+    card.classList.remove('correct','incorrect');
+    const seg = card.querySelector('[data-role="validity"]');
+    delete seg.dataset.value;
+    seg.querySelectorAll('button').forEach(b=>b.classList.remove('sel','valid-sel','invalid-sel'));
+    const icon = card.querySelector('[data-icon="validity"]');
+    icon.classList.remove('show','ok','bad');
+    icon.textContent = '';
+    card.querySelector('.explain').classList.remove('show');
+  });
+  document.getElementById('scoreDisplay').textContent = '0 / ' + TOTAL;
+}
+</script>
+</body>
+</html>
