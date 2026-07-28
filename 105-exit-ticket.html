@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exit Ticket · Connectives</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+    --lv1:#7FA79A; --lv2:#4F8A73; --lv3:#C79A3E; --lv4:#C17A3A; --lv5:#B5493D;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);background-image:radial-gradient(circle at 1px 1px, rgba(28,43,51,0.06) 1px, transparent 0);background-size:22px 22px;font-family:'IBM Plex Sans',sans-serif;color:var(--ink);padding:36px 16px 60px;}
+  .wrap{max-width:640px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(26px,5vw,34px);margin:0 0 4px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14px;margin-bottom:28px;}
+
+  .ticket{position:relative;background:var(--card);border-radius:14px;box-shadow:0 18px 40px -18px rgba(28,43,51,.35), 0 1px 0 rgba(28,43,51,.05);transform:rotate(0.6deg);padding:24px 26px;margin-bottom:30px;border:1px solid rgba(28,43,51,.08);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .ticket h2{font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin:0 0 6px;}
+  .ticket p{margin:0;color:var(--ink-soft);font-size:13.5px;line-height:1.5;}
+  .badge{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:var(--gold);color:var(--ink);padding:6px 10px;border-radius:20px;white-space:nowrap;}
+
+  .q-card{background:var(--card);border-radius:12px;padding:18px 20px;margin-bottom:14px;border:1px solid rgba(28,43,51,.08);box-shadow:0 6px 16px -12px rgba(28,43,51,.4);}
+  .q-top{display:flex;gap:10px;align-items:center;margin-bottom:8px;}
+  .q-num{font-family:'Fraunces',serif;font-weight:600;font-size:15px;color:var(--ink-soft);min-width:26px;}
+  .lvl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#fff;padding:3px 8px;border-radius:20px;}
+  .lv1{background:var(--lv1);} .lv2{background:var(--lv2);} .lv3{background:var(--lv3);}
+  .lv4{background:var(--lv4);} .lv5{background:var(--lv5);}
+  .q-text{font-size:15px;line-height:1.55;margin:0 0 10px;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;}
+
+  .reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:6px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .reveal-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
+
+  .answer{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .q-card.revealed .answer{max-height:420px;opacity:1;margin-top:12px;}
+  .answer-inner{border-top:1px dashed var(--line);padding-top:12px;font-size:14px;line-height:1.6;display:flex;gap:12px;align-items:flex-start;}
+  .stamp{flex-shrink:0;display:inline-block;border:2.5px solid var(--teal);color:var(--teal);padding:5px 10px;border-radius:7px;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px;letter-spacing:.06em;transform:rotate(-8deg) scale(.7);opacity:0;mix-blend-mode:multiply;transition:all .4s cubic-bezier(.2,1.7,.4,1);white-space:nowrap;margin-top:2px;}
+  .q-card.revealed .stamp{opacity:1;transform:rotate(-8deg) scale(1);}
+  .stamp.brick{border-color:var(--brick);color:var(--brick);}
+  .stamp.gold{border-color:var(--gold);color:#8a6a24;}
+
+  .reflect{background:#fff;border:1.5px solid var(--gold);border-radius:12px;padding:16px 18px;margin-top:6px;font-size:13.5px;color:var(--ink-soft);}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:30px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Exit Ticket</h1>
+  <p class="sub">Topic 2 — Connectives</p>
+
+  <div class="ticket">
+    <div>
+      <h2>Wrapping Up Connectives</h2>
+      <p>Before you go — show me what stuck. Compare your Entry Ticket instincts to what you now know formally.</p>
+    </div>
+    <div class="badge">5 min</div>
+  </div>
+
+  <div class="q-card" id="q1"><div class="q-top"><span class="q-num">1</span><span class="lvl lv2">Lv2</span></div>
+    <p class="q-text">List all five connectives covered today with their symbols.</p>
+    <button class="reveal-btn" onclick="toggle('q1')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">DEF</span><span>Negation <span class="mono">¬</span>, Conjunction <span class="mono">∧</span>, Disjunction <span class="mono">∨</span>, Conditional <span class="mono">→</span>, Biconditional <span class="mono">↔</span>.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q2"><div class="q-top"><span class="q-num">2</span><span class="lvl lv2">Lv2</span></div>
+    <p class="q-text">Given <span class="mono">p</span> = True, <span class="mono">q</span> = True, evaluate <span class="mono">p ↔ q</span>.</p>
+    <button class="reveal-btn" onclick="toggle('q2')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">TRUE</span><span>Both share the same truth value (both True), so the biconditional holds.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q3"><div class="q-top"><span class="q-num">3</span><span class="lvl lv3">Lv3</span></div>
+    <p class="q-text">Let <span class="mono">p</span>: "the alarm rings," <span class="mono">q</span>: "I wake up." Translate: "The alarm rings but I don't wake up."</p>
+    <button class="reveal-btn" onclick="toggle('q3')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">✓</span><span><span class="mono">p ∧ ¬q</span> — "but" behaves just like "and" in logic.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q4"><div class="q-top"><span class="q-num">4</span><span class="lvl lv3">Lv3</span></div>
+    <p class="q-text">Given <span class="mono">p</span> = False, <span class="mono">q</span> = True, evaluate <span class="mono">p → q</span>.</p>
+    <button class="reveal-btn" onclick="toggle('q4')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">TRUE</span><span>The conditional is only False when p is True and q is False. Here p is already False, so it's automatically True.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q5"><div class="q-top"><span class="q-num">5</span><span class="lvl lv4">Lv4</span></div>
+    <p class="q-text">Return to your Entry Ticket Q9 (rain / umbrella). Now, formally: what truth value does <span class="mono">p → q</span> take when <span class="mono">p</span> is False, no matter what <span class="mono">q</span> is?</p>
+    <button class="reveal-btn" onclick="toggle('q5')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">ALWAYS TRUE</span><span>Whenever the antecedent is False, the conditional is vacuously True — this matches your entry-ticket instinct that the sentence "makes no promise" when it doesn't rain.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q6"><div class="q-top"><span class="q-num">6</span><span class="lvl lv4">Lv4</span></div>
+    <p class="q-text">A classmate says <span class="mono">p ∨ q</span> and <span class="mono">p ⊕ q</span> are interchangeable. Give the one truth-value combination where they disagree.</p>
+    <button class="reveal-btn" onclick="toggle('q6')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp brick">DISAGREE</span><span>When <span class="mono">p</span> = True and <span class="mono">q</span> = True: <span class="mono">p ∨ q</span> = True, but <span class="mono">p ⊕ q</span> = False.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q7"><div class="q-top"><span class="q-num">7</span><span class="lvl lv5">Lv5</span></div>
+    <p class="q-text">Write a compound sentence from your own life using a biconditional (<span class="mono">↔</span>), and explain what it takes for your sentence to be True.</p>
+    <button class="reveal-btn" onclick="toggle('q7')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">🧩 OPEN</span><span>Sample: "I get a certificate if and only if I attend all sessions." True exactly when both halves match — either both happen, or neither does. Many valid answers.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q8"><div class="q-top"><span class="q-num">8</span><span class="lvl lv3">Lv3</span></div>
+    <p class="q-text">Translate: "Neither the printer nor the scanner is working," using <span class="mono">p</span>: "printer works," <span class="mono">q</span>: "scanner works."</p>
+    <button class="reveal-btn" onclick="toggle('q8')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">✓</span><span><span class="mono">¬p ∧ ¬q</span> — "neither... nor" negates both and joins them with "and."</span></div></div>
+  </div>
+
+  <div class="q-card" id="q9"><div class="q-top"><span class="q-num">9</span><span class="lvl lv5">Lv5</span></div>
+    <p class="q-text"><strong>Predict:</strong> next class we ask whether a compound statement can be True <em>no matter what</em> truth values its parts take. What do you think such a statement would be called?</p>
+    <button class="reveal-btn" onclick="toggle('q9')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp gold">🔮 NEXT</span><span>A <strong>tautology</strong> — a compound statement that comes out True in every single row of its truth table. That's exactly Topic 3.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q10"><div class="q-top"><span class="q-num">10</span><span class="lvl lv2">Lv2</span></div>
+    <p class="q-text">Muddiest point: which connective (or translation rule) are you least confident about?</p>
+    <div class="reflect">Write freely — there's no "reveal" here. I'll address the most common muddy points at the start of next class.</div>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Topic 2 Exit Ticket — see you at Topic 3: Tautologies &amp; Logic</footer>
+</div>
+
+<script>function toggle(id){ document.getElementById(id).classList.toggle('revealed'); }</script>
+</body>
+</html>

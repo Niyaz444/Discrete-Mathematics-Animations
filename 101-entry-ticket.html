@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entry Ticket · Connectives</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+    --lv1:#7FA79A; --lv2:#4F8A73; --lv3:#C79A3E; --lv4:#C17A3A; --lv5:#B5493D;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);background-image:radial-gradient(circle at 1px 1px, rgba(28,43,51,0.06) 1px, transparent 0);background-size:22px 22px;font-family:'IBM Plex Sans',sans-serif;color:var(--ink);padding:36px 16px 60px;}
+  .wrap{max-width:640px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(26px,5vw,34px);margin:0 0 4px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14px;margin-bottom:28px;}
+
+  .ticket{position:relative;background:var(--card);border-radius:14px;box-shadow:0 18px 40px -18px rgba(28,43,51,.35), 0 1px 0 rgba(28,43,51,.05);transform:rotate(-0.6deg);padding:24px 26px;margin-bottom:30px;border:1px solid rgba(28,43,51,.08);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .ticket h2{font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin:0 0 6px;}
+  .ticket p{margin:0;color:var(--ink-soft);font-size:13.5px;line-height:1.5;}
+  .badge{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:var(--ink);color:var(--paper);padding:6px 10px;border-radius:20px;white-space:nowrap;}
+
+  .q-card{background:var(--card);border-radius:12px;padding:18px 20px;margin-bottom:14px;border:1px solid rgba(28,43,51,.08);box-shadow:0 6px 16px -12px rgba(28,43,51,.4);}
+  .q-top{display:flex;gap:10px;align-items:center;margin-bottom:8px;}
+  .q-num{font-family:'Fraunces',serif;font-weight:600;font-size:15px;color:var(--ink-soft);min-width:26px;}
+  .lvl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#fff;padding:3px 8px;border-radius:20px;}
+  .lv1{background:var(--lv1);} .lv2{background:var(--lv2);} .lv3{background:var(--lv3);}
+  .lv4{background:var(--lv4);} .lv5{background:var(--lv5);}
+  .q-text{font-size:15px;line-height:1.55;margin:0 0 10px;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;}
+
+  .reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:6px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .reveal-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
+
+  .answer{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .q-card.revealed .answer{max-height:400px;opacity:1;margin-top:12px;}
+  .answer-inner{border-top:1px dashed var(--line);padding-top:12px;font-size:14px;line-height:1.6;display:flex;gap:12px;align-items:flex-start;}
+  .stamp{flex-shrink:0;display:inline-block;border:2.5px solid var(--teal);color:var(--teal);padding:5px 10px;border-radius:7px;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px;letter-spacing:.06em;transform:rotate(-8deg) scale(.7);opacity:0;mix-blend-mode:multiply;transition:all .4s cubic-bezier(.2,1.7,.4,1);white-space:nowrap;margin-top:2px;}
+  .q-card.revealed .stamp{opacity:1;transform:rotate(-8deg) scale(1);}
+  .stamp.brick{border-color:var(--brick);color:var(--brick);}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:30px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Entry Ticket</h1>
+  <p class="sub">Topic 2 — Connectives</p>
+
+  <div class="ticket">
+    <div>
+      <h2>Joining Statements</h2>
+      <p>10 quick-fire questions. We know what a statement is — today we start gluing them together with "not," "and," "or," and "if... then."</p>
+    </div>
+    <div class="badge">5 min</div>
+  </div>
+
+  <div class="q-card" id="q1"><div class="q-top"><span class="q-num">1</span><span class="lvl lv1">Lv1</span></div>
+    <p class="q-text">Recap: is <em>"x − 1 = 6"</em> a statement? Why or why not?</p>
+    <button class="reveal-btn" onclick="toggle('q1')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp brick">✗ NO</span><span>It's an open sentence — <span class="mono">x</span> is a free variable, so no fixed truth value exists yet.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q2"><div class="q-top"><span class="q-num">2</span><span class="lvl lv1">Lv1</span></div>
+    <p class="q-text">In everyday speech, for <em>"I'll pass and I'll celebrate"</em> to be true, how many of the two parts need to actually happen?</p>
+    <button class="reveal-btn" onclick="toggle('q2')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">BOTH</span><span>Both parts must hold. "And" is the strictest way to combine two claims — it demands everything.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q3"><div class="q-top"><span class="q-num">3</span><span class="lvl lv1">Lv1</span></div>
+    <p class="q-text">True or False: the word "not" simply flips a statement's truth value.</p>
+    <button class="reveal-btn" onclick="toggle('q3')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">✓ TRUE</span><span>True becomes False and False becomes True — nothing more complicated than that.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q4"><div class="q-top"><span class="q-num">4</span><span class="lvl lv2">Lv2</span></div>
+    <p class="q-text">Guess: if <span class="mono">p</span> is True and <span class="mono">q</span> is False, do you think <em>"p and q"</em> is True or False?</p>
+    <button class="reveal-btn" onclick="toggle('q4')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp brick">FALSE</span><span>"And" needs every part to be true. One False part is enough to sink the whole combined claim.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q5"><div class="q-top"><span class="q-num">5</span><span class="lvl lv2">Lv2</span></div>
+    <p class="q-text">Same <span class="mono">p</span> True, <span class="mono">q</span> False — guess: is <em>"p or q"</em> True or False?</p>
+    <button class="reveal-btn" onclick="toggle('q5')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">TRUE</span><span>"Or" only needs one part to hold. Since <span class="mono">p</span> is True, the whole claim survives.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q6"><div class="q-top"><span class="q-num">6</span><span class="lvl lv2">Lv2</span></div>
+    <p class="q-text">"Coffee or tea?" usually means pick exactly one. "Study hard or you'll fail" allows doing both (studying hard AND still somehow failing isn't the point — the "or" here isn't demanding exclusivity). Why might mathematicians dislike this inconsistency in English?</p>
+    <button class="reveal-btn" onclick="toggle('q6')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">💡 IDEA</span><span>A symbol needs one fixed meaning to build reliable truth tables. So logic picks one "or" as the default (allowing both) and gives the "exactly one" version its own separate symbol.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q7"><div class="q-top"><span class="q-num">7</span><span class="lvl lv3">Lv3</span></div>
+    <p class="q-text">Predict: if a statement has 2 building-block parts (<span class="mono">p</span> and <span class="mono">q</span>), each True or False, how many total combinations of truth values are possible?</p>
+    <button class="reveal-btn" onclick="toggle('q7')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">4</span><span>Two choices for <span class="mono">p</span> × two choices for <span class="mono">q</span> = 4 combinations (TT, TF, FT, FF). This is why a 2-statement truth table always has 4 rows.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q8"><div class="q-top"><span class="q-num">8</span><span class="lvl lv3">Lv3</span></div>
+    <p class="q-text">Why do you think mathematics needs the "allows both" version of "or" as the standard one, rather than "exactly one"?</p>
+    <button class="reveal-btn" onclick="toggle('q8')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">💡 IDEA</span><span>It matches how "or" behaves in most careful reasoning and proofs — e.g. "n is divisible by 2 or 3" should stay true even for 6, which is divisible by both.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q9"><div class="q-top"><span class="q-num">9</span><span class="lvl lv4">Lv4</span></div>
+    <p class="q-text">Consider: <em>"If it rains, I carry an umbrella."</em> If it does NOT rain, does this sentence force you to carry — or not carry — an umbrella?</p>
+    <button class="reveal-btn" onclick="toggle('q9')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">NEITHER</span><span>The sentence makes no promise at all about what happens when it doesn't rain. It only commits to something in the "if it rains" case.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q10"><div class="q-top"><span class="q-num">10</span><span class="lvl lv5">Lv5</span></div>
+    <p class="q-text">One-line guess: when we combine "not," "and," "or" in one long sentence, do you think order matters — the way it does with <span class="mono">+</span> and <span class="mono">×</span> in arithmetic?</p>
+    <button class="reveal-btn" onclick="toggle('q10')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">🔮 PREVIEW</span><span>Yes — logic has its own order of operations, just like arithmetic. We'll pin down exactly which connective "binds tighter" today.</span></div></div>
+  </div>
+
+  <footer>Keep this ticket — we'll revisit Q9 and Q10 later in the unit.</footer>
+</div>
+
+<script>function toggle(id){document.getElementById(id).classList.toggle('revealed');}</script>
+</body>
+</html>

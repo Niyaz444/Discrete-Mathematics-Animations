@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exit Ticket · Tautologies, Logic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+    --lv1:#7FA79A; --lv2:#4F8A73; --lv3:#C79A3E; --lv4:#C17A3A; --lv5:#B5493D;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);background-image:radial-gradient(circle at 1px 1px, rgba(28,43,51,0.06) 1px, transparent 0);background-size:22px 22px;font-family:'IBM Plex Sans',sans-serif;color:var(--ink);padding:36px 16px 60px;}
+  .wrap{max-width:640px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(26px,5vw,34px);margin:0 0 4px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14px;margin-bottom:28px;}
+
+  .ticket{position:relative;background:var(--card);border-radius:14px;box-shadow:0 18px 40px -18px rgba(28,43,51,.35), 0 1px 0 rgba(28,43,51,.05);transform:rotate(0.6deg);padding:24px 26px;margin-bottom:30px;border:1px solid rgba(28,43,51,.08);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .ticket h2{font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin:0 0 6px;}
+  .ticket p{margin:0;color:var(--ink-soft);font-size:13.5px;line-height:1.5;}
+  .badge{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:var(--gold);color:var(--ink);padding:6px 10px;border-radius:20px;white-space:nowrap;}
+
+  .q-card{background:var(--card);border-radius:12px;padding:18px 20px;margin-bottom:14px;border:1px solid rgba(28,43,51,.08);box-shadow:0 6px 16px -12px rgba(28,43,51,.4);}
+  .q-top{display:flex;gap:10px;align-items:center;margin-bottom:8px;}
+  .q-num{font-family:'Fraunces',serif;font-weight:600;font-size:15px;color:var(--ink-soft);min-width:26px;}
+  .lvl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#fff;padding:3px 8px;border-radius:20px;}
+  .lv1{background:var(--lv1);} .lv2{background:var(--lv2);} .lv3{background:var(--lv3);}
+  .lv4{background:var(--lv4);} .lv5{background:var(--lv5);}
+  .q-text{font-size:15px;line-height:1.55;margin:0 0 10px;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;}
+
+  .reveal-btn{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:6px 12px;border-radius:20px;cursor:pointer;transition:.2s ease;}
+  .reveal-btn:hover{background:var(--ink);color:var(--paper);}
+  .reveal-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
+
+  .answer{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .q-card.revealed .answer{max-height:420px;opacity:1;margin-top:12px;}
+  .answer-inner{border-top:1px dashed var(--line);padding-top:12px;font-size:14px;line-height:1.6;display:flex;gap:12px;align-items:flex-start;}
+  .stamp{flex-shrink:0;display:inline-block;border:2.5px solid var(--teal);color:var(--teal);padding:5px 10px;border-radius:7px;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px;letter-spacing:.06em;transform:rotate(-8deg) scale(.7);opacity:0;mix-blend-mode:multiply;transition:all .4s cubic-bezier(.2,1.7,.4,1);white-space:nowrap;margin-top:2px;}
+  .q-card.revealed .stamp{opacity:1;transform:rotate(-8deg) scale(1);}
+  .stamp.brick{border-color:var(--brick);color:var(--brick);}
+  .stamp.gold{border-color:var(--gold);color:#8a6a24;}
+
+  .reflect{background:#fff;border:1.5px solid var(--gold);border-radius:12px;padding:16px 18px;margin-top:6px;font-size:13.5px;color:var(--ink-soft);}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:30px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Exit Ticket</h1>
+  <p class="sub">Topic 3 — Tautologies, Logic</p>
+
+  <div class="ticket">
+    <div>
+      <h2>Always, Never, Sometimes — Revisited</h2>
+      <p>Before you go — show me what stuck. Compare your Entry Ticket guesses to what you now know formally.</p>
+    </div>
+    <div class="badge">5 min</div>
+  </div>
+
+  <div class="q-card" id="q1"><div class="q-top"><span class="q-num">1</span><span class="lvl lv2">Lv2</span></div>
+    <p class="q-text">Name the three classifications a compound statement can fall into, based on its truth table.</p>
+    <button class="reveal-btn" onclick="toggle('q1')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">DEF</span><span><strong>Tautology</strong> (all True), <strong>Contradiction</strong> (all False), <strong>Contingency</strong> (mixed).</span></div></div>
+  </div>
+
+  <div class="q-card" id="q2"><div class="q-top"><span class="q-num">2</span><span class="lvl lv3">Lv3</span></div>
+    <p class="q-text">Classify <span class="mono">q ∨ ¬q</span> without drawing a table.</p>
+    <button class="reveal-btn" onclick="toggle('q2')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">TAUTOLOGY</span><span>Same pattern as <span class="mono">p ∨ ¬p</span> — one of the two sides is always True.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q3"><div class="q-top"><span class="q-num">3</span><span class="lvl lv3">Lv3</span></div>
+    <p class="q-text">Classify <span class="mono">r ∧ ¬r</span> without drawing a table.</p>
+    <button class="reveal-btn" onclick="toggle('q3')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp brick">CONTRADICTION</span><span>A statement and its negation can never both be True.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q4"><div class="q-top"><span class="q-num">4</span><span class="lvl lv3">Lv3</span></div>
+    <p class="q-text">Classify <span class="mono">p ↔ q</span>. Is it a tautology, contradiction, or contingency?</p>
+    <button class="reveal-btn" onclick="toggle('q4')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp gold">CONTINGENCY</span><span>True when p and q match (both T or both F), False when they differ — depends on the inputs.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q5"><div class="q-top"><span class="q-num">5</span><span class="lvl lv4">Lv4</span></div>
+    <p class="q-text">Go back to your Entry Ticket Q2 (rain or no rain). Now, formally, what makes <span class="mono">p ∨ ¬p</span> a tautology rather than just "usually true"?</p>
+    <button class="reveal-btn" onclick="toggle('q5')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">💡</span><span>It's not just usually true — every single row of its truth table comes out True, with zero exceptions. That's the strict requirement for "tautology."</span></div></div>
+  </div>
+
+  <div class="q-card" id="q6"><div class="q-top"><span class="q-num">6</span><span class="lvl lv4">Lv4</span></div>
+    <p class="q-text">Is <span class="mono">p → (p ∨ q)</span> satisfiable? Is it a tautology? Explain both.</p>
+    <button class="reveal-btn" onclick="toggle('q6')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">BOTH YES</span><span>It's a tautology (True in every row), and every tautology is automatically satisfiable too, since "True in every row" certainly includes "True in at least one."</span></div></div>
+  </div>
+
+  <div class="q-card" id="q7"><div class="q-top"><span class="q-num">7</span><span class="lvl lv5">Lv5</span></div>
+    <p class="q-text">Construct your own contradiction using <span class="mono">p</span> and <span class="mono">q</span> (not just <span class="mono">p ∧ ¬p</span> repeated). Explain why every row fails.</p>
+    <button class="reveal-btn" onclick="toggle('q7')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">🧩 OPEN</span><span>Sample: <span class="mono">(p → q) ∧ p ∧ ¬q</span>. If p is True and q is False, p→q itself fails — so the whole conjunction can never be True. Many valid answers.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q8"><div class="q-top"><span class="q-num">8</span><span class="lvl lv2">Lv2</span></div>
+    <p class="q-text">True or False: every contingency is satisfiable.</p>
+    <button class="reveal-btn" onclick="toggle('q8')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp">✓ TRUE</span><span>By definition a contingency has at least one True row — that's exactly what "satisfiable" requires.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q9"><div class="q-top"><span class="q-num">9</span><span class="lvl lv5">Lv5</span></div>
+    <p class="q-text"><strong>Predict:</strong> next class we ask whether two <em>different-looking</em> compound statements can secretly always match, row for row. What do you think that relationship would be called?</p>
+    <button class="reveal-btn" onclick="toggle('q9')">Tap to reveal</button>
+    <div class="answer"><div class="answer-inner"><span class="stamp gold">🔮 NEXT</span><span><strong>Logical equivalence</strong> — two statements that agree on every row of their truth tables, even though they look different. That's exactly Topic 4: Propositional Equivalence.</span></div></div>
+  </div>
+
+  <div class="q-card" id="q10"><div class="q-top"><span class="q-num">10</span><span class="lvl lv2">Lv2</span></div>
+    <p class="q-text">Muddiest point: which classification (tautology / contradiction / contingency) are you least confident spotting quickly?</p>
+    <div class="reflect">Write freely — there's no "reveal" here. I'll address the most common muddy points at the start of next class.</div>
+  </div>
+
+  <footer>Discrete Mathematics · Module 1 · Topic 3 Exit Ticket — see you at Topic 4: Propositional Equivalence</footer>
+</div>
+
+<script>function toggle(id){ document.getElementById(id).classList.toggle('revealed'); }</script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz · Tautologies, Logic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+    --lv1:#7FA79A; --lv2:#4F8A73; --lv3:#C79A3E; --lv4:#C17A3A; --lv5:#B5493D;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);font-family:'IBM Plex Sans',sans-serif;color:var(--ink);}
+  .wrap{max-width:720px;margin:0 auto;padding:36px 16px 70px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(26px,5vw,36px);margin:0 0 4px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14px;margin-bottom:20px;}
+
+  .score-bar{position:sticky;top:12px;z-index:10;display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:#F4F2EA;border-radius:14px;padding:12px 18px;font-family:'IBM Plex Mono',monospace;font-size:13px;margin-bottom:28px;box-shadow:0 10px 26px -14px rgba(28,43,51,.6);}
+  .score-bar strong{color:var(--gold);font-size:16px;}
+  .reset-btn{background:transparent;border:1.5px solid #F4F2EA;color:#F4F2EA;border-radius:20px;padding:5px 12px;font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;text-transform:uppercase;letter-spacing:.05em;}
+  .reset-btn:hover{background:#F4F2EA;color:var(--ink);}
+
+  .q-card{background:var(--card);border-radius:12px;padding:18px 20px;margin-bottom:16px;border:1px solid rgba(28,43,51,.08);box-shadow:0 6px 16px -12px rgba(28,43,51,.35);}
+  .q-top{display:flex;gap:10px;align-items:center;margin-bottom:8px;}
+  .q-num{font-family:'Fraunces',serif;font-weight:600;font-size:15px;color:var(--ink-soft);min-width:20px;}
+  .lvl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#fff;padding:3px 8px;border-radius:20px;}
+  .lv1{background:var(--lv1);} .lv2{background:var(--lv2);} .lv3{background:var(--lv3);}
+  .lv4{background:var(--lv4);} .lv5{background:var(--lv5);}
+  .q-text{font-size:15px;line-height:1.55;margin:0 0 12px;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;}
+
+  .opts{display:flex;flex-direction:column;gap:8px;}
+  .opt{text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;transition:.15s ease;font-family:'IBM Plex Sans',sans-serif;}
+  .opt:hover{border-color:var(--ink);}
+  .opt.correct{border-color:var(--teal);background:#EAF4F0;color:var(--teal);font-weight:600;}
+  .opt.wrong{border-color:var(--brick);background:#F8ECEA;color:var(--brick);font-weight:600;}
+  .opt[disabled]{cursor:default;}
+
+  .explain{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .q-card.answered .explain{max-height:300px;opacity:1;margin-top:12px;}
+  .explain-inner{border-top:1px dashed var(--line);padding-top:10px;font-size:13.5px;line-height:1.6;display:flex;gap:10px;align-items:flex-start;}
+  .stamp{flex-shrink:0;display:inline-block;border:2px solid var(--teal);color:var(--teal);padding:3px 9px;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:10.5px;letter-spacing:.05em;white-space:nowrap;margin-top:2px;}
+  .stamp.brick{border-color:var(--brick);color:var(--brick);}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:36px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Quiz</h1>
+  <p class="sub">Topic 3 — Tautologies, Logic · 15 questions, Level 1 → 5</p>
+
+  <div class="score-bar">
+    <span>Score: <strong id="scoreDisplay">0 / 0</strong></span>
+    <button class="reset-btn" onclick="resetQuiz()">Reset</button>
+  </div>
+
+  <div id="quiz"></div>
+
+  <footer>Discrete Mathematics · Module 1 · Topic 3 Quiz — self-check only, doesn't record anywhere</footer>
+</div>
+
+<script>
+const questions = [
+  {lvl:1, q:'A tautology is a compound statement that is:', opts:['Always False regardless of components','Always True regardless of components','True only when all components are True','Sometimes True and sometimes False'], correct:1, why:'A tautology comes out True in every single row of its truth table, no matter the inputs.'},
+  {lvl:1, q:'A contradiction (fallacy) is a compound statement that is:', opts:['Always True regardless of components','True only when all components are False','Sometimes True and sometimes False','Always False regardless of components'], correct:3, why:'A contradiction comes out False in every single row of its truth table.'},
+  {lvl:1, q:'A contingency is a compound statement that is:', opts:['Sometimes True and sometimes False depending on inputs','Always True','Always False','Undefined'], correct:0, why:'A contingency\'s truth value genuinely depends on the inputs — some rows True, some False.'},
+  {lvl:1, q:'Which of these is a classic tautology?', opts:['p ∧ ¬p','p ∧ q','p ∨ ¬p','p → q'], correct:2, why:'p ∨ ¬p is the Law of Excluded Middle — always True.'},
+  {lvl:2, q:'Which of these is a classic contradiction?', opts:['p ∨ ¬p','p ∧ ¬p','p → p','p ↔ p'], correct:1, why:'p ∧ ¬p is the Law of Non-Contradiction — always False.'},
+  {lvl:2, q:'Is p → p a tautology, contradiction, or contingency?', opts:['Tautology','Contradiction','Contingency','Cannot be determined'], correct:0, why:'Antecedent and consequent are identical, so the conditional can never fail — True in every row.'},
+  {lvl:2, q:'Is p ∨ q a tautology, contradiction, or contingency?', opts:['Tautology','Contradiction','Neither — it is undefined','Contingency'], correct:3, why:'False only when both p and q are False; True in the other three rows — depends on inputs.'},
+  {lvl:2, q:'How many rows does a truth table need to test a statement with 3 variables (p, q, r)?', opts:['3','6','8','9'], correct:2, why:'2³ = 8 combinations of True/False across three variables.'},
+  {lvl:3, q:'Evaluate (p ∧ q) → p across all rows. What type is it?', opts:['Tautology','Contradiction','Contingency','Satisfiable but not a tautology'], correct:0, why:'Whenever p ∧ q is True, p is certainly True too — the implication can never be broken.'},
+  {lvl:3, q:'Evaluate p ↔ ¬p. What type is it?', opts:['Tautology','Contingency','Satisfiable','Contradiction'], correct:3, why:'p and ¬p never share the same truth value, so the biconditional fails in every row.'},
+  {lvl:3, q:'A statement is called "satisfiable" if:', opts:['It is always True','It is True in at least one row of its truth table','It is always False','It has exactly one variable'], correct:1, why:'Satisfiable just means there\'s at least one row where it comes out True.'},
+  {lvl:4, q:'Evaluate ((p → q) ∧ p) → q for all truth values. What type is it?', opts:['Contradiction','Contingency','Tautology','Neither of the three — it is undefined'], correct:2, why:'This is the Modus Ponens pattern: whenever p→q and p both hold, q must hold — never fails.'},
+  {lvl:4, q:'Which statement below is a contradiction?', opts:['(p ∨ q) ∧ ¬p ∧ ¬q','p ∨ ¬p','p → p','p ∨ q'], correct:0, why:'¬p ∧ ¬q forces both False, which directly contradicts p ∨ q being required True — no row can satisfy all three pieces.'},
+  {lvl:4, q:'Without building the full table, why must ¬(p ∧ ¬p) be a tautology?', opts:['Because negation always produces a tautology','Because p ∧ ¬p is always False, so its negation is always True','Because it contains only one variable','It is not actually a tautology'], correct:1, why:'p ∧ ¬p is a known contradiction (always False); negating an always-False statement gives an always-True one.'},
+  {lvl:5, q:'Which best explains why tautologies are useful inside longer mathematical proofs?', opts:['They are shorter to write','They only work for two variables','They eliminate the need for truth tables entirely','They are guaranteed true, so they can be used as a reliable stepping stone in any proof, regardless of the situation'], correct:3, why:'Because a tautology never fails, a proof can lean on it at any point without first checking conditions.'}
+];
+
+const quizEl = document.getElementById('quiz');
+let answeredCount = 0, correctCount = 0;
+
+questions.forEach((item, qi)=>{
+  const card = document.createElement('div');
+  card.className = 'q-card';
+  card.id = 'quiz-q'+qi;
+  card.innerHTML = `
+    <div class="q-top"><span class="q-num">${qi+1}</span><span class="lvl lv${item.lvl}">Lv${item.lvl}</span></div>
+    <p class="q-text">${item.q}</p>
+    <div class="opts">
+      ${item.opts.map((o,oi)=>`<button class="opt" data-oi="${oi}">${o}</button>`).join('')}
+    </div>
+    <div class="explain"><div class="explain-inner">
+      <span class="stamp" id="stamp-${qi}">RESULT</span>
+      <span>${item.why}</span>
+    </div></div>
+  `;
+  quizEl.appendChild(card);
+
+  const buttons = card.querySelectorAll('.opt');
+  buttons.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(card.classList.contains('answered')) return;
+      const chosen = parseInt(btn.dataset.oi);
+      const isCorrect = chosen === item.correct;
+      buttons.forEach((b,bi)=>{
+        b.disabled = true;
+        if(bi === item.correct) b.classList.add('correct');
+        else if(bi === chosen) b.classList.add('wrong');
+      });
+      const stamp = document.getElementById('stamp-'+qi);
+      if(isCorrect){ stamp.textContent='✓ CORRECT'; stamp.classList.remove('brick'); correctCount++; }
+      else { stamp.textContent='✗ REVIEW'; stamp.classList.add('brick'); }
+      card.classList.add('answered');
+      answeredCount++;
+      updateScore();
+    });
+  });
+});
+
+function updateScore(){
+  document.getElementById('scoreDisplay').textContent = correctCount + ' / ' + answeredCount;
+}
+
+function resetQuiz(){
+  answeredCount = 0; correctCount = 0;
+  updateScore();
+  document.querySelectorAll('.q-card').forEach(card=>{
+    card.classList.remove('answered');
+    card.querySelectorAll('.opt').forEach(b=>{
+      b.disabled=false; b.classList.remove('correct','wrong');
+    });
+  });
+  document.querySelectorAll('.stamp').forEach(s=>{ s.textContent='RESULT'; s.classList.remove('brick'); });
+}
+</script>
+</body>
+</html>

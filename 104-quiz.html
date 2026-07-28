@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz · Connectives</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6; --card:#FFFFFF; --ink:#1C2B33; --ink-soft:#5B6670;
+    --line:#D6D1C1; --teal:#2F7A66; --brick:#B5493D; --gold:#C79A3E;
+    --lv1:#7FA79A; --lv2:#4F8A73; --lv3:#C79A3E; --lv4:#C17A3A; --lv5:#B5493D;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);font-family:'IBM Plex Sans',sans-serif;color:var(--ink);}
+  .wrap{max-width:720px;margin:0 auto;padding:36px 16px 70px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:8px;}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:600;text-align:center;font-size:clamp(26px,5vw,36px);margin:0 0 4px;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:14px;margin-bottom:20px;}
+
+  .score-bar{position:sticky;top:12px;z-index:10;display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:#F4F2EA;border-radius:14px;padding:12px 18px;font-family:'IBM Plex Mono',monospace;font-size:13px;margin-bottom:28px;box-shadow:0 10px 26px -14px rgba(28,43,51,.6);}
+  .score-bar strong{color:var(--gold);font-size:16px;}
+  .reset-btn{background:transparent;border:1.5px solid #F4F2EA;color:#F4F2EA;border-radius:20px;padding:5px 12px;font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;text-transform:uppercase;letter-spacing:.05em;}
+  .reset-btn:hover{background:#F4F2EA;color:var(--ink);}
+
+  .q-card{background:var(--card);border-radius:12px;padding:18px 20px;margin-bottom:16px;border:1px solid rgba(28,43,51,.08);box-shadow:0 6px 16px -12px rgba(28,43,51,.35);}
+  .q-top{display:flex;gap:10px;align-items:center;margin-bottom:8px;}
+  .q-num{font-family:'Fraunces',serif;font-weight:600;font-size:15px;color:var(--ink-soft);min-width:20px;}
+  .lvl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#fff;padding:3px 8px;border-radius:20px;}
+  .lv1{background:var(--lv1);} .lv2{background:var(--lv2);} .lv3{background:var(--lv3);}
+  .lv4{background:var(--lv4);} .lv5{background:var(--lv5);}
+  .q-text{font-size:15px;line-height:1.55;margin:0 0 12px;}
+  .mono{font-family:'IBM Plex Mono',monospace;background:#F3F1E8;padding:1px 5px;border-radius:4px;}
+
+  .opts{display:flex;flex-direction:column;gap:8px;}
+  .opt{text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;transition:.15s ease;font-family:'IBM Plex Sans',sans-serif;}
+  .opt:hover{border-color:var(--ink);}
+  .opt.correct{border-color:var(--teal);background:#EAF4F0;color:var(--teal);font-weight:600;}
+  .opt.wrong{border-color:var(--brick);background:#F8ECEA;color:var(--brick);font-weight:600;}
+  .opt[disabled]{cursor:default;}
+
+  .explain{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease,margin .3s ease;}
+  .q-card.answered .explain{max-height:300px;opacity:1;margin-top:12px;}
+  .explain-inner{border-top:1px dashed var(--line);padding-top:10px;font-size:13.5px;line-height:1.6;display:flex;gap:10px;align-items:flex-start;}
+  .stamp{flex-shrink:0;display:inline-block;border:2px solid var(--teal);color:var(--teal);padding:3px 9px;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:10.5px;letter-spacing:.05em;white-space:nowrap;margin-top:2px;}
+  .stamp.brick{border-color:var(--brick);color:var(--brick);}
+
+  footer{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:36px;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Discrete Mathematics · Module 1 · Predicate Calculus</div>
+  <h1 class="page-title">Quiz</h1>
+  <p class="sub">Topic 2 — Connectives · 15 questions, Level 1 → 5</p>
+
+  <div class="score-bar">
+    <span>Score: <strong id="scoreDisplay">0 / 0</strong></span>
+    <button class="reset-btn" onclick="resetQuiz()">Reset</button>
+  </div>
+
+  <div id="quiz"></div>
+
+  <footer>Discrete Mathematics · Module 1 · Topic 2 Quiz — self-check only, doesn't record anywhere</footer>
+</div>
+
+<script>
+const questions = [
+  {lvl:1, q:'Which symbol represents negation ("not")?', opts:['∧','∨','¬','→'], correct:2, why:'¬ (sometimes written ~) flips a statement\'s truth value.'},
+  {lvl:1, q:'Which symbol represents conjunction ("and")?', opts:['∧','∨','¬','⊕'], correct:0, why:'∧ is the standard symbol for conjunction.'},
+  {lvl:1, q:'p ∧ q is true only when:', opts:['p is true','q is true','at least one is true','both p and q are true'], correct:3, why:'Conjunction demands every part hold — a single false part fails the whole claim.'},
+  {lvl:1, q:'p ∨ q is false only when:', opts:['both p and q are true','both p and q are false','p is true and q is false','p is false and q is true'], correct:1, why:'Disjunction only fails when every part fails — both must be false.'},
+  {lvl:2, q:'Let p: "It is sunny" (True), q: "I go for a walk" (False). What is p ∧ q?', opts:['False','True'], correct:0, why:'One false part is enough to make the conjunction False.'},
+  {lvl:2, q:'Same p (True), q (False). What is p ∨ q?', opts:['False','True'], correct:1, why:'Disjunction only needs one true part — p being True is enough.'},
+  {lvl:2, q:'If p is False, what is ¬p?', opts:['False','True','Undefined','Both True and False'], correct:1, why:'Negation flips the value: False becomes True.'},
+  {lvl:2, q:'Exclusive OR (p ⊕ q) is true when:', opts:['both p and q are true','both p and q are false','at least one of p, q is true','exactly one of p, q is true'], correct:3, why:'⊕ demands exactly one true part — both-true or both-false both fail it.'},
+  {lvl:3, q:'Let p: "it is raining," q: "I carry an umbrella." Translate: "It is not raining and I carry an umbrella."', opts:['p ∧ q','¬p ∨ q','¬p ∧ q','p ∨ ¬q'], correct:2, why:'"Not raining" is ¬p, joined with "and I carry an umbrella" (q) using ∧.'},
+  {lvl:3, q:'Let p: "the exam is postponed," q: "I fail." Translate: "Either the exam is postponed or I fail."', opts:['p ∧ q','¬p ∧ ¬q','p ∨ q','p → q'], correct:2, why:'"Either... or" is disjunction — at least one of the two holds.'},
+  {lvl:3, q:'Translate "You will fail unless you study" with p: "you study," q: "you fail."', opts:['p → q','q → p','¬p ∧ q','¬p → q'], correct:3, why:'"q unless p" means "if not p, then q" — that\'s ¬p → q.'},
+  {lvl:4, q:'Given p = True, q = False, r = True, what is (p ∧ q) ∨ r?', opts:['True','False'], correct:0, why:'p ∧ q = False, but False ∨ r (True) = True overall.'},
+  {lvl:4, q:'Given p = True, q = False, what is ¬(p ∨ q)?', opts:['True','False'], correct:1, why:'p ∨ q = True (since p is True), so its negation is False.'},
+  {lvl:4, q:'Which connective\'s truth-table column reads T, F, F, F for rows TT, TF, FT, FF?', opts:['Conjunction (∧)','Disjunction (∨)','Exclusive OR (⊕)','Biconditional (↔)'], correct:0, why:'Only both-True gives True — that\'s conjunction\'s signature single-True-row pattern.'},
+  {lvl:5, q:'"p ∨ q and p ⊕ q always give the same truth value." True or False?', opts:['False','True'], correct:0, why:'They disagree exactly when both p and q are True: p ∨ q is True there, but p ⊕ q is False.'}
+];
+
+const quizEl = document.getElementById('quiz');
+let answeredCount = 0, correctCount = 0;
+
+questions.forEach((item, qi)=>{
+  const card = document.createElement('div');
+  card.className = 'q-card';
+  card.id = 'quiz-q'+qi;
+  card.innerHTML = `
+    <div class="q-top"><span class="q-num">${qi+1}</span><span class="lvl lv${item.lvl}">Lv${item.lvl}</span></div>
+    <p class="q-text">${item.q}</p>
+    <div class="opts">
+      ${item.opts.map((o,oi)=>`<button class="opt" data-oi="${oi}">${o}</button>`).join('')}
+    </div>
+    <div class="explain"><div class="explain-inner">
+      <span class="stamp" id="stamp-${qi}">RESULT</span>
+      <span>${item.why}</span>
+    </div></div>
+  `;
+  quizEl.appendChild(card);
+
+  const buttons = card.querySelectorAll('.opt');
+  buttons.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(card.classList.contains('answered')) return;
+      const chosen = parseInt(btn.dataset.oi);
+      const isCorrect = chosen === item.correct;
+      buttons.forEach((b,bi)=>{
+        b.disabled = true;
+        if(bi === item.correct) b.classList.add('correct');
+        else if(bi === chosen) b.classList.add('wrong');
+      });
+      const stamp = document.getElementById('stamp-'+qi);
+      if(isCorrect){ stamp.textContent='✓ CORRECT'; stamp.classList.remove('brick'); correctCount++; }
+      else { stamp.textContent='✗ REVIEW'; stamp.classList.add('brick'); }
+      card.classList.add('answered');
+      answeredCount++;
+      updateScore();
+    });
+  });
+});
+
+function updateScore(){
+  document.getElementById('scoreDisplay').textContent = correctCount + ' / ' + answeredCount;
+}
+
+function resetQuiz(){
+  answeredCount = 0; correctCount = 0;
+  updateScore();
+  document.querySelectorAll('.q-card').forEach(card=>{
+    card.classList.remove('answered');
+    card.querySelectorAll('.opt').forEach(b=>{
+      b.disabled=false; b.classList.remove('correct','wrong');
+    });
+  });
+  document.querySelectorAll('.stamp').forEach(s=>{ s.textContent='RESULT'; s.classList.remove('brick'); });
+}
+</script>
+</body>
+</html>
